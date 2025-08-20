@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What is my Delta?</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="container">
+    <h1>What is my Delta?</h1>
+    <p class="tagline">A guided intro flow to define your problem, design a small experiment, and move forward.</p>
+  </header>
+
+  <main class="container">
+    <section id="try-coachai" class="card">
+      <h2>Try CoachAI</h2>
+      <p>Paste your chat widget embed (Voiceflow or similar) below. The placeholder will be replaced by your embed script.</p>
+      <div id="chat-embed" class="embed-placeholder">
+        <!-- Paste your Voiceflow (or other) widget embed script here -->
+        <!-- Example (replace with your own): 
+        <script type="text/javascript">
+          !function(){{/* vendor embed code */}}();
+        </script>
+        -->
+        <p class="muted">Embed goes here. Until then, use the guided flow below.</p>
+      </div>
+    </section>
+
+    <section id="ab-controls" class="card">
+      <h3>A/B Variant</h3>
+      <p>Current: <span id="variant-label">A</span></p>
+      <div class="row">
+        <button id="setA" class="btn">Use Variant A (Linear Wizard)</button>
+        <button id="setB" class="btn">Use Variant B (Conversational)</button>
+      </div>
+      <p class="muted">Variants are also selectable via URL: <code>?variant=A</code> or <code>?variant=B</code></p>
+    </section>
+
+    <section id="flow" class="card">
+      <h2>PS101 Intro Flow</h2>
+      <div id="flow-root"></div>
+    </section>
+
+    <section id="export" class="card">
+      <h3>Export Your Session</h3>
+      <div class="row">
+        <button id="export-md" class="btn">Download Markdown</button>
+        <button id="reset" class="btn btn-secondary">Reset</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container">
+    <p class="muted">© 2025 What is my Delta?</p>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
