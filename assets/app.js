@@ -29,7 +29,7 @@
       {key:'beliefs', label:'Beliefs/habits/experiences contributing?', type:'textarea'},
       {key:'outsider', label:'If you were an outsider, what would you notice?', type:'textarea'}
     ]},
-    { id:'selfeff', title:'4) Self‑Efficacy', fields:[
+    { id:'selfeff', title:'4) Self-Efficacy', fields:[
       {key:'confidence', label:'Confidence (1–10) and why?', type:'text'},
       {key:'past_skills', label:'Past experiences or skills to draw on', type:'textarea'},
       {key:'capability_view', label:'How does your capability perception affect approach?', type:'textarea'},
@@ -69,7 +69,7 @@
       {key:'skills_gained', label:'New skills or knowledge gained', type:'textarea'},
       {key:'apply_future', label:'How you will apply this in future', type:'textarea'},
       {key:'momentum', label:'Strategies to maintain momentum', type:'textarea'},
-      {key:'self_view', label:'How has your self‑view changed?', type:'textarea'},
+      {key:'self_view', label:'How has your self-view changed?', type:'textarea'},
       {key:'commitment', label:'What specific actions will you commit to this week?', type:'textarea'},
       {key:'hold_accountable', label:'How will you hold yourself accountable?', type:'textarea'},
       {key:'share_plan', label:'Who will you share your plan with?', type:'textarea'}
@@ -252,6 +252,103 @@
     setTimeout(()=>URL.revokeObjectURL(url), 5000);
   }
 
+  // ---- CSV Library (local or bundled) ----
+  const csvFile = document.getElementById('csv-file');
+  const csvStatus = document.getElementById('csv-status');
+  const csvPreview = document.getElementById('csv-preview');
+  const clearCsvBtn = document.getElementById('clear-csv');
+
+  function csvRenderPreview(rows){
+    csvPreview.innerHTML = '';
+    if (!rows || !rows.length){ return; }
+    const table = el('table', {class:'table'});
+    const thead = el('thead');
+    const headerRow = el('tr');
+    const cols = Object.keys(rows[0]);
+    cols.forEach(c => headerRow.appendChild(el('th', {text:c})));
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    const tbody = el('tbody');
+    rows.slice(0,5).forEach(r => {
+      const tr = el('tr');
+      cols.forEach(c => tr.appendChild(el('td', {text: (r[c]||'').toString().slice(0,200)})));
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    csvPreview.appendChild(table);
+  }
+
+  function csvLoadFromState(){
+    try {
+      const saved = JSON.parse(state['csv.prompts'] || '[]');
+      if (saved.length){
+        if (csvStatus) csvStatus.textContent = `Loaded ${saved.length} rows from previous session.`;
+        if (csvPreview) csvRenderPreview(saved);
+      } else {
+        if (csvStatus) csvStatus.textContent = `No CSV loaded.`;
+      }
+    } catch(e){
+      if (csvStatus) csvStatus.textContent = `No CSV loaded.`;
+    }
+  }
+
+  async function tryLoadBundledCsv(){
+    try{
+      const resp = await fetch('assets/prompts.csv', { cache: 'no-store' });
+      if (!resp.ok) return;
+      const text = await resp.text();
+      if (!text || !text.trim()) return;
+      if (window.Papa){
+        const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+        const rows = (parsed && parsed.data) ? parsed.data : [];
+        if (rows.length){
+          state['csv.prompts'] = JSON.stringify(rows);
+          save();
+          if (csvStatus) csvStatus.textContent = `Auto-loaded ${rows.length} rows from bundled CSV.`;
+          if (csvPreview) csvRenderPreview(rows);
+        }
+      }
+    } catch(e){
+      // ignore if missing
+    }
+  }
+
+  if (csvFile){
+    csvFile.addEventListener('change', (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if (!file){ return; }
+      if (csvStatus) csvStatus.textContent = 'Parsing...';
+      if (window.Papa){
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (res)=>{
+            const rows = (res && res.data) ? res.data : [];
+            state['csv.prompts'] = JSON.stringify(rows);
+            save();
+            if (csvStatus) csvStatus.textContent = `Loaded ${rows.length} rows.`;
+            if (csvPreview) csvRenderPreview(rows);
+          },
+          error: (err)=>{
+            if (csvStatus) csvStatus.textContent = `Parse error: ${err && err.message ? err.message : err}`;
+          }
+        });
+      } else {
+        if (csvStatus) csvStatus.textContent = 'Papa Parse not available.';
+      }
+    });
+  }
+
+  if (clearCsvBtn){
+    clearCsvBtn.addEventListener('click', ()=>{
+      delete state['csv.prompts'];
+      save();
+      if (csvStatus) csvStatus.textContent = 'Cleared.';
+      if (csvPreview) csvPreview.innerHTML = '';
+      if (csvFile) csvFile.value = '';
+    });
+  }
+
   document.getElementById('export-md').onclick = exportMarkdown;
   document.getElementById('reset').onclick = ()=>{
     if (confirm('Clear saved session?')){
@@ -259,6 +356,123 @@
       location.reload();
     }
   };
+
+  csvLoadFromState();
+  tryLoadBundledCsv();
+
+  // ---- Consent & Data Use ----
+  const optPersonal = document.getElementById('opt-personal');
+  const optShare = document.getElementById('opt-share');
+  const optEmail = document.getElementById('opt-email');
+  const consentStatus = document.getElementById('consent-status');
+
+  function consentLoad(){
+    const c = JSON.parse(localStorage.getItem('delta_consent') || '{}');
+    if (optPersonal) optPersonal.checked = !!c.personal;
+    if (optShare) optShare.checked = !!c.share;
+    if (optEmail) optEmail.checked = !!c.email;
+    if (consentStatus) consentStatus.textContent = 'Preferences are saved locally and can be changed anytime.';
+  }
+  function consentSave(){
+    const c = {
+      personal: optPersonal && optPersonal.checked,
+      share: optShare && optShare.checked,
+      email: optEmail && optEmail.checked
+    };
+    localStorage.setItem('delta_consent', JSON.stringify(c));
+  }
+  [optPersonal,optShare,optEmail].forEach(el=> el && el.addEventListener('change', consentSave));
+  consentLoad();
+
+  // ---- Extra Exports ----
+  function exportJSON(){
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'what_is_my_delta_session.json'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+  }
+  function exportTranscript(){
+    const lines = [];
+    const dt = new Date().toISOString();
+    lines.push(`# What is my Delta — Transcript`);
+    lines.push(`_Exported: ${dt}_`);
+    lines.push('');
+
+    function addBlock(title, arr){
+      if (!arr || !arr.length) return;
+      lines.push(`## ${title}`);
+      arr.forEach(p => {
+        const ts = new Date(p.t || Date.now()).toLocaleString();
+        lines.push(`- **${ts}** — ${p.text}`);
+      });
+      lines.push('');
+    }
+
+    // Build from state
+    const ask = JSON.parse(state['prompt.ask'] || '[]');
+    const clarify = JSON.parse(state['prompt.clarify'] || '[]');
+    addBlock('Asked Questions', ask);
+    addBlock('Clarifying Inputs', clarify);
+
+    // Include key PS101 fields as a compact summary
+    const important = ['problem.challenge','problem.problem_statement','root.root_causes','experiment.small_experiment','action.steps'];
+    lines.push('## Summary');
+    important.forEach(key => {
+      const v = (state[key] || '').trim();
+      if (v) lines.push(`- **${key.replace('.',' → ')}**: ${v}`);
+    });
+
+    const blob = new Blob([lines.join('\n')], {type:'text/markdown'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'Transcript.md'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+  }
+
+  const exportJsonBtn = document.getElementById('export-json');
+  const exportMd2Btn = document.getElementById('export-md2');
+  exportJsonBtn && (exportJsonBtn.onclick = exportJSON);
+  exportMd2Btn && (exportMd2Btn.onclick = exportTranscript);
+
+  // ---- Prompt Library Viewer ----
+  const pvSearch = document.getElementById('pv-search');
+  const pvTable = document.getElementById('pv-table');
+  const pvCount = document.getElementById('pv-count');
+
+  function getPrompts(){
+    try { return JSON.parse(state['csv.prompts'] || '[]'); }
+    catch(e){ return []; }
+  }
+  function renderPromptTable(rows){
+    pvTable.innerHTML = '';
+    const table = el('table', {class:'table'});
+    const thead = el('thead');
+    const hr = el('tr');
+    ['prompt','completion'].forEach(h => hr.appendChild(el('th', {text:h})));
+    thead.appendChild(hr);
+    table.appendChild(thead);
+    const tbody = el('tbody');
+    rows.forEach(r => {
+      const tr = el('tr');
+      tr.appendChild(el('td', {text: (r.prompt||'').toString().slice(0,500)}));
+      tr.appendChild(el('td', {text: (r.completion||'').toString().slice(0,500)}));
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    pvTable.appendChild(table);
+  }
+  function updateViewer(){
+    const all = getPrompts();
+    const q = (pvSearch && pvSearch.value || '').toLowerCase();
+    const filtered = q ? all.filter(r => (r.prompt||'').toLowerCase().includes(q) || (r.completion||'').toLowerCase().includes(q)) : all;
+    if (pvCount) pvCount.textContent = `${filtered.length} / ${all.length} rows`;
+    renderPromptTable(filtered.slice(0, 500)); // cap to keep UI snappy
+  }
+  pvSearch && pvSearch.addEventListener('input', updateViewer);
+
+  // Initialize viewer after CSV loads
+  setTimeout(updateViewer, 300);
 
   renderWizard();
 })();

@@ -5,8 +5,6 @@
   --text:#e6e6e6;
   --muted:#9aa0a6;
   --accent:#66fcf1;
-  --accent-2:#45a29e;
-  --red:#ff6b6b;
 }
 *{box-sizing:border-box}
 body{
@@ -76,3 +74,5 @@ label{display:block; font-weight:600; margin:8px 0 6px}
   padding:4px 8px;
   border-radius:999px;
 }
+table{width:100%; border-collapse:collapse; font-size:.9rem}
+th, td{border:1px solid #2a2f3a; padding:6px; text-align:left}
