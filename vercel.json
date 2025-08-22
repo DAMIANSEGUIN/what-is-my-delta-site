@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src self; script-src self https://embed.tawk.to https://cdn.jsdelivr.net; style-src self unsafe-inline https://*.tawk.to https://cdn.jsdelivr.net https://fonts.googleapis.com; img-src self https://*.tawk.to https://cdn.jsdelivr.net https://tawk.link https://s3.amazonaws.com data:; font-src self https://*.tawk.to https://fonts.gstatic.com; connect-src self https://*.tawk.to wss://*.tawk.to; frame-src https://*.tawk.to;"
+          "value": "default-src self; script-src self unsafe-inline unsafe-eval https://client.crisp.chat https://*.crisp.chat; connect-src self https://*.crisp.chat wss://*.crisp.chat; img-src self data: https://*.crisp.chat; style-src self unsafe-inline https://*.crisp.chat; frame-src https://*.crisp.chat; font-src self data: https://*.crisp.chat;"
         }
       ]
     }
