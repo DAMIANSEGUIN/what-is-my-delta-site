@@ -1,0 +1,5 @@
+what_is_my_delta_full_export_v2/
+*.bak
+server.log
+CLAUDE.md
+claude-context.sh

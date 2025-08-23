@@ -1,9 +1,9 @@
 # Claude Context File
 
 ## Current Session Work (2025-08-23)
-- Working on: Vercel deployment sync and widget functionality issues
-- Status: ✅ Vercel deployment working, ✅ GitHub sync working, ❓ Testing widgets
-- Next steps: Verify widgets load correctly on live site
+- Working on: Vercel deployment sync and widget functionality issues  
+- Status: 🚨 **CRITICAL ISSUE**: Vercel serving wrong/old index.html file
+- Next steps: Fix deployment sync - live site doesn't match repository code
 
 ## Development Commands
 - Test locally: Open index.html in browser

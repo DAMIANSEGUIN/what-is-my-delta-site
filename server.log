@@ -1,0 +1,6 @@
+::1 - - [23/Aug/2025 16:37:44] "GET / HTTP/1.1" 200 -
+::1 - - [23/Aug/2025 16:37:56] "GET /?widget=crisp HTTP/1.1" 200 -
+::1 - - [23/Aug/2025 16:38:10] "GET / HTTP/1.1" 200 -
+::1 - - [23/Aug/2025 16:38:10] "GET /test-crisp.html HTTP/1.1" 200 -
+::1 - - [23/Aug/2025 16:38:10] "GET /?widget=tidio HTTP/1.1" 200 -
+::1 - - [23/Aug/2025 16:42:19] "GET /data/prompts.ps101.json HTTP/1.1" 200 -
