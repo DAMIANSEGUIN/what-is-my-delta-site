@@ -5,104 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>What is my Delta?</title>
   <link rel="stylesheet" href="assets/styles.css">
+  <!-- CSP in Report-Only to start; tighten after widget testing -->
+  <meta http-equiv="Content-Security-Policy-Report-Only" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.supabase.co; report-uri /csp-report">
 </head>
 <body>
-  <header class="container">
+  <header class="wrap">
     <h1>What is my Delta?</h1>
-    <p class="tagline">A guided intro flow to define your problem, design a small experiment, and move forward.</p>
+    <p class="muted">Step-by-step coaching. Progress saved locally. Optional community database.</p>
   </header>
 
-  <main class="container">
-    <section id="try-coachai" class="card">
-      <h2>Try CoachAI</h2>
-      <p>Paste your chat widget embed (Voiceflow or similar) below. The placeholder will be replaced by your embed script.</p>
-      <div id="chat-embed" class="embed-placeholder">
-        <!-- Paste your Voiceflow (or other) widget embed script here -->
-        <p class="muted">Embed goes here. Until then, use the guided flow below.</p>
-      </div>
-    </section>
+  <main class="wrap card">
+    <div id="status" class="status"></div>
 
-    <section id="ab-controls" class="card">
-      <h3>A/B Variant</h3>
-      <p>Current: <span id="variant-label">A</span></p>
+    <div id="promptBox">
+      <div id="prompt" class="prompt">Loading…</div>
+      <textarea id="answer" class="answer" placeholder="Type your thoughts here…"></textarea>
       <div class="row">
-        <button id="setA" class="btn">Use Variant A (Linear Wizard)</button>
-        <button id="setB" class="btn">Use Variant B (Conversational)</button>
+        <button id="btnStart" class="btn">Start</button>
+        <button id="btnNext" class="btn">Next</button>
+        <button id="btnSupport" class="btn btn-ghost">Support</button>
+        <span class="counter" id="counter"></span>
       </div>
-      <p class="muted">Variants are also selectable via URL: <code>?variant=A</code> or <code>?variant=B</code></p>
-    </section>
+    </div>
 
-    <section id="flow" class="card">
-      <h2>PS101 Intro Flow</h2>
-      <div id="flow-root"></div>
-    </section>
+    <details class="card" style="margin-top:1rem;">
+      <summary>Upload optional context (TXT / small PDF)</summary>
+      <input type="file" id="fileInput" accept=".txt,.pdf" />
+      <div id="fileStatus" class="muted"></div>
+    </details>
 
-    <section id="csvlib" class="card">
-      <h3>Prompt Library (CSV)</h3>
-      <p class="muted">Upload your CSV of <code>prompt,completion</code> pairs. Parsing happens locally in your browser — nothing is uploaded. If <code>assets/prompts.csv</code> exists, it will auto-load.</p>
-      <div class="row" style="align-items:center;gap:8px;">
-        <input type="file" id="csv-file" accept=".csv" class="input" style="max-width:320px;">
-        <button id="clear-csv" class="btn btn-secondary">Clear</button>
-      </div>
-      <p id="csv-status" class="muted" style="margin-top:8px;"></p>
-      <div id="csv-preview" style="overflow:auto; max-height:220px; margin-top:8px;"></div>
-    </section>
-
-
-    <section id="resources" class="card">
-      <h3>Resources & Downloads</h3>
-      <p class="muted">Grab the core materials or export your data.</p>
-      <ul>
-        <li><a href="assets/PS101_Intro_and_Prompts.docx" download>Download PS101 Intro & Prompts (.docx)</a></li>
-        <li><a href="assets/PS101_Intro_and_Resources.docx" download>Download PS101 Intro & Resources (.docx)</a></li>
-        <li><a href="assets/prompts.csv" download>Download Prompt Library (prompts.csv) — public if present</a></li>
-      </ul>
+    <details class="card" style="margin-top:1rem;">
+      <summary>Saved progress</summary>
+      <pre id="savedDump" class="dump"></pre>
       <div class="row">
-        <button id="export-md2" class="btn">Download Transcript.md</button>
-        <button id="export-json" class="btn btn-secondary">Download Session JSON</button>
+        <button id="btnExport" class="btn btn-ghost">Export JSON</button>
+        <button id="btnReset" class="btn danger">Reset</button>
       </div>
-    </section>
+    </details>
 
-    <section id="consent" class="card">
-      <h3>Consent & Data Use</h3>
-      <p class="muted">Choose what you allow. Defaults keep everything on this device only.</p>
-      <div>
-        <label><input type="checkbox" id="opt-personal" /> Save my profile on this device for personalization</label>
-      </div>
-      <div>
-        <label><input type="checkbox" id="opt-share" /> Share anonymized session to improve the system (owner-only access)</label>
-      </div>
-      <div>
-        <label><input type="checkbox" id="opt-email" /> Email me a transcript after sessions (requires email later)</label>
-      </div>
-      <p class="muted" id="consent-status"></p>
-    </section>
-
-    <section id="prompt-viewer" class="card">
-      <h3>Prompt Library Viewer</h3>
-      <div class="row" style="gap:8px;">
-        <input type="text" id="pv-search" class="input" placeholder="Search prompts..." style="max-width:320px;">
-        <span class="muted" id="pv-count"></span>
-      </div>
-      <div id="pv-table" style="overflow:auto; max-height:300px; margin-top:8px;"></div>
-    </section>
-
-
-    <section id="export" class="card">
-      <h3>Export Your Session</h3>
+    <details class="card" style="margin-top:1rem;">
+      <summary>Community</summary>
       <div class="row">
-        <button id="export-md" class="btn">Download Markdown</button>
-        <button id="reset" class="btn btn-secondary">Reset</button>
+        <input id="displayName" class="input" placeholder="Display name (optional)" />
+        <button id="btnSubmitAnswer" class="btn">Submit answer</button>
+        <button id="btnSuggestPrompt" class="btn btn-ghost">Suggest prompt</button>
       </div>
+      <div class="muted small">DB optional. If disabled, buttons save locally and queue submission.</div>
+    </details>
+
+    <section class="card" style="margin-top:1rem;">
+      <h3 class="muted">Insights</h3>
+      <pre id="insights" class="dump">Run aggregate to see trends…</pre>
+      <button id="btnRefreshInsights" class="btn btn-ghost">Refresh</button>
     </section>
   </main>
 
-  <footer class="container">
-    <p class="muted">© 2025 What is my Delta?</p>
+  <footer class="wrap muted small">
+    <div>Variant: <code id="variantCode"></code> • Widget: <code id="widgetCode"></code> • Beta free until Sep 15, 2025</div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- Dynamic widget loading based on URL parameter -->
+
+  <script src="public/env.js"></script>
+  <script src="assets/coaching.js"></script>
+  <script src="assets/db.js"></script>
+  <script src="assets/widget-loader.js"></script>
   <script src="assets/app.js"></script>
-<script type="text/javascript">var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();(function(){var s1=document.createElement("script");s1.async=true;s1.src="https://embed.tawk.to/68a767d97ebce11927982120/1j36uravb";s1.charset="UTF-8";s1.setAttribute("crossorigin","*");var s0=document.getElementsByTagName("script")[0];s0.parentNode.insertBefore(s1,s0);})();</script>
-<script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="37669e51-8fd7-4b2b-8c69-9a008bb9b0c6";(function(){var d=document,s=d.createElement(script);s.src=https://client.crisp.chat/l.js;s.async=1;d.getElementsByTagName(head)[0].appendChild(s);})();</script><script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="37669e51-8fd7-4b2b-8c69-9a008bb9b0c6";(function(){var d=document,s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script></body>
+</body>
 </html>

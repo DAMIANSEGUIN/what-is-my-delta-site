@@ -1,13 +1,29 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
         {
-          "key": "Content-Security-Policy",
-          "value": "default-src self; script-src self unsafe-inline unsafe-eval https://client.crisp.chat https://*.crisp.chat; connect-src self https://*.crisp.chat wss://*.crisp.chat; img-src self data: https://*.crisp.chat; style-src self unsafe-inline https://*.crisp.chat; frame-src https://*.crisp.chat; font-src self data: https://*.crisp.chat;"
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
         }
       ]
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/aggregate",
+      "dest": "/api/aggregate.js"
+    },
+    {
+      "src": "/csp-report",
+      "dest": "/api/aggregate.js"
     }
   ]
 }
