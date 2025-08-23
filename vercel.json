@@ -16,14 +16,14 @@
       ]
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/aggregate",
-      "dest": "/api/aggregate.js"
+      "source": "/api/aggregate",
+      "destination": "/api/aggregate.js"
     },
     {
-      "src": "/csp-report",
-      "dest": "/api/aggregate.js"
+      "source": "/csp-report",
+      "destination": "/api/aggregate.js"
     }
   ]
 }
