@@ -1,16 +1,17 @@
-# What is my Delta? — Front-End Intro Flow
+# What is my Delta? — Dynamic Widget Testing
 
-Static bundle with:
-- PS101 intro flow + A/B variants (`?variant=A|B`)
-- Export to Markdown
-- CSV prompt/completion library (local upload, and auto-load from `assets/prompts.csv` if present)
-- Voiceflow embed placeholder
+This is the production version with dynamic widget switching for A/B testing different chat solutions.
 
-## Host on Vercel (fast)
-- New Project → Import GitHub repo → Framework: Other (Static)
-- Build command: (blank) | Output dir: `/`
-- Deploy
+## Widget Testing URLs:
+- `https://what-is-my-delta.vercel.app/` → Clean (no widget)
+- `https://what-is-my-delta.vercel.app/?widget=crisp` → Crisp chat only
+- `https://what-is-my-delta.vercel.app/?widget=tidio` → Tidio chat only  
+- `https://what-is-my-delta.vercel.app/?widget=tawk` → Tawk.to chat only
 
-## Using the CSV
-- For private local use: upload your CSV via the "Prompt Library (CSV)" card.
-- To ship with a shared bundle: place your CSV at `assets/prompts.csv` (headers: `prompt,completion`) and deploy. Anyone can then load it from the site.
+## Features:
+- 8-prompt coaching flow (simplified from 10-step)
+- Dynamic widget loading without conflicts
+- Widget tracking in analytics
+- LocalStorage with optional Supabase integration
+
+Last updated: 2025-08-23
