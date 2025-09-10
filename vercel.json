@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.11"
+    }
+  },
+  "routes": [
+    { "src": "/health", "dest": "/api/index.py" },
+    { "src": "/wimd", "dest": "/api/index.py" },
+    { "src": "/jobsearch", "dest": "/api/index.py" }
+  ]
+}
