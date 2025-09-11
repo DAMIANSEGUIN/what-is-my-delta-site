@@ -1,0 +1,2 @@
+persona_id,name,age_band,career_stage,goals,blockers,skills_snapshot_pipe,constraints,scenario_scripts,evaluation_findings,issues_detected_pipe,recommendations
+p1,Ava,35_44,mid-career switcher,Move from marketing ops to AI-enabled program mgmt,Time scarcity; impostor syndrome,Stakeholder comms|Light SQL|No-code,Toronto; remote OK; part-time OK,Run WIMD; test JSM search for PM roles in career-tech,WIMD guidance clear; JSM match strong,IA_nav|comprehension,Add breadcrumb; simplify jargon

@@ -1,0 +1,2 @@
+tester_id,date,scenario,task,clarity_rating_1_5,relevance_rating_1_5,trust_rating_1_5,drift_observed_bool,failure_notes,suggestions,version
+t1,2025-08-26T16:35:26,Persona p1,Complete WIMD then submit to JSM,4,5,4,FALSE,None,Shorten step 2 text,v1

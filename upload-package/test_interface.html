@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mosaic WIMD Testing Interface</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        .section { margin: 20px 0; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; }
+        .section h3 { color: #34495e; margin-top: 0; }
+        textarea, input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        textarea { height: 100px; font-family: monospace; }
+        button { background: #3498db; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; margin: 5px; }
+        button:hover { background: #2980b9; }
+        .result { background: #f8f9fa; border-left: 4px solid #28a745; padding: 15px; margin: 10px 0; border-radius: 4px; }
+        .error { background: #f8d7da; border-left: 4px solid #dc3545; color: #721c24; }
+        .endpoint { background: #e9f7ff; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; }
+        .status { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .status.compliant { background: #d4edda; color: #155724; }
+        .status.non-compliant { background: #f8d7da; color: #721c24; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Mosaic WIMD Testing Interface</h1>
+        <p><strong>Base URL:</strong> <span class="endpoint">http://127.0.0.1:8000</span></p>
+
+        <div class="section">
+            <h3>💬 Basic WIMD Chat Test</h3>
+            <textarea id="wimdPrompt" placeholder="Enter your coaching prompt here...">I'm feeling stuck in my career and need guidance on next steps.</textarea>
+            <button onclick="testWIMD()">Test WIMD</button>
+            <div id="wimdResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>📄 File Upload Test</h3>
+            <input type="file" id="fileUpload" accept=".txt,.pdf,.docx,.mp3,.wav,.jpg,.png">
+            <textarea id="filePrompt" placeholder="Optional prompt for file analysis...">Please analyze this file and provide coaching insights.</textarea>
+            <button onclick="testFileUpload()">Upload & Analyze</button>
+            <div id="fileResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>📚 Multiple Documents Upload</h3>
+            <div style="background: #e8f4fd; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 14px;">
+                <strong>💡 How to select multiple files:</strong><br>
+                • <strong>Windows:</strong> Hold <kbd style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">Ctrl</kbd> and click each file<br>
+                • <strong>Mac:</strong> Hold <kbd style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">Cmd</kbd> and click each file<br>
+                • <strong>Range:</strong> Click first file, hold <kbd style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">Shift</kbd>, click last file<br>
+                • <strong>Zip files:</strong> Upload one zip with multiple documents inside
+            </div>
+            <input type="file" id="multipleFiles" multiple accept=".txt,.pdf,.docx,.mp3,.wav,.jpg,.png,.zip">
+            <div id="fileCount" style="margin: 10px 0; font-size: 12px; color: #666;"></div>
+            <textarea id="multiplePrompt" placeholder="Prompt for analyzing multiple documents...">Please analyze all these documents together and provide comprehensive coaching insights based on the combined information. (Max 5 files supported)</textarea>
+            <button onclick="testMultipleUpload()">Upload Multiple & Analyze</button>
+            <button onclick="testMultipleDemo()" style="background: #17a2b8;">Demo with Sample Files</button>
+            <div id="multipleResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>🎭 Personas Testing</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" id="personaName" placeholder="Persona name" value="Alex">
+                <select id="maslowLevel">
+                    <option value="survival">Survival</option>
+                    <option value="safety" selected>Safety</option>
+                    <option value="belonging">Belonging</option>
+                    <option value="esteem">Esteem</option>
+                    <option value="self_actualization">Self-Actualization</option>
+                </select>
+                <input type="text" id="barriers" placeholder="Primary barriers (comma-separated)" value="time_constraints, financial_limitations">
+                <input type="number" id="stages" placeholder="Test stages" value="3" min="1" max="5">
+            </div>
+            <button onclick="testPersona()">Run Persona Test</button>
+            <div id="personaResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>🔍 Job Search Test</h3>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px;">
+                <input type="text" id="jobQuery" placeholder="Job search query" value="data analyst">
+                <input type="text" id="jobLocation" placeholder="Location" value="Toronto, ON">
+                <input type="number" id="maxResults" placeholder="Max results" value="5">
+            </div>
+            <button onclick="testJobSearch()">Test Job Search</button>
+            <div id="jobResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>📊 Quick Status Check</h3>
+            <button onclick="checkHealth()">Health Check</button>
+            <button onclick="checkPersonasStatus()">Personas Status</button>
+            <button onclick="openDocs()">API Docs</button>
+            <div id="statusResult"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+
+        async function apiCall(endpoint, method = 'GET', body = null, headers = {}) {
+            try {
+                const config = { method, headers };
+                if (body) {
+                    if (body instanceof FormData) {
+                        config.body = body;
+                    } else {
+                        config.headers['Content-Type'] = 'application/json';
+                        config.body = JSON.stringify(body);
+                    }
+                }
+                const response = await fetch(`${API_BASE}${endpoint}`, config);
+                return await response.json();
+            } catch (error) {
+                return { error: error.message };
+            }
+        }
+
+        function displayResult(containerId, data) {
+            const container = document.getElementById(containerId);
+            if (data.error) {
+                container.innerHTML = `<div class="result error"><strong>Error:</strong> ${data.error}</div>`;
+            } else {
+                container.innerHTML = `<div class="result"><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+            }
+        }
+
+        async function testWIMD() {
+            const prompt = document.getElementById('wimdPrompt').value;
+            const result = await apiCall('/wimd', 'POST', { prompt });
+            displayResult('wimdResult', result);
+        }
+
+        async function testFileUpload() {
+            const fileInput = document.getElementById('fileUpload');
+            const prompt = document.getElementById('filePrompt').value;
+            
+            if (!fileInput.files[0]) {
+                displayResult('fileResult', { error: 'Please select a file' });
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('prompt', prompt);
+
+            const result = await apiCall('/wimd/upload', 'POST', formData);
+            displayResult('fileResult', result);
+        }
+
+        async function testMultipleUpload() {
+            const fileInput = document.getElementById('multipleFiles');
+            const prompt = document.getElementById('multiplePrompt').value;
+            
+            if (!fileInput.files.length) {
+                displayResult('multipleResult', { error: 'Please select at least one file' });
+                return;
+            }
+
+            // Show uploading status
+            displayResult('multipleResult', { message: `Uploading ${fileInput.files.length} files...` });
+
+            const formData = new FormData();
+            
+            // Add all selected files
+            for (let i = 0; i < fileInput.files.length; i++) {
+                formData.append('files', fileInput.files[i]);
+            }
+            formData.append('prompt', prompt);
+
+            try {
+                const response = await fetch(`${API_BASE}/wimd/multiple`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                displayResult('multipleResult', result);
+            } catch (error) {
+                displayResult('multipleResult', { error: error.message });
+            }
+        }
+
+        async function testPersona() {
+            const persona_data = {
+                name: document.getElementById('personaName').value,
+                maslow_level: document.getElementById('maslowLevel').value,
+                primary_barriers: document.getElementById('barriers').value.split(',').map(s => s.trim())
+            };
+            const stages = parseInt(document.getElementById('stages').value);
+            
+            const result = await apiCall('/personas/test', 'POST', { persona_data, stages });
+            displayResult('personaResult', result);
+        }
+
+        async function testJobSearch() {
+            const query = document.getElementById('jobQuery').value;
+            const location = document.getElementById('jobLocation').value;
+            const max_results = parseInt(document.getElementById('maxResults').value);
+            
+            const result = await apiCall('/jobsearch', 'POST', { query, location, max_results });
+            displayResult('jobResult', result);
+        }
+
+        async function checkHealth() {
+            const result = await apiCall('/health');
+            displayResult('statusResult', result);
+        }
+
+        async function checkPersonasStatus() {
+            const result = await apiCall('/personas/test');
+            displayResult('statusResult', result);
+        }
+
+        function openDocs() {
+            window.open(`${API_BASE}/docs`, '_blank');
+        }
+
+        // File selection handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const multipleFiles = document.getElementById('multipleFiles');
+            const fileCount = document.getElementById('fileCount');
+            
+            if (multipleFiles && fileCount) {
+                multipleFiles.addEventListener('change', function() {
+                    const count = this.files.length;
+                    if (count > 0) {
+                        const fileNames = Array.from(this.files).map(f => f.name).join(', ');
+                        const limitWarning = count > 5 ? ' (Only first 5 will be processed)' : '';
+                        fileCount.innerHTML = `${count} file(s) selected: ${fileNames}${limitWarning}`;
+                        fileCount.style.color = count > 5 ? '#e74c3c' : '#666';
+                    } else {
+                        fileCount.innerHTML = 'No files selected';
+                    }
+                });
+            }
+        });
+
+        // Auto-load status on page load
+        window.onload = () => {
+            checkHealth();
+        };
+    </script>
+</body>
+</html>

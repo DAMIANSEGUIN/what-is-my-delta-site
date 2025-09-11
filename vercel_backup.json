@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.9"
+    }
+  },
+  "rewrites": [
+    { "source": "/health", "destination": "/api/index.py" },
+    { "source": "/wimd", "destination": "/api/index.py" },
+    { "source": "/wimd/(.*)", "destination": "/api/index.py" },
+    { "source": "/opportunities", "destination": "/api/index.py" },
+    { "source": "/jobsearch", "destination": "/api/index.py" },
+    { "source": "/personas/(.*)", "destination": "/api/index.py" },
+    { "source": "/test", "destination": "/api/index.py" },
+    { "source": "/(.*)", "destination": "/api/index.py" }
+  ]
+}
