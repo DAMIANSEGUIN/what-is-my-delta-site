@@ -1,0 +1,22 @@
+# env & secrets
+.env
+.env.*
+*.key
+*.pem
+*.p8
+
+# runtime
+__pycache__/
+*.pyc
+.venv/
+.envrc
+.DS_Store
+
+# app data
+data/prompts_registry.json
+
+# node (if present)
+node_modules/
+.next/
+dist/
+build/
