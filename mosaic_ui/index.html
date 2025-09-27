@@ -1,0 +1,357 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>What Is My Delta — Unified Minimal Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{--fg:#000;--muted:#666;--line:#e8e8e8;--hair:#111;--max:980px}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#fff;color:var(--fg)}
+  body{font:12px/1.75 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  a{color:inherit;text-decoration:none}
+  a:hover,a:focus{text-decoration:underline}
+  .wrap{max-width:var(--max);margin:0 auto;padding:28px 20px}
+
+  .nav{display:flex;gap:24px;margin-bottom:60px}
+  .hero{margin:120px 0 40px}
+  .title{font:500 15px/1.4 Helvetica,Arial;letter-spacing:.02em}
+  .sub{color:var(--muted);max-width:64ch}
+  .actions{margin:24px 0 0;display:flex;gap:16px;align-items:center}
+  .quiet{border:1px solid var(--line);padding:6px 10px;background:#fff}
+
+  svg.schema{display:block;width:100%;height:auto;margin:50px 0}
+  .wire{stroke:var(--hair);stroke-width:.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .dot{fill:var(--hair)}
+
+  .rule{border-top:1px solid var(--line);margin:80px 0}
+  .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:30px 0 90px}
+  .card{border:1px solid var(--line);padding:14px}
+  .k{color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:10px}
+  .v{font-size:18px;font-weight:600;margin-top:4px}
+
+  .island{margin:100px 0}
+  .module{margin:70px 0}
+  .module h3{margin:0 0 6px;font:600 12px/1 Helvetica,Arial;text-transform:uppercase;letter-spacing:.06em}
+  .module ul{list-style:none;margin:6px 0 0;padding:0;color:var(--muted)}
+  .module li{margin:3px 0}
+  textarea.small{width:100%;min-height:60px;border:1px solid var(--line);padding:8px;background:#fff}
+
+  .welcome-title{font:600 12px/1 Helvetica,Arial;text-transform:uppercase;letter-spacing:.08em}
+  details.micro{margin-top:16px}
+  details.micro summary{cursor:pointer}
+
+  .chat{position:fixed;right:20px;bottom:20px;width:320px;max-width:90vw;background:#fff;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.06);display:none}
+  .chat header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line)}
+  .chat header .x{border:1px solid var(--line);padding:2px 6px;background:#fff}
+  .chat main{padding:10px 12px;height:220px;overflow:auto}
+  .msg{margin:6px 0}
+  .chat footer{padding:8px 10px;border-top:1px solid var(--line);display:flex;gap:6px}
+  .chat input{flex:1;border:1px solid var(--line);padding:6px 8px}
+
+  .modal{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center}
+  .modal .panel{background:#fff;border:1px solid var(--line);padding:20px;min-width:280px;max-width:92vw}
+  .modal .close{margin-top:16px;border:1px solid var(--line);background:#fff;padding:6px 10px}
+  .drop{border:1px dashed #ccc;padding:24px;text-align:center}
+
+  .savebar{margin:80px 0 0;display:flex;gap:18px}
+  .btn{border:1px solid var(--line);padding:6px 10px;background:#fff}
+
+  .formrow{margin:16px 0}
+  .radio{display:flex;gap:12px;align-items:center}
+  .radio label{display:flex;gap:6px;align-items:center}
+  .notice{position:fixed;left:20px;right:20px;bottom:16px;display:none;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--line);padding:8px 10px}
+  .notice .btn{border:1px solid var(--line);background:#fff;padding:6px 10px}
+
+  .foot{border-top:1px solid var(--line);margin-top:140px;padding:14px 0;color:#777;font-size:12px;display:flex;justify-content:space-between}
+  @media (max-width:860px){.metrics{grid-template-columns:1fr}}
+</style>
+<div class="wrap">
+  <nav class="nav">
+    <a href="#modules" title="Modules">modules</a>
+    <a href="#learn" title="Learn">learn</a>
+    <a id="openUpload" href="#" title="Upload a resume, image, or audio">upload</a>
+    <a id="openChat" href="#" title="Open coaching chat">chat</a>
+  </nav>
+
+  <!-- WELCOME / INTRO -->
+  <section id="welcome" class="island" aria-label="Welcome">
+    <div class="welcome-title" title="a short human hello">welcome</div>
+    <p class="sub" title="what this is">this is your values‑first workspace. pick a path or ask the coach.</p>
+    <div class="actions">
+      <a class="quiet" href="#fast" title="guided route: ps101 → coaching → dashboard" id="linkFast">fast track</a>
+      <a class="quiet" href="#discover" title="wander through modules and notes" id="linkDiscover">discovery</a>
+      <a class="quiet" href="#journey" id="showJourney" title="show the full journey on this page">intro</a>
+      <button class="quiet" id="saveBtn" title="Save progress to file">save</button>
+      <label class="quiet" for="loadFile" title="Load a saved file">load<input id="loadFile" type="file" accept="application/json" hidden></label>
+    </div>
+    <details class="micro"><summary>what’s the difference?</summary>
+      <small>fast track gives you a direct sequence (ps101 → coaching → dashboard). discovery lets you skim modules, read notes, and dip in where you like.</small>
+    </details>
+  </section>
+
+  <header class="hero" id="top">
+    <div class="title">WHAT IS MY DELTA</div>
+    <p class="sub">values‑first career platform. clear metrics. focused coaching. no clutter.</p>
+  </header>
+
+  <svg class="schema" viewBox="0 0 980 140" aria-hidden="true">
+    <path class="wire" d="M120 90 H360 C400 90 420 78 450 70 C480 62 520 60 560 68 C600 76 640 60 700 58 C820 54 860 54 900 56"/>
+    <circle class="dot" cx="120" cy="90" r="1.2"/>
+  </svg>
+
+  <div class="rule"></div>
+
+  <section class="metrics" aria-label="Metrics">
+    <div class="card"><div class="k">Clarity</div><div class="v" id="mClarity">75%</div></div>
+    <div class="card"><div class="k">Action</div><div class="v" id="mAction">45%</div></div>
+    <div class="card"><div class="k">Momentum</div><div class="v" id="mMomentum">32%</div></div>
+  </section>
+
+  <section id="modules" class="island" aria-label="Modules">
+    <div class="module" id="ps101">
+      <h3><a href="#ps101" title="open PS101">PS101 — Foundations</a></h3>
+      <ul><li>Values inventory</li><li>Narrative capture</li><li>Signal extraction</li></ul>
+      <textarea class="small" placeholder="your values / narrative / signals…" id="t_ps101"></textarea>
+      <div><a href="#" data-coach="help me start ps101 with 3 values">ask coach: start ps101</a></div>
+    </div>
+    <div class="module" id="coaching">
+      <h3><a href="#coaching" title="open Coaching">Coaching — Sprint</a></h3>
+      <ul><li>Weekly check‑ins</li><li>Action ledger</li><li>Friction mapping</li></ul>
+      <textarea class="small" placeholder="today’s focus / shipped / blocked…" id="t_coaching"></textarea>
+      <div><a href="#" data-coach="help me set today’s focus and 1 action">ask coach: focus</a></div>
+    </div>
+    <div class="module" id="jobs">
+      <h3><a href="#jobs" title="open Jobs">Jobs — Fit Scan</a></h3>
+      <ul><li>Role triage</li><li>Keyword heatmap</li><li>Risk notes</li></ul>
+      <textarea class="small" placeholder="roles / keywords / risks…" id="t_jobs"></textarea>
+      <div><a href="#" data-coach="help me triage 3 roles">ask coach: triage roles</a></div>
+    </div>
+    <div class="module" id="resume">
+      <h3><a href="#resume" title="open Resume">Resume — Bridge</a></h3>
+      <ul><li>Evidence mapping</li><li>ATS lines</li><li>Truth filters</li></ul>
+      <textarea class="small" placeholder="evidence → concise ATS lines…" id="t_resume"></textarea>
+      <div><a href="#" data-coach="turn this evidence into one ats line">ask coach: ats line</a></div>
+    </div>
+    <div class="module" id="dashboard">
+      <h3><a href="#dashboard" title="open Dashboard">Delta — Dashboard</a></h3>
+      <ul><li>Clarity graph</li><li>Action trend</li><li>Next steps</li></ul>
+      <textarea class="small" placeholder="next step (one thing to do)…" id="t_dashboard"></textarea>
+      <div><a href="#" data-coach="suggest 1 next step from my notes">ask coach: next step</a></div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section id="learn" class="island" aria-label="Learn">
+    <div style="margin:6px 0"><a href="#learn" title="principles">principles</a></div>
+    <div style="margin:24px 0"><a href="#learn" title="getting started">getting started</a></div>
+    <div style="margin:24px 0"><a href="#learn" title="coaching flow">coaching flow</a></div>
+    <div style="margin:24px 0"><a href="#learn" title="jobs & fit">jobs & fit</a></div>
+  </section>
+
+  <!-- FEEDBACK -->
+  <section id="feedback" class="island" aria-label="Feedback">
+    <div class="welcome-title" title="tell us, briefly">feedback</div>
+    <p class="sub">this helps us tune the welcome + flow. optional, quick.</p>
+
+    <div class="formrow">
+      <div class="k">intro clarity</div>
+      <div class="radio">
+        <label><input type="radio" name="fb_clarity" value="very clear"> very clear</label>
+        <label><input type="radio" name="fb_clarity" value="somewhat"> somewhat</label>
+        <label><input type="radio" name="fb_clarity" value="unclear"> unclear</label>
+      </div>
+    </div>
+
+    <div class="formrow">
+      <div class="k">felt welcomed</div>
+      <div class="radio">
+        <label><input type="radio" name="fb_welcome" value="yes"> yes</label>
+        <label><input type="radio" name="fb_welcome" value="partly"> partly</label>
+        <label><input type="radio" name="fb_welcome" value="not really"> not really</label>
+      </div>
+    </div>
+
+    <div class="formrow">
+      <div class="k">preferred path</div>
+      <div class="radio">
+        <label><input type="radio" name="fb_path" value="fast track"> fast track</label>
+        <label><input type="radio" name="fb_path" value="discovery"> discovery</label>
+        <label><input type="radio" name="fb_path" value="unsure"> unsure</label>
+      </div>
+    </div>
+
+    <div class="formrow">
+      <div class="k">one thing to improve</div>
+      <textarea id="fb_comment" class="small" placeholder="tiny note…"></textarea>
+    </div>
+
+    <div class="actions" style="margin-top:20px">
+      <button id="fbSubmit" class="quiet" title="download a copy + (optional) open SurveyMonkey">submit feedback</button>
+      <a id="fbLink" class="quiet" href="#" target="_blank" style="display:none">open survey</a>
+    </div>
+  </section>
+
+  <div class="notice" id="saveNotice" aria-live="polite">
+    <div>save before you leave?</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="noticeSave">save now</button>
+      <button class="btn" id="noticeDismiss">dismiss</button>
+    </div>
+  </div>
+
+  <footer class="foot"><div>© <span id="y"></span> Delta</div><div>privacy · terms · support</div></footer>
+</div>
+
+<!-- CHAT -->
+<aside class="chat" id="chat">
+  <header>
+    <div>coaching</div>
+    <button class="x" id="closeChat" title="Close">×</button>
+  </header>
+  <main id="chatLog" aria-live="polite"></main>
+  <footer>
+    <input id="chatInput" placeholder="type and enter…" aria-label="message">
+    <button class="btn" id="sendMsg">send</button>
+  </footer>
+</aside>
+
+<!-- UPLOAD MODAL -->
+<div class="modal" id="uploadModal">
+  <div class="panel">
+    <div class="drop">
+      <div style="margin-bottom:10px">upload a resume, image, or audio</div>
+      <input type="file" id="filePick" multiple>
+    </div>
+    <button class="close" id="closeUpload">close</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+  $('#y').textContent = new Date().getFullYear();
+
+  // Chat
+  const chat = $('#chat');
+  $('#openChat').addEventListener('click', e=>{e.preventDefault(); chat.style.display='block';});
+  $('#closeChat').addEventListener('click', ()=> chat.style.display='none');
+  const chatLog = $('#chatLog');
+  const chatInput = $('#chatInput');
+  const sendMsg = $('#sendMsg');
+  function addMsg(txt, who='you'){ const div=document.createElement('div'); div.className='msg'; div.textContent=(who==='you'?'> ':'')+txt; chatLog.appendChild(div); chatLog.scrollTop=chatLog.scrollHeight; }
+  async function askCoach(prompt){
+    // Hook to backend when ready:
+    // const res = await fetch('https://mosaic-platform.vercel.app/wimd', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt }) });
+    // const data = await res.json(); return data?.result?.message || '(no response)';
+    return 'noted.'; // stub
+  }
+  async function send(){ const v=chatInput.value.trim(); if(!v) return; addMsg(v,'you'); chatInput.value=''; try{ const r = await askCoach(v); addMsg(r,'bot'); } catch(e){ addMsg('…connection issue','bot'); } }
+  chatInput.addEventListener('keydown',e=>{ if(e.key==='Enter') { e.preventDefault(); send(); } });
+  sendMsg.addEventListener('click', send);
+
+  // Coach strip: tiny input inline (open panel + send)
+  (function(){
+    // create strip dynamically (to keep single file compact)
+    const strip = document.createElement('div');
+    strip.id = 'coachStrip';
+    strip.style.cssText = 'margin:24px 0 60px;border:1px solid #e8e8e8;padding:6px 8px;display:flex;gap:8px;align-items:center';
+    strip.innerHTML = '<span style="color:#666">coach</span><input id="coachAsk" placeholder="ask or try: fast track" style="flex:1;border:1px solid #e8e8e8;padding:6px 8px"><button id="coachSend" class="quiet">send</button>';
+    document.querySelector('.wrap').insertBefore(strip, document.querySelector('.hero'));
+    const coachAsk = $('#coachAsk'); const coachSend = $('#coachSend');
+    function sendStrip(){ const v=(coachAsk.value||'').trim(); if(!v) return; chat.style.display='block'; addMsg(v,'you'); coachAsk.value=''; askCoach(v).then(m=>addMsg(m,'bot')).catch(()=>addMsg('…connection issue','bot')); softRoute(v); }
+    coachSend.addEventListener('click', sendStrip);
+    coachAsk.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); sendStrip(); }});
+  })();
+
+  // First-visit gentle nudge
+  const SEEN='delta_seen_intro_v1';
+  if (!localStorage.getItem(SEEN)) {
+    chat.style.display='block'; addMsg('hi — prefer fast track or discovery?','bot'); localStorage.setItem(SEEN,'1');
+  }
+
+  // Upload
+  const modal = $('#uploadModal');
+  $('#openUpload').addEventListener('click', e=>{e.preventDefault(); modal.style.display='flex'; document.body.style.overflow='hidden';});
+  $('#closeUpload').addEventListener('click', ()=>{ modal.style.display='none'; document.body.style.overflow='auto'; });
+
+  // Save / Load + Feedback + Leave Guard
+  let dirty=false, savedThisSession=false;
+  function markDirty(){ dirty=true; $('#saveNotice').style.display='flex'; }
+
+  function collect(){
+    return {
+      metrics:{ clarity: $('#mClarity').textContent, action: $('#mAction').textContent, momentum: $('#mMomentum').textContent },
+      notes:{ ps101: $('#t_ps101').value, coaching: $('#t_coaching').value, jobs: $('#t_jobs').value, resume: $('#t_resume').value, dashboard: $('#t_dashboard').value },
+      feedback: collectFeedback()
+    };
+  }
+  function collectFeedback(){
+    const val = n=>{ const el=[...document.getElementsByName(n)].find(i=>i.checked); return el?el.value:'' };
+    return { clarity: val('fb_clarity'), welcome: val('fb_welcome'), path: val('fb_path'), comment: $('#fb_comment').value };
+  }
+  function apply(data){
+    if(data?.metrics){ $('#mClarity').textContent=data.metrics.clarity||'75%'; $('#mAction').textContent=data.metrics.action||'45%'; $('#mMomentum').textContent=data.metrics.momentum||'32%'; }
+    if(data?.notes){ $('#t_ps101').value=data.notes.ps101||''; $('#t_coaching').value=data.notes.coaching||''; $('#t_jobs').value=data.notes.jobs||''; $('#t_resume').value=data.notes.resume||''; $('#t_dashboard').value=data.notes.dashboard||''; }
+    if(data?.feedback){ const set=(name,val)=>{ if(!val) return; const el=[...document.getElementsByName(name)].find(i=>i.value===val); if(el) el.checked=true; };
+      set('fb_clarity', data.feedback.clarity); set('fb_welcome', data.feedback.welcome); set('fb_path', data.feedback.path); $('#fb_comment').value=data.feedback.comment||''; }
+  }
+  function download(filename, obj){ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href); savedThisSession=true; $('#saveNotice').style.display='none'; dirty=false; }
+  $('#saveBtn').addEventListener('click', ()=> download('delta-progress.json', collect()));
+  $('#loadFile').addEventListener('change', (e)=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const data=JSON.parse(r.result); apply(data); }catch(err){ alert('invalid file'); } }; r.readAsText(f); });
+
+  ['#t_ps101','#t_coaching','#t_jobs','#t_resume','#t_dashboard','#fb_comment'].forEach(sel=> $(sel)?.addEventListener('input', ()=>{ markDirty(); saveAuto(); }));
+  ;['fb_clarity','fb_welcome','fb_path'].forEach(name=> document.getElementsByName(name).forEach(el=> el.addEventListener('change', ()=>{ markDirty(); saveAuto(); })));
+
+  const AUTO='delta_auto_v2';
+  function saveAuto(){ localStorage.setItem(AUTO, JSON.stringify(collect())); }
+  (function loadAuto(){ try{ const data=JSON.parse(localStorage.getItem(AUTO)||'{}'); if(Object.keys(data).length) apply(data); }catch(e){} })();
+
+  window.addEventListener('beforeunload', (e)=>{ if(dirty && !savedThisSession){ e.preventDefault(); e.returnValue=''; }});
+  $('#noticeSave').addEventListener('click', ()=> download('delta-progress.json', collect()));
+  $('#noticeDismiss').addEventListener('click', ()=> { $('#saveNotice').style.display='none'; });
+
+  // Feedback → JSON + (optional) SurveyMonkey
+  const SURVEY_URL = ''; // set to your collector link
+  $('#fbSubmit').addEventListener('click', ()=>{
+    const payload = { timestamp: new Date().toISOString(), feedback: collectFeedback() };
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='delta-feedback.json'; a.click(); URL.revokeObjectURL(a.href);
+    if(SURVEY_URL){ const link=$('#fbLink'); link.href=SURVEY_URL; link.style.display='inline-block'; link.click(); }
+  });
+
+  // smooth anchors + soft routing
+  function smoothTo(id){ const el=$(id); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click', evt=>{ const href=a.getAttribute('href'); if(href && href.length>1){ evt.preventDefault(); smoothTo(href); }});
+  });
+  function softRoute(txt){
+    const t=(txt||'').toLowerCase();
+    if (t.includes('fast')) smoothTo('#ps101');
+    if (t.includes('discover')) smoothTo('#modules');
+    if (t.includes('dashboard')) smoothTo('#dashboard');
+  }
+
+  // Intro link reveals journey (just scroll to modules for now)
+  $('#showJourney').addEventListener('click', e=>{ e.preventDefault(); smoothTo('#modules'); });
+
+  // quick links for Fast / Discovery
+  $('#linkFast').addEventListener('click', e=>{ e.preventDefault(); smoothTo('#ps101'); });
+  $('#linkDiscover').addEventListener('click', e=>{ e.preventDefault(); smoothTo('#modules'); });
+
+  // ask coach links
+  document.querySelectorAll('[data-coach]').forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const msg = a.getAttribute('data-coach');
+      document.getElementById('openChat').click();
+      chatInput.value = msg;
+      document.getElementById('sendMsg').click();
+    });
+  });
+
+  // year
+  document.getElementById('y').textContent = new Date().getFullYear();
+})();
+</script>

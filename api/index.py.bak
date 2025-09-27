@@ -17,20 +17,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def _startup():
-    await startup_or_die()
-
-@app.get("/")
-def root():
-    s = get_settings()
-    return {
-        "message": "WIMD API",
-        "endpoints": {
-            "health": "/health",
-            "config": "/config",
-            "prompts": "/prompts/active",
-        },
-        "schemaVersion": s.APP_SCHEMA_VERSION,
-    }
+    startup_or_die()
 
 @app.get("/health")
 def health():
@@ -40,10 +27,3 @@ def health():
 def config():
     s = get_settings()
     return {"apiBase": os.getenv("PUBLIC_API_BASE", ""), "schemaVersion": s.APP_SCHEMA_VERSION}
-
-@app.get("/prompts/active")
-def prompts_active():
-    # returns the active prompts registry SHA if present
-    from .prompts_loader import read_registry
-    reg = read_registry()
-    return {"active": reg.get("active")}

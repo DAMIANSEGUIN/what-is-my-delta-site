@@ -1,24 +1,58 @@
-# WIMD – Railway Deploy Project
+# 🚦 WIMD Railway Deploy – Restart Protocol
 
-This repo is a **persisted handover** for Codex/Cursor: Protocol 0 (secrets), rolling checklist, minimal FastAPI app, and Railway deployment files.
+Run this to begin every session:
 
-## Quick Start
-1. Set secrets in **Railway → Service or Shared Variables**:
-   - `OPENAI_API_KEY`, `CLAUDE_API_KEY`, optional: `PUBLIC_SITE_ORIGIN`, `PUBLIC_API_BASE`, `DATABASE_URL`, `SENTRY_DSN`
-2. Deploy via Git push. Railway uses `Procfile` / `railway.json`.
-3. Verify:
-   ```bash
-   ./scripts/verify_deploy.sh https://<your-api-domain>
-   ```
+```zsh
+/Users/damianseguin/restart_wimd.sh
+```
 
-## Files
-- `Procfile`, `railway.json` – start command & healthcheck
-- `api/index.py` – FastAPI app (`/health`, `/config`), strict CORS
-- `api/settings.py`, `api/startup_checks.py` – secrets validation & provider ping at startup
-- `api/prompts_loader.py` – CSV hashing, registry, activation
-- `scripts/predeploy_sanity.sh` – tripwire script
-- `scripts/check_prompts.sh` – CSV validator
-- `.github/workflows/secret-scan.yml` – CI secret scanning
-- `.env.example`, `.gitignore`
+The script auto-loads APP_URL from wimd_config.sh (asks once, then saves), runs update_status.sh, logs to DEPLOY_STATUS_NOTE.md, and prints the last 10 lines.
 
-See `ROLLING_CHECKLIST.md` for gated steps.
+---
+
+# 📝 WIMD Railway Deploy – Context Note
+
+> Action on Restart: run ~/restart_wimd.sh (auto-logs status; URL saved in wimd_config.sh)
+
+## Required Env Vars (Railway → Variables)
+OPENAI_API_KEY=sk-xxx
+CLAUDE_API_KEY=sk-ant-xxx
+PUBLIC_SITE_ORIGIN=https://whatismydelta.com
+PUBLIC_API_BASE=
+DATABASE_URL=
+SENTRY_DSN=
+APP_SCHEMA_VERSION=v1
+
+## API Endpoints
+- `GET /health` — basic health probe
+- `GET /config` — returns `{ apiBase, schemaVersion }`
+- `GET /prompts/active` — returns `{ active }` (may be null until a CSV is ingested)
+
+## Verify Deploy
+```zsh
+./scripts/predeploy_sanity.sh
+./scripts/verify_deploy.sh "$PUBLIC_API_BASE"
+```
+
+## One-Shot Fresh Deploy (New Railway Project)
+- Run to create a brand-new Railway project, set variables, and deploy:
+  
+  ```zsh
+  ./scripts/one_shot_new_deploy.sh
+  ```
+
+- Notes:
+  - It does not delete your existing Railway project; it creates a new one with a timestamped name.
+  - You’ll be prompted for variables based on `.env.example`.
+  - After deploy, copy the service URL to `PUBLIC_API_BASE` as needed and re-run `./scripts/verify_deploy.sh`.
+  - If you want to remove the old service/project, do so from the Railway dashboard to avoid accidental data loss.
+
+## Railway Variables (Build vs Runtime)
+- In the Railway service → Variables, ensure each variable is:
+  - Scoped to the correct environment (e.g., Production)
+  - Marked "Available during deploy" so Nixpacks can access it at build time
+- Typical vars: `OPENAI_API_KEY`, `CLAUDE_API_KEY`, `PUBLIC_API_BASE`, `PUBLIC_SITE_ORIGIN`, `APP_SCHEMA_VERSION`
+
+If build fails with "secret NAME: not found":
+- The variable likely isn’t marked "Available during deploy" or isn’t defined for this service/environment.
+- Toggle it on and redeploy.

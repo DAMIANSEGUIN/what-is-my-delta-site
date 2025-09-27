@@ -21,8 +21,19 @@ def load_csv(path: str)->List[Dict[str,str]]:
     return rows
 
 def read_registry():
-    if not os.path.exists(REGISTRY_FILE): return {"active": None, "versions": []}
-    with open(REGISTRY_FILE,"r",encoding="utf-8") as f: return json.load(f)
+    if not os.path.exists(REGISTRY_FILE):
+        return {"active": None, "versions": []}
+    try:
+        with open(REGISTRY_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            if not isinstance(data, dict):
+                return {"active": None, "versions": []}
+            data.setdefault("active", None)
+            data.setdefault("versions", [])
+            return data
+    except Exception:
+        # corrupted or unreadable registry; return empty structure
+        return {"active": None, "versions": []}
 
 def write_registry(reg):
     with open(REGISTRY_FILE,"w",encoding="utf-8") as f: json.dump(reg, f, indent=2)
@@ -39,3 +50,7 @@ def ingest_prompts(csv_path: str):
     reg["active"]=digest
     write_registry(reg)
     return {"status":"ok","active":digest,"file":out}
+
+def get_active():
+    reg = read_registry()
+    return {"active": reg.get("active")}

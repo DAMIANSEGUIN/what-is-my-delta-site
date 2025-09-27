@@ -2,8 +2,9 @@
   "build": {
     "builder": "NIXPACKS"
   },
+  "include": ["data/**/*"],
   "deploy": {
-    "startCommand": "gunicorn api.index:app -b 0.0.0.0:$PORT -w 1 --timeout 120",
+    "startCommand": "gunicorn api.index:app -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT -w 1 --timeout 120",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",

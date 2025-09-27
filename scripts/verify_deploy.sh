@@ -10,3 +10,8 @@ pass "/health 200"
 cfg=$(curl -fsS "$API_BASE/config")
 echo "$cfg" | grep -E '"apiBase"|"schemaVersion"' >/dev/null || fail "/config missing fields"
 pass "/config ok"
+
+# prompts active endpoint (field existence)
+act=$(curl -fsS "$API_BASE/prompts/active")
+echo "$act" | grep -E '"active"' >/dev/null || fail "/prompts/active missing field"
+pass "/prompts/active ok"
