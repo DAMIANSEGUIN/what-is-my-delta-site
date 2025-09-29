@@ -210,7 +210,10 @@ async def _startup():
 def root():
     s = get_settings()
     return {
-        "message": "Mosaic Platform API",
+        "message": "Mosaic Platform API - Complete Implementation",
+        "interface_design": "Integrated with minimal app architecture",
+        "deployment_timestamp": datetime.utcnow().isoformat() + "Z",
+        "cache_bust": "nuclear_reset_complete",
         "endpoints": {
             "health": "/health",
             "config": "/config",
