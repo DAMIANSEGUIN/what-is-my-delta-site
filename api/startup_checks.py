@@ -1,4 +1,9 @@
-import asyncio, httpx, os
+import asyncio
+import os
+
+import httpx
+
+from .storage import cleanup_expired_sessions, init_db
 from .settings import get_settings
 
 async def ping_openai(client):
@@ -29,6 +34,8 @@ async def ping_anthropic(client):
 
 async def run():
     _ = get_settings()
+    init_db()
+    cleanup_expired_sessions()
     print("Settings loaded successfully")
     async with httpx.AsyncClient() as client:
         await asyncio.gather(ping_openai(client), ping_anthropic(client))

@@ -1,1 +1,1 @@
-web: gunicorn api.index:app -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT -w 1 --timeout 120
+web: python -m uvicorn api.index:app --host 0.0.0.0 --port $PORT --workers 1 --timeout-keep-alive 120

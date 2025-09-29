@@ -594,4 +594,10 @@ def create_customized_resume(wimd_data, job_requirements):
 
 This architecture provides a complete, scalable, and privacy-focused platform for the Mosaic system. The implementation follows a clear roadmap with specific deliverables, success criteria, and maintenance requirements. The system is designed to be simple for users while providing powerful functionality for career development and job matching.
 
+> **Ops Snapshot – 2025-09-29**
+> - Netlify (`resonant-crostata-90b706`) serves the Mosaic UI at `https://www.whatismydelta.com` (apex redirects to `www`).
+> - Railway service `what-is-my-delta-site` hosts the FastAPI backend at `https://what-is-my-delta-site-production.up.railway.app`.
+> - `PUBLIC_SITE_ORIGIN` → `https://www.whatismydelta.com`; `PUBLIC_API_BASE` → Railway origin.
+> - Current gap: domain API routes return Netlify 404 until rewrite proxies requests to the Railway backend.
+
 The three-AI collaboration system (Codex, Claude Code, Human) ensures proper implementation, debugging, and oversight throughout the development process.

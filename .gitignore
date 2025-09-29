@@ -20,3 +20,12 @@ node_modules/
 .next/
 dist/
 build/
+
+# Local Netlify folder
+.netlify
+
+# Netlify CLI state
+.netlify_site_id
+
+# Logs
+*.log
