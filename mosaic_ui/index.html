@@ -62,6 +62,17 @@
   .notice .btn{border:1px solid var(--line);background:#fff;padding:6px 10px}
 
   .foot{border-top:1px solid var(--line);margin-top:140px;padding:14px 0;color:#777;font-size:12px;display:flex;justify-content:space-between}
+  .status{font-size:11px;color:var(--muted);margin-top:8px}
+  .status.error{color:#b00020}
+  .status.ok{color:#2d7a2d}
+  .job-card{border:1px solid var(--line);padding:12px;margin:12px 0;cursor:pointer;transition:border-color .2s ease}
+  .job-card.selected{border-color:var(--hair)}
+  .job-card.applied{border-style:dashed}
+  .job-actions{display:flex;gap:8px;margin-top:10px}
+  .pill{display:inline-block;border:1px solid var(--line);padding:2px 6px;margin:2px 4px 0 0;font-size:10px;color:var(--muted)}
+  .muted{color:var(--muted);font-size:11px}
+  .resume-output{border:1px solid var(--line);padding:12px;background:#fafafa;margin-top:12px;white-space:pre-wrap}
+  .loading{opacity:.6;pointer-events:none}
   @media (max-width:860px){.metrics{grid-template-columns:1fr}}
 </style>
 <div class="wrap">
@@ -124,12 +135,28 @@
       <ul><li>Role triage</li><li>Keyword heatmap</li><li>Risk notes</li></ul>
       <textarea class="small" placeholder="roles / keywords / risks…" id="t_jobs"></textarea>
       <div><a href="#" data-coach="help me triage 3 roles">ask coach: triage roles</a></div>
+      <div class="actions" style="margin-top:12px;gap:8px;flex-wrap:wrap">
+        <button id="jobsFetch" class="quiet" type="button">find opportunities</button>
+      </div>
+      <div id="jobsStatus" class="status" aria-live="polite"></div>
+      <div id="jobsList" aria-live="polite"></div>
     </div>
     <div class="module" id="resume">
       <h3><a href="#resume" title="open Resume">Resume — Bridge</a></h3>
       <ul><li>Evidence mapping</li><li>ATS lines</li><li>Truth filters</li></ul>
       <textarea class="small" placeholder="evidence → concise ATS lines…" id="t_resume"></textarea>
       <div><a href="#" data-coach="turn this evidence into one ats line">ask coach: ats line</a></div>
+      <div class="actions" style="margin-top:12px;gap:8px;flex-wrap:wrap">
+        <button id="resumeRewrite" class="quiet" type="button">rewrite from notes</button>
+        <button id="resumeCustomize" class="quiet" type="button">customize for selected job</button>
+        <button id="resumeFeedback" class="quiet" type="button">feedback</button>
+      </div>
+      <div id="resumeStatus" class="status" aria-live="polite"></div>
+      <pre id="resumeOutput" class="resume-output" hidden></pre>
+      <details class="micro" id="resumeVersionsWrap" style="margin-top:12px;display:none">
+        <summary>saved versions</summary>
+        <ul id="resumeVersions" style="list-style:none;margin:8px 0;padding:0"></ul>
+      </details>
     </div>
     <div class="module" id="dashboard">
       <h3><a href="#dashboard" title="open Dashboard">Delta — Dashboard</a></h3>
@@ -222,6 +249,7 @@
       <div style="margin-bottom:10px">upload a resume, image, or audio</div>
       <input type="file" id="filePick" multiple>
     </div>
+    <div id="uploadStatus" class="status" aria-live="polite"></div>
     <button class="close" id="closeUpload">close</button>
   </div>
 </div>
@@ -231,127 +259,689 @@
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-  $('#y').textContent = new Date().getFullYear();
+  const SESSION_KEY = 'delta_session_id';
+  const AUTO = 'delta_auto_v2';
+  const SEEN = 'delta_seen_intro_v1';
+  let sessionId = localStorage.getItem(SESSION_KEY) || '';
+  let apiBase = '';
+  let configPromise = null;
+  let jobCache = [];
+  let selectedJobId = null;
+  let lastResumeDraft = '';
+  let dirty = false;
+  let savedThisSession = false;
 
-  // Chat
+  if(sessionId) {
+    document.body.dataset.session = sessionId;
+  }
+
   const chat = $('#chat');
-  $('#openChat').addEventListener('click', e=>{e.preventDefault(); chat.style.display='block';});
-  $('#closeChat').addEventListener('click', ()=> chat.style.display='none');
   const chatLog = $('#chatLog');
   const chatInput = $('#chatInput');
   const sendMsg = $('#sendMsg');
-  function addMsg(txt, who='you'){ const div=document.createElement('div'); div.className='msg'; div.textContent=(who==='you'?'> ':'')+txt; chatLog.appendChild(div); chatLog.scrollTop=chatLog.scrollHeight; }
-  async function askCoach(prompt){
-    // Hook to backend when ready:
-    // const res = await fetch('https://mosaic-platform.vercel.app/wimd', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt }) });
-    // const data = await res.json(); return data?.result?.message || '(no response)';
-    return 'noted.'; // stub
+  const modal = $('#uploadModal');
+  const filePick = $('#filePick');
+  const uploadStatus = $('#uploadStatus');
+  const jobsButton = $('#jobsFetch');
+  const jobsStatus = $('#jobsStatus');
+  const jobsList = $('#jobsList');
+  const resumeRewriteBtn = $('#resumeRewrite');
+  const resumeCustomizeBtn = $('#resumeCustomize');
+  const resumeFeedbackBtn = $('#resumeFeedback');
+  const resumeStatus = $('#resumeStatus');
+  const resumeOutput = $('#resumeOutput');
+  const resumeVersionsWrap = $('#resumeVersionsWrap');
+  const resumeVersionsList = $('#resumeVersions');
+  const resumeNotes = $('#t_resume');
+  const jobsButtonLabel = jobsButton ? jobsButton.textContent.trim() : '';
+  const metricsEls = {
+    clarity: $('#mClarity'),
+    action: $('#mAction'),
+    momentum: $('#mMomentum'),
+  };
+
+  $('#y').textContent = new Date().getFullYear();
+
+  function setStatus(el, msg, kind='info'){
+    if(!el) return;
+    el.textContent = msg || '';
+    el.classList.remove('error','ok');
+    if(!msg) return;
+    if(kind === 'error') el.classList.add('error');
+    else if(kind === 'ok') el.classList.add('ok');
   }
-  async function send(){ const v=chatInput.value.trim(); if(!v) return; addMsg(v,'you'); chatInput.value=''; try{ const r = await askCoach(v); addMsg(r,'bot'); } catch(e){ addMsg('…connection issue','bot'); } }
-  chatInput.addEventListener('keydown',e=>{ if(e.key==='Enter') { e.preventDefault(); send(); } });
+
+  function setSession(id){
+    if(!id) return;
+    sessionId = id;
+    localStorage.setItem(SESSION_KEY, id);
+    document.body.dataset.session = id;
+  }
+
+  function setMetrics(metrics){
+    if(!metrics) return;
+    ['clarity','action','momentum'].forEach(k=>{
+      if(typeof metrics[k] !== 'undefined' && metricsEls[k]){
+        metricsEls[k].textContent = `${Math.round(metrics[k])}%`;
+      }
+    });
+  }
+
+  async function ensureConfig(){
+    if(apiBase) return apiBase;
+    if(configPromise) return configPromise;
+    const endpoints = [
+      `${window.location.origin}/config`,
+      'https://what-is-my-delta-site-production.up.railway.app/config',
+      'https://whatismydelta.com/config'
+    ];
+    configPromise = (async ()=>{
+      for(const url of endpoints){
+        try{
+          const res = await fetch(url, {mode:'cors'});
+          if(!res.ok) continue;
+          const data = await res.json();
+          apiBase = (data.apiBase || new URL(url).origin || '').replace(/\/$/,'');
+          if(!apiBase) apiBase = new URL(url).origin;
+          document.body.dataset.apiBase = apiBase;
+          return apiBase;
+        }catch(err){
+          // ignore endpoint failure
+        }
+      }
+      apiBase = 'https://what-is-my-delta-site-production.up.railway.app';
+      document.body.dataset.apiBase = apiBase;
+      return apiBase;
+    })();
+    return configPromise;
+  }
+
+  async function callJson(path, {method='GET', body, headers={}} = {}){
+    await ensureConfig();
+    const init = {method, headers:{...headers}};
+    if(body !== undefined){
+      if(body instanceof FormData){
+        init.body = body;
+      }else{
+        init.headers['Content-Type'] = 'application/json';
+        init.body = JSON.stringify(body);
+      }
+    }
+    if(sessionId){
+      init.headers['X-Session-ID'] = sessionId;
+    }
+    const res = await fetch(`${apiBase}${path}`, init);
+    let data = null;
+    try{ data = await res.json(); } catch(err){ data = null; }
+    if(!res.ok){
+      const message = (data && (data.detail || data.error)) || `request_failed (${res.status})`;
+      throw new Error(message);
+    }
+    if(data && data.session_id) setSession(data.session_id);
+    if(data && data.metrics) setMetrics(data.metrics);
+    return data || {};
+  }
+
+  async function uploadToWimd(file){
+    await ensureConfig();
+    const headers = {};
+    if(sessionId) headers['X-Session-ID'] = sessionId;
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch(`${apiBase}/wimd/upload`, {method:'POST', headers, body: form});
+    let data = null;
+    try{ data = await res.json(); } catch(err){ data = null; }
+    if(!res.ok){
+      const message = (data && (data.detail || data.error)) || `upload_failed (${res.status})`;
+      throw new Error(message);
+    }
+    if(data && data.session_id) setSession(data.session_id);
+    if(data && data.file && data.file.metrics) setMetrics(data.file.metrics);
+    return data;
+  }
+
+  function getJob(jobId){
+    return jobCache.find(item => item.job_id === jobId);
+  }
+
+  function highlightSelected(){
+    $$('.job-card').forEach(card => {
+      card.classList.toggle('selected', card.dataset.jobId === selectedJobId);
+    });
+  }
+
+  function renderJobs(matches){
+    jobCache = Array.isArray(matches) ? matches : [];
+    jobsList.innerHTML = '';
+    selectedJobId = null;
+    if(!jobCache.length){
+      setStatus(jobsStatus, 'no opportunities yet — keep working the coach flow', 'info');
+      return;
+    }
+    jobCache.forEach(match=>{
+      const skillsArr = Array.isArray(match.skills_match) ? match.skills_match : [];
+      const valuesArr = Array.isArray(match.values_match) ? match.values_match : [];
+      const card = document.createElement('div');
+      card.className = 'job-card';
+      card.dataset.jobId = match.job_id;
+      const fit = Math.round(match.fit_score || 0);
+      card.innerHTML = `
+        <div><strong>${match.role}</strong> — ${match.company}</div>
+        <div class="muted">${match.location || 'remote'}</div>
+        <div class="muted">fit score: ${fit}%</div>
+        <div class="muted">skills</div>
+        <div>${skillsArr.map(s=>`<span class=\"pill\">${s}</span>`).join(' ')}</div>
+        <div class="muted">values</div>
+        <div>${valuesArr.map(s=>`<span class=\"pill\">${s}</span>`).join(' ')}</div>
+        <div class="job-actions">
+          <button class="quiet job-select" type="button">focus</button>
+          <button class="quiet job-apply" type="button">apply</button>
+        </div>
+      `;
+      jobsList.appendChild(card);
+    });
+    setStatus(jobsStatus, `found ${jobCache.length} opportunities`, 'ok');
+  }
+
+  function selectJob(jobId){
+    if(!jobId) return;
+    selectedJobId = jobId;
+    highlightSelected();
+    const job = getJob(jobId);
+    setStatus(jobsStatus, job ? `focused on ${job.role}` : `focused on ${jobId}`, 'ok');
+  }
+
+  function currentResumeSource(){
+    if(lastResumeDraft) return lastResumeDraft;
+    return (resumeNotes?.value || '').trim();
+  }
+
+  function setResumeOutput(text){
+    lastResumeDraft = text || '';
+    if(resumeOutput){
+      if(lastResumeDraft){
+        resumeOutput.textContent = lastResumeDraft;
+        resumeOutput.hidden = false;
+      }else{
+        resumeOutput.hidden = true;
+      }
+    }
+  }
+
+  async function refreshResumeVersions(){
+    if(!sessionId || !resumeVersionsList) return;
+    try{
+      const data = await callJson('/resume/versions');
+      const list = data.versions || [];
+      resumeVersionsList.innerHTML = '';
+      if(list.length){
+        resumeVersionsWrap.style.display = 'block';
+        list.forEach(item=>{
+          const li = document.createElement('li');
+          const ts = item.created_at ? new Date(item.created_at).toLocaleString() : '';
+          li.textContent = `${item.version_name || 'version'}${ts ? ` — ${ts}` : ''}`;
+          resumeVersionsList.appendChild(li);
+        });
+      }else{
+        resumeVersionsWrap.style.display = 'none';
+      }
+    }catch(err){
+      // versions optional
+    }
+  }
+
+  function markDirty(){
+    dirty = true;
+    $('#saveNotice').style.display = 'flex';
+  }
+
+  function collect(){
+    return {
+      metrics:{
+        clarity: metricsEls.clarity?.textContent || '',
+        action: metricsEls.action?.textContent || '',
+        momentum: metricsEls.momentum?.textContent || '',
+      },
+      notes:{
+        ps101: $('#t_ps101')?.value || '',
+        coaching: $('#t_coaching')?.value || '',
+        jobs: $('#t_jobs')?.value || '',
+        resume: resumeNotes?.value || '',
+        dashboard: $('#t_dashboard')?.value || '',
+      },
+      feedback: collectFeedback(),
+    };
+  }
+
+  function collectFeedback(){
+    const val = name => {
+      const el = [...document.getElementsByName(name)].find(i => i.checked);
+      return el ? el.value : '';
+    };
+    return {
+      clarity: val('fb_clarity'),
+      welcome: val('fb_welcome'),
+      path: val('fb_path'),
+      comment: $('#fb_comment')?.value || '',
+    };
+  }
+
+  function applyData(data){
+    if(data?.metrics){
+      metricsEls.clarity.textContent = data.metrics.clarity || '75%';
+      metricsEls.action.textContent = data.metrics.action || '45%';
+      metricsEls.momentum.textContent = data.metrics.momentum || '32%';
+    }
+    if(data?.notes){
+      $('#t_ps101').value = data.notes.ps101 || '';
+      $('#t_coaching').value = data.notes.coaching || '';
+      $('#t_jobs').value = data.notes.jobs || '';
+      resumeNotes.value = data.notes.resume || '';
+      $('#t_dashboard').value = data.notes.dashboard || '';
+    }
+    if(data?.feedback){
+      const set = (name,val)=>{
+        if(!val) return;
+        const el = [...document.getElementsByName(name)].find(i=>i.value===val);
+        if(el) el.checked = true;
+      };
+      set('fb_clarity', data.feedback.clarity);
+      set('fb_welcome', data.feedback.welcome);
+      set('fb_path', data.feedback.path);
+      $('#fb_comment').value = data.feedback.comment || '';
+    }
+  }
+
+  function download(filename, obj){
+    const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    savedThisSession = true;
+    $('#saveNotice').style.display = 'none';
+    dirty = false;
+  }
+
+  async function askCoach(prompt){
+    const payload = {prompt};
+    if(sessionId) payload.session_id = sessionId;
+    const data = await callJson('/wimd', {method:'POST', body: payload});
+    return data.message || 'noted.';
+  }
+
+  async function fetchOpportunities(){
+    if(!sessionId){
+      throw new Error('start with the coach to unlock matches');
+    }
+    const data = await callJson('/ob/opportunities');
+    renderJobs(data.opportunities || []);
+  }
+
+  async function applyForJob(jobId, notes=''){
+    const data = await callJson('/ob/apply', {
+      method:'POST',
+      body: {job_id: jobId, notes},
+    });
+    const job = getJob(jobId);
+    if(job){
+      job.extras = job.extras || {};
+      job.extras.status = 'applied';
+    }
+    const card = jobsList.querySelector(`.job-card[data-job-id="${jobId}"]`);
+    if(card){
+      card.classList.add('applied');
+    }
+    return data;
+  }
+
+  async function rewriteResume(jobId, source){
+    const body = {};
+    if(sessionId) body.session_id = sessionId;
+    if(jobId) body.job_id = jobId;
+    if(source) body.source_resume = source;
+    const data = await callJson('/resume/rewrite', {method:'POST', body});
+    setResumeOutput(data.resume || '');
+    if(resumeNotes && data.resume){
+      resumeNotes.value = data.resume;
+    }
+    await refreshResumeVersions();
+    return data;
+  }
+
+  async function customizeResume(jobId, source, job){
+    if(!jobId) throw new Error('select an opportunity first');
+    if(!source) throw new Error('add resume content first');
+    const body = {
+      job_id: jobId,
+      resume: source,
+      highlight_skills: Array.isArray(job?.skills_match) ? job.skills_match : [],
+    };
+    if(sessionId) body.session_id = sessionId;
+    const data = await callJson('/resume/customize', {method:'POST', body});
+    setResumeOutput(data.resume || '');
+    if(resumeNotes && data.resume){
+      resumeNotes.value = data.resume;
+    }
+    await refreshResumeVersions();
+    return data;
+  }
+
+  async function resumeFeedback(source){
+    if(!source) throw new Error('need a resume draft first');
+    const body = {resume: source};
+    if(sessionId) body.session_id = sessionId;
+    const data = await callJson('/resume/feedback', {method:'POST', body});
+    await refreshResumeVersions();
+    return data;
+  }
+
+  ensureConfig().then(()=>{
+    if(sessionId){
+      callJson('/wimd/metrics').catch(()=>{});
+      refreshResumeVersions();
+    }
+  }).catch(()=>{});
+
+  $('#openChat').addEventListener('click', e=>{ e.preventDefault(); chat.style.display='block'; });
+  $('#closeChat').addEventListener('click', ()=>{ chat.style.display='none'; });
+
+  function addMsg(txt, who='you'){
+    const div = document.createElement('div');
+    div.className = 'msg';
+    div.textContent = (who==='you'?'> ':'') + txt;
+    chatLog.appendChild(div);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  async function send(){
+    const v = (chatInput.value || '').trim();
+    if(!v) return;
+    addMsg(v, 'you');
+    chatInput.value = '';
+    try{
+      const r = await askCoach(v);
+      addMsg(r, 'bot');
+    }catch(err){
+      addMsg(err.message || '…connection issue', 'bot');
+    }
+  }
+
+  chatInput.addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      send();
+    }
+  });
   sendMsg.addEventListener('click', send);
 
-  // Coach strip: tiny input inline (open panel + send)
   (function(){
-    // create strip dynamically (to keep single file compact)
     const strip = document.createElement('div');
     strip.id = 'coachStrip';
     strip.style.cssText = 'margin:24px 0 60px;border:1px solid #e8e8e8;padding:6px 8px;display:flex;gap:8px;align-items:center';
     strip.innerHTML = '<span style="color:#666">coach</span><input id="coachAsk" placeholder="ask or try: fast track" style="flex:1;border:1px solid #e8e8e8;padding:6px 8px"><button id="coachSend" class="quiet">send</button>';
     document.querySelector('.wrap').insertBefore(strip, document.querySelector('.hero'));
-    const coachAsk = $('#coachAsk'); const coachSend = $('#coachSend');
-    function sendStrip(){ const v=(coachAsk.value||'').trim(); if(!v) return; chat.style.display='block'; addMsg(v,'you'); coachAsk.value=''; askCoach(v).then(m=>addMsg(m,'bot')).catch(()=>addMsg('…connection issue','bot')); softRoute(v); }
+    const coachAsk = $('#coachAsk');
+    const coachSend = $('#coachSend');
+    async function sendStrip(){
+      const v = (coachAsk.value || '').trim();
+      if(!v) return;
+      chat.style.display = 'block';
+      addMsg(v, 'you');
+      coachAsk.value = '';
+      try{
+        const reply = await askCoach(v);
+        addMsg(reply, 'bot');
+        softRoute(v);
+      }catch(err){
+        addMsg(err.message || '…connection issue', 'bot');
+      }
+    }
     coachSend.addEventListener('click', sendStrip);
     coachAsk.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); sendStrip(); }});
   })();
 
-  // First-visit gentle nudge
-  const SEEN='delta_seen_intro_v1';
-  if (!localStorage.getItem(SEEN)) {
-    chat.style.display='block'; addMsg('hi — prefer fast track or discovery?','bot'); localStorage.setItem(SEEN,'1');
+  if(!localStorage.getItem(SEEN)){
+    chat.style.display = 'block';
+    addMsg('hi — prefer fast track or discovery?', 'bot');
+    localStorage.setItem(SEEN, '1');
   }
 
-  // Upload
-  const modal = $('#uploadModal');
-  $('#openUpload').addEventListener('click', e=>{e.preventDefault(); modal.style.display='flex'; document.body.style.overflow='hidden';});
-  $('#closeUpload').addEventListener('click', ()=>{ modal.style.display='none'; document.body.style.overflow='auto'; });
+  $('#openUpload').addEventListener('click', e=>{
+    e.preventDefault();
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  });
+  $('#closeUpload').addEventListener('click', ()=>{
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    setStatus(uploadStatus, '');
+  });
 
-  // Save / Load + Feedback + Leave Guard
-  let dirty=false, savedThisSession=false;
-  function markDirty(){ dirty=true; $('#saveNotice').style.display='flex'; }
+  if(filePick){
+    filePick.addEventListener('change', async e=>{
+      const file = (e.target.files || [])[0];
+      if(!file) return;
+      try{
+        setStatus(uploadStatus, `uploading ${file.name}…`);
+        await uploadToWimd(file);
+        setStatus(uploadStatus, `${file.name} uploaded`, 'ok');
+        markDirty();
+        saveAuto();
+        await refreshResumeVersions();
+      }catch(err){
+        setStatus(uploadStatus, err.message, 'error');
+      }finally{
+        e.target.value = '';
+      }
+    });
+  }
 
-  function collect(){
-    return {
-      metrics:{ clarity: $('#mClarity').textContent, action: $('#mAction').textContent, momentum: $('#mMomentum').textContent },
-      notes:{ ps101: $('#t_ps101').value, coaching: $('#t_coaching').value, jobs: $('#t_jobs').value, resume: $('#t_resume').value, dashboard: $('#t_dashboard').value },
-      feedback: collectFeedback()
-    };
-  }
-  function collectFeedback(){
-    const val = n=>{ const el=[...document.getElementsByName(n)].find(i=>i.checked); return el?el.value:'' };
-    return { clarity: val('fb_clarity'), welcome: val('fb_welcome'), path: val('fb_path'), comment: $('#fb_comment').value };
-  }
-  function apply(data){
-    if(data?.metrics){ $('#mClarity').textContent=data.metrics.clarity||'75%'; $('#mAction').textContent=data.metrics.action||'45%'; $('#mMomentum').textContent=data.metrics.momentum||'32%'; }
-    if(data?.notes){ $('#t_ps101').value=data.notes.ps101||''; $('#t_coaching').value=data.notes.coaching||''; $('#t_jobs').value=data.notes.jobs||''; $('#t_resume').value=data.notes.resume||''; $('#t_dashboard').value=data.notes.dashboard||''; }
-    if(data?.feedback){ const set=(name,val)=>{ if(!val) return; const el=[...document.getElementsByName(name)].find(i=>i.value===val); if(el) el.checked=true; };
-      set('fb_clarity', data.feedback.clarity); set('fb_welcome', data.feedback.welcome); set('fb_path', data.feedback.path); $('#fb_comment').value=data.feedback.comment||''; }
-  }
-  function download(filename, obj){ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href); savedThisSession=true; $('#saveNotice').style.display='none'; dirty=false; }
   $('#saveBtn').addEventListener('click', ()=> download('delta-progress.json', collect()));
-  $('#loadFile').addEventListener('change', (e)=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const data=JSON.parse(r.result); apply(data); }catch(err){ alert('invalid file'); } }; r.readAsText(f); });
-
-  ['#t_ps101','#t_coaching','#t_jobs','#t_resume','#t_dashboard','#fb_comment'].forEach(sel=> $(sel)?.addEventListener('input', ()=>{ markDirty(); saveAuto(); }));
-  ;['fb_clarity','fb_welcome','fb_path'].forEach(name=> document.getElementsByName(name).forEach(el=> el.addEventListener('change', ()=>{ markDirty(); saveAuto(); })));
-
-  const AUTO='delta_auto_v2';
-  function saveAuto(){ localStorage.setItem(AUTO, JSON.stringify(collect())); }
-  (function loadAuto(){ try{ const data=JSON.parse(localStorage.getItem(AUTO)||'{}'); if(Object.keys(data).length) apply(data); }catch(e){} })();
-
-  window.addEventListener('beforeunload', (e)=>{ if(dirty && !savedThisSession){ e.preventDefault(); e.returnValue=''; }});
-  $('#noticeSave').addEventListener('click', ()=> download('delta-progress.json', collect()));
-  $('#noticeDismiss').addEventListener('click', ()=> { $('#saveNotice').style.display='none'; });
-
-  // Feedback → JSON + (optional) SurveyMonkey
-  const SURVEY_URL = ''; // set to your collector link
-  $('#fbSubmit').addEventListener('click', ()=>{
-    const payload = { timestamp: new Date().toISOString(), feedback: collectFeedback() };
-    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='delta-feedback.json'; a.click(); URL.revokeObjectURL(a.href);
-    if(SURVEY_URL){ const link=$('#fbLink'); link.href=SURVEY_URL; link.style.display='inline-block'; link.click(); }
+  $('#loadFile').addEventListener('change', e=>{
+    const f = e.target.files?.[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const data = JSON.parse(reader.result);
+        applyData(data);
+      }catch(err){
+        alert('invalid file');
+      }
+    };
+    reader.readAsText(f);
   });
 
-  // smooth anchors + soft routing
-  function smoothTo(id){ const el=$(id); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }
-  document.querySelectorAll('a[href^="#"]').forEach(a=>{
-    a.addEventListener('click', evt=>{ const href=a.getAttribute('href'); if(href && href.length>1){ evt.preventDefault(); smoothTo(href); }});
+  ['#t_ps101','#t_coaching','#t_jobs','#t_resume','#t_dashboard','#fb_comment'].forEach(sel=>{
+    const el = $(sel);
+    if(el) el.addEventListener('input', ()=>{
+      markDirty();
+      saveAuto();
+    });
   });
-  function softRoute(txt){
-    const t=(txt||'').toLowerCase();
-    if (t.includes('fast')) smoothTo('#ps101');
-    if (t.includes('discover')) smoothTo('#modules');
-    if (t.includes('dashboard')) smoothTo('#dashboard');
-  }
-
-  // Intro link reveals journey (just scroll to modules for now)
-  $('#showJourney').addEventListener('click', e=>{ e.preventDefault(); smoothTo('#modules'); });
-
-  // quick links for Fast / Discovery
-  $('#linkFast').addEventListener('click', e=>{ e.preventDefault(); smoothTo('#ps101'); });
-  $('#linkDiscover').addEventListener('click', e=>{ e.preventDefault(); smoothTo('#modules'); });
-
-  // ask coach links
-  document.querySelectorAll('[data-coach]').forEach(a=>{
-    a.addEventListener('click', (e)=>{
-      e.preventDefault();
-      const msg = a.getAttribute('data-coach');
-      document.getElementById('openChat').click();
-      chatInput.value = msg;
-      document.getElementById('sendMsg').click();
+  ['fb_clarity','fb_welcome','fb_path'].forEach(name=>{
+    document.getElementsByName(name).forEach(el=>{
+      el.addEventListener('change', ()=>{
+        markDirty();
+        saveAuto();
+      });
     });
   });
 
-  // year
-  document.getElementById('y').textContent = new Date().getFullYear();
+  function saveAuto(){
+    localStorage.setItem(AUTO, JSON.stringify(collect()));
+  }
+  (function loadAuto(){
+    try{
+      const data = JSON.parse(localStorage.getItem(AUTO) || '{}');
+      if(Object.keys(data).length) applyData(data);
+    }catch(err){
+      // ignore
+    }
+  })();
+
+  window.addEventListener('beforeunload', e=>{
+    if(dirty && !savedThisSession){
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+  $('#noticeSave').addEventListener('click', ()=> download('delta-progress.json', collect()));
+  $('#noticeDismiss').addEventListener('click', ()=> { $('#saveNotice').style.display='none'; });
+
+  const SURVEY_URL = '';
+  $('#fbSubmit').addEventListener('click', ()=>{
+    const payload = {timestamp: new Date().toISOString(), feedback: collectFeedback()};
+    const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'delta-feedback.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    if(SURVEY_URL){
+      const link = $('#fbLink');
+      link.href = SURVEY_URL;
+      link.style.display = 'inline-block';
+      link.click();
+    }
+  });
+
+  function smoothTo(id){
+    const el = $(id);
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click', evt=>{
+      const href = a.getAttribute('href');
+      if(href && href.length>1){
+        evt.preventDefault();
+        smoothTo(href);
+      }
+    });
+  });
+  function softRoute(txt){
+    const t = (txt || '').toLowerCase();
+    if(t.includes('fast')) smoothTo('#ps101');
+    if(t.includes('discover')) smoothTo('#modules');
+    if(t.includes('dashboard')) smoothTo('#dashboard');
+  }
+  $('#showJourney').addEventListener('click', e=>{ e.preventDefault(); smoothTo('#modules'); });
+  $('#linkFast').addEventListener('click', e=>{ e.preventDefault(); smoothTo('#ps101'); });
+  $('#linkDiscover').addEventListener('click', e=>{ e.preventDefault(); smoothTo('#modules'); });
+
+  document.querySelectorAll('[data-coach]').forEach(a=>{
+    a.addEventListener('click', e=>{
+      e.preventDefault();
+      const msg = a.getAttribute('data-coach');
+      $('#openChat').click();
+      chatInput.value = msg;
+      sendMsg.click();
+    });
+  });
+
+  if(jobsButton){
+    jobsButton.addEventListener('click', async e=>{
+      e.preventDefault();
+      jobsButton.classList.add('loading');
+      jobsButton.textContent = 'finding…';
+      setStatus(jobsStatus, '');
+      try{
+        await fetchOpportunities();
+      }catch(err){
+        setStatus(jobsStatus, err.message, 'error');
+      }finally{
+        jobsButton.classList.remove('loading');
+        jobsButton.textContent = jobsButtonLabel || 'find opportunities';
+      }
+    });
+  }
+
+  if(jobsList){
+    jobsList.addEventListener('click', async e=>{
+      const card = e.target.closest('.job-card');
+      if(!card) return;
+      const jobId = card.dataset.jobId;
+      if(e.target.classList.contains('job-select')){
+        selectJob(jobId);
+        return;
+      }
+      if(e.target.classList.contains('job-apply')){
+        e.preventDefault();
+        card.classList.add('loading');
+        try{
+          const data = await applyForJob(jobId);
+          selectJob(jobId);
+          setStatus(jobsStatus, `applied to ${data.job?.role || jobId}`, 'ok');
+          markDirty();
+          saveAuto();
+        }catch(err){
+          setStatus(jobsStatus, err.message, 'error');
+        }finally{
+          card.classList.remove('loading');
+        }
+      }
+    });
+  }
+
+  if(resumeRewriteBtn){
+    resumeRewriteBtn.addEventListener('click', async e=>{
+      e.preventDefault();
+      const source = (resumeNotes?.value || '').trim();
+      resumeRewriteBtn.classList.add('loading');
+      setStatus(resumeStatus, 'rewriting…');
+      try{
+        const data = await rewriteResume(selectedJobId, source);
+        setStatus(resumeStatus, `saved ${data.version_name}`, 'ok');
+        markDirty();
+        saveAuto();
+      }catch(err){
+        setStatus(resumeStatus, err.message, 'error');
+      }finally{
+        resumeRewriteBtn.classList.remove('loading');
+      }
+    });
+  }
+
+  if(resumeCustomizeBtn){
+    resumeCustomizeBtn.addEventListener('click', async e=>{
+      e.preventDefault();
+      const job = getJob(selectedJobId);
+      const source = currentResumeSource();
+      resumeCustomizeBtn.classList.add('loading');
+      setStatus(resumeStatus, 'customizing…');
+      try{
+        const data = await customizeResume(selectedJobId, source, job);
+        setStatus(resumeStatus, `customized for ${data.version_name}`, 'ok');
+        markDirty();
+        saveAuto();
+      }catch(err){
+        setStatus(resumeStatus, err.message, 'error');
+      }finally{
+        resumeCustomizeBtn.classList.remove('loading');
+      }
+    });
+  }
+
+  if(resumeFeedbackBtn){
+    resumeFeedbackBtn.addEventListener('click', async e=>{
+      e.preventDefault();
+      const source = currentResumeSource();
+      resumeFeedbackBtn.classList.add('loading');
+      setStatus(resumeStatus, 'scanning draft…');
+      try{
+        const data = await resumeFeedback(source);
+        const suggestions = data.suggestions || [];
+        setStatus(resumeStatus, suggestions.length ? suggestions.join(' • ') : 'no changes suggested', 'ok');
+        markDirty();
+        saveAuto();
+      }catch(err){
+        setStatus(resumeStatus, err.message, 'error');
+      }finally{
+        resumeFeedbackBtn.classList.remove('loading');
+      }
+    });
+  }
 })();
 </script>
