@@ -37,6 +37,35 @@ cat api/startup_checks.py
 python3 -c "from dotenv import load_dotenv; load_dotenv(); import os; print('CLAUDE after load_dotenv:', os.getenv('CLAUDE_API_KEY')[:10] + '...')"
 ```
 
+---
+
+## 🎉 **MAJOR ISSUE RESOLVED - 2025-09-29**
+
+**Problem**: Railway deployment showed successful builds but served "Hello World" instead of complete FastAPI
+**Root Cause**: Missing `python-multipart` dependency caused FastAPI startup failure
+**Solution**: Added `python-multipart` to requirements.txt
+**Result**: Railway now serves complete 449-line Mosaic Platform API
+
+### **Updated System Status**
+- ✅ **API Backend**: WORKING - Complete FastAPI implementation deployed
+- ✅ **All Endpoints**: `/health`, `/config`, `/prompts/active` functional
+- ✅ **Local Development**: Working environment documented
+- ✅ **Dependencies**: Complete requirements.txt with all needed packages
+- ⚠️ **Domain Routing**: Netlify proxy configuration pending (separate task)
+
+### **Key Learning**
+The issue was resolved using the local-first development approach rather than infrastructure debugging. Running the application locally immediately revealed the missing dependency error that Railway was masking with a fallback app.
+
+### **Working Commands**
+```bash
+# Test Railway API (now working)
+curl https://what-is-my-delta-site-production.up.railway.app/health
+curl https://what-is-my-delta-site-production.up.railway.app/config
+
+# Local development setup (for future debugging)
+python3 -m uvicorn api.index:app --host 0.0.0.0 --port 8000
+```
+
 ## **CODEX TROUBLESHOOTING REQUEST - IMMEDIATE ACTIONS**
 
 **From CODEX_HANDOVER_README.md**: "Claude API Key not being recognized by the application"
@@ -797,6 +826,21 @@ railway run cat data/prompts_clean.csv | head -5
 
 ---
 
-**Last Updated**: 2025-09-25  
-**Version**: 1.0  
-**Status**: Active - Ready for debugging operations
+---
+
+## **CANONICAL OPERATIONAL RULES (2025-09-29)**
+
+**CRITICAL**: These rules must be followed in every session to prevent time waste and ensure efficiency:
+
+1. **Execute tasks directly** - Do not hand tasks to user that I can perform myself
+2. **Auto-identify project information** - Use available tools to gather context rather than asking user
+3. **Issue commands directly** - Use Bash tool to execute rather than providing copy-paste commands
+4. **Environment constraint checking** - Always validate against known system parameters before coding
+5. **Use internet research** - Fetch up-to-date information about environments, issues, and solutions before acting
+6. **Review operational guidelines** - Check project documentation every 30 minutes during sessions
+7. **No broken commands** - Test all commands and create working scripts instead of multi-line copy-paste
+8. **Canonical commitment** - User time is valuable, no syntax errors or repeated mistakes allowed
+
+**Last Updated**: 2025-09-29
+**Version**: 1.1
+**Status**: Active - Enhanced operational rules implemented

@@ -18,10 +18,19 @@ The script auto-loads APP_URL from wimd_config.sh (asks once, then saves), runs 
 OPENAI_API_KEY=sk-xxx
 CLAUDE_API_KEY=sk-ant-xxx
 PUBLIC_SITE_ORIGIN=https://whatismydelta.com
-PUBLIC_API_BASE=
+PUBLIC_API_BASE=https://what-is-my-delta-site-production.up.railway.app
 DATABASE_URL=
 SENTRY_DSN=
 APP_SCHEMA_VERSION=v1
+
+## Dependencies (requirements.txt)
+- fastapi
+- uvicorn
+- gunicorn
+- httpx
+- pydantic
+- pydantic-settings
+- python-multipart (CRITICAL: Required for file uploads)
 
 ## API Endpoints
 - `GET /health` — basic health probe
@@ -30,8 +39,33 @@ APP_SCHEMA_VERSION=v1
 
 ## Verify Deploy
 ```zsh
+# Test Railway API directly
+curl https://what-is-my-delta-site-production.up.railway.app/health
+curl https://what-is-my-delta-site-production.up.railway.app/config
+
+# Run verification scripts
 ./scripts/predeploy_sanity.sh
 ./scripts/verify_deploy.sh "$PUBLIC_API_BASE"
+```
+
+## Local Development (RECOMMENDED FOR DEBUGGING)
+```zsh
+# Set environment variables
+export OPENAI_API_KEY="your_key_here"
+export CLAUDE_API_KEY="your_key_here"
+export PUBLIC_SITE_ORIGIN="https://whatismydelta.com"
+export APP_SCHEMA_VERSION="v1"
+
+# Install dependencies
+pip3 install --user -r requirements.txt
+
+# Start local server
+python3 -m uvicorn api.index:app --host 0.0.0.0 --port 8000
+
+# Test locally
+curl http://localhost:8000/health
+curl http://localhost:8000/config
+curl http://localhost:8000/prompts/active
 ```
 
 ## One-Shot Fresh Deploy (New Railway Project)
