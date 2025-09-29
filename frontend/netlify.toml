@@ -1,0 +1,41 @@
+[[redirects]]
+  from = "/health"
+  to = "https://what-is-my-delta-site-production.up.railway.app/health"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/config"
+  to = "https://what-is-my-delta-site-production.up.railway.app/config"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/prompts/*"
+  to = "https://what-is-my-delta-site-production.up.railway.app/prompts/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/wimd/*"
+  to = "https://what-is-my-delta-site-production.up.railway.app/wimd/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/ob/*"
+  to = "https://what-is-my-delta-site-production.up.railway.app/ob/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/resume/*"
+  to = "https://what-is-my-delta-site-production.up.railway.app/resume/:splat"
+  status = 200
+  force = true
+
+# Fallback to SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
