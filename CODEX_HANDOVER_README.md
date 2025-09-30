@@ -32,8 +32,16 @@
 ## PROJECT DIRECTORY
 /Users/damianseguin/Downloads/WIMD-Railway-Deploy-Project
 
+## ARCHITECTURE CONSOLIDATION COMPLETED ✅
+- **Unified Project Created**: `/Users/damianseguin/projects/mosaic-platform/`
+- **All Components Consolidated**: Backend, frontend, docs, and deployment scripts
+- **⚠️ CODEX ACCESS ISSUE**: CODEX cannot access `/Users/damianseguin/projects/` due to sandbox limitations
+- **SOLUTION**: CODEX should work from this current accessible workspace (`/Users/damianseguin/Downloads/WIMD-Railway-Deploy-Project/`)
+- **All fixes already exist here**: Complete FastAPI code, netlify.toml, fixed requirements.txt
+
 ## CRITICAL
-- Keep using the Railway origin for API testing until Netlify rewrite is in place.
-- Smoke tests remain pending until the public domain resolves API routes.
-- Document every change in `CONVERSATION_NOTES.md` and `ROLLING_CHECKLIST.md`.
+- CODEX should deploy from this accessible workspace - all fixed code already exists here
+- Architectural consolidation completed but deployment still needed from accessible location
+- Keep using the Railway origin for API testing until Netlify rewrite is in place
+- Document every change in `CONVERSATION_NOTES.md` and `ROLLING_CHECKLIST.md`
 

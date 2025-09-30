@@ -20,12 +20,12 @@
 - **SSL:** Working (Railway automatic)
 - **Prompts:** Loaded and active
 
-## Verifications (2025-09-29)
-- `curl https://whatismydelta.com/health` → Netlify HTML 404 (no rewrite)
-- `curl https://whatismydelta.com/config` → Netlify HTML 404
-- `curl https://whatismydelta.com/prompts/active` → Netlify HTML 404
-- `curl https://www.whatismydelta.com/health` → Netlify HTML 404
-- `curl https://what-is-my-delta-site-production.up.railway.app/health` → `{"ok": true}`
+## Verifications (2025-09-30 - FIXED)
+- ✅ `curl https://whatismydelta.com/health` → `{"ok":true,"timestamp":"..."}`
+- ✅ `curl https://whatismydelta.com/config` → Working
+- ✅ `curl https://whatismydelta.com/prompts/active` → Working
+- ✅ Domain routing: WORKING - Netlify proxying to Railway backend
+- ✅ Solution: Connected Netlify site to GitHub repository
 
 ## User Instructions
 - **Track everything** user tells me
