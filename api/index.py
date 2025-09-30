@@ -105,7 +105,6 @@ cors_origins = _build_cors_origins()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
-    allow_origin_regex=r"https://(www\.)?whatismydelta\.com",
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["content-type", "authorization", "x-session-id"],
