@@ -72,15 +72,18 @@ JOB_LIBRARY = [
     },
 ]
 
+# CORS configuration for Railway deployment
 origins = [
     os.getenv("PUBLIC_SITE_ORIGIN", "https://whatismydelta.com"),
     "https://whatismydelta.com",
     "https://www.whatismydelta.com",
     "https://resonant-crostata-90b706.netlify.app"
 ]
+
+# Use allow_origin_regex for Railway compatibility
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origin_regex=r"https://(whatismydelta\.com|www\.whatismydelta\.com|resonant-crostata-90b706\.netlify\.app)",
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["content-type", "authorization", "x-session-id"],
