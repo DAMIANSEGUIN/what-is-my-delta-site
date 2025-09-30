@@ -69,4 +69,21 @@
 
 ### Next Action Required:
 
-Fix CORS headers in Railway backend to explicitly allow `https://whatismydelta.com` origin, then chat will work.
+~~Fix CORS headers in Railway backend to explicitly allow `https://whatismydelta.com` origin, then chat will work.~~
+
+### Update 2025-09-30 15:24:
+✅ **CORS fix committed** (commit 1456992) - Added explicit origins to api/index.py
+⏳ **Waiting for Railway auto-deploy** - Should deploy within 2-5 minutes
+❌ **Current issue**: Railway hasn't deployed yet, missing `access-control-allow-origin` header in response
+- Browser blocks due to CORS preflight failure
+- API itself works (tested with curl)
+- Just needs Railway to pick up the commit and redeploy
+
+### Update 2025-09-30 15:28:
+❌ **CRITICAL DISCOVERY**: Railway is NOT monitoring GitHub repository
+- Last deployment: 19 hours ago
+- No auto-deploy triggered from recent commits
+- **Same issue as Netlify had** - service not connected to Git
+- **Solution required**: Connect Railway service to GitHub in Railway dashboard
+  - Or: Manual redeploy via Railway dashboard (temporary fix)
+  - Or: Install Railway CLI and deploy manually

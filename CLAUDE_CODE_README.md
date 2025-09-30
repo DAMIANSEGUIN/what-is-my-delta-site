@@ -840,6 +840,12 @@ railway run cat data/prompts_clean.csv | head -5
 6. **Review operational guidelines** - Check project documentation every 30 minutes during sessions
 7. **No broken commands** - Test all commands and create working scripts instead of multi-line copy-paste
 8. **Canonical commitment** - User time is valuable, no syntax errors or repeated mistakes allowed
+9. **Document troubleshooting** - Create/update SESSION_TROUBLESHOOTING_LOG.md with:
+   - What was tried (with ❌ for failures, ✅ for successes)
+   - Why it failed
+   - What worked and why
+   - Architecture limitations discovered
+   - DO NOT RETRY documented failed approaches
 
 **Last Updated**: 2025-09-29
 **Version**: 1.1
