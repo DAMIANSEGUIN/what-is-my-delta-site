@@ -73,17 +73,39 @@ JOB_LIBRARY = [
 ]
 
 # CORS configuration for Railway deployment
-origins = [
-    os.getenv("PUBLIC_SITE_ORIGIN", "https://whatismydelta.com"),
-    "https://whatismydelta.com",
-    "https://www.whatismydelta.com",
-    "https://resonant-crostata-90b706.netlify.app"
-]
 
-# Use allow_origin_regex for Railway compatibility
+
+def _build_cors_origins() -> List[str]:
+    candidates = [
+        os.getenv("PUBLIC_SITE_ORIGIN", ""),
+        "https://whatismydelta.com",
+        "https://www.whatismydelta.com",
+        "https://resonant-crostata-90b706.netlify.app",
+    ]
+    origins: List[str] = []
+    for value in candidates:
+        if not value:
+            continue
+        for item in value.split(","):
+            origin = item.strip().rstrip("/")
+            if origin:
+                origins.append(origin)
+
+    deduped: List[str] = []
+    seen = set()
+    for origin in origins:
+        if origin not in seen:
+            deduped.append(origin)
+            seen.add(origin)
+    return deduped
+
+
+cors_origins = _build_cors_origins()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https://(whatismydelta\.com|www\.whatismydelta\.com|resonant-crostata-90b706\.netlify\.app)",
+    allow_origins=cors_origins,
+    allow_origin_regex=r"https://(www\.)?whatismydelta\.com",
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["content-type", "authorization", "x-session-id"],
