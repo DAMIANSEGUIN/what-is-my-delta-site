@@ -1,3 +1,7 @@
+[build]
+  base = "mosaic_ui"
+  publish = "."
+
 [[redirects]]
   from = "/health"
   to = "https://what-is-my-delta-site-production.up.railway.app/health"
