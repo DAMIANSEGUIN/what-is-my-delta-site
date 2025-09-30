@@ -10,6 +10,7 @@ from fastapi import (
     File,
     Header,
     HTTPException,
+    Response,
     UploadFile,
 )
 from fastapi.middleware.cors import CORSMiddleware
@@ -284,6 +285,12 @@ def prompts_active():
     return {"active": reg.get("active")}
 
 
+@app.options("/wimd")
+def wimd_options():
+    """Explicit OPTIONS handler for Railway edge compatibility"""
+    return Response(status_code=200)
+
+
 @app.post("/wimd", response_model=WimdResponse)
 async def wimd_chat(
     payload: WimdRequest,
@@ -342,6 +349,12 @@ async def _save_upload(session_id: str, file: UploadFile) -> Dict[str, Any]:
     return {"filename": file.filename or safe_name, "size": size, "content_type": file.content_type}
 
 
+@app.options("/wimd/upload")
+def wimd_upload_options():
+    """Explicit OPTIONS handler for Railway edge compatibility"""
+    return Response(status_code=200)
+
+
 @app.post("/wimd/upload", response_model=UploadResponse)
 async def wimd_upload(
     background: BackgroundTasks,
@@ -386,6 +399,12 @@ def ob_status(session_header: Optional[str] = Header(None, alias="X-Session-ID")
     }
 
 
+@app.options("/ob/apply")
+def ob_apply_options():
+    """Explicit OPTIONS handler for Railway edge compatibility"""
+    return Response(status_code=200)
+
+
 @app.post("/ob/apply")
 def ob_apply(
     payload: ApplyRequest,
@@ -407,6 +426,12 @@ def ob_apply(
     }
 
 
+@app.options("/resume/rewrite")
+def resume_rewrite_options():
+    """Explicit OPTIONS handler for Railway edge compatibility"""
+    return Response(status_code=200)
+
+
 @app.post("/resume/rewrite")
 def resume_rewrite(
     payload: ResumeRewriteRequest,
@@ -423,6 +448,12 @@ def resume_rewrite(
         "version_name": version_name,
         "resume": draft,
     }
+
+
+@app.options("/resume/customize")
+def resume_customize_options():
+    """Explicit OPTIONS handler for Railway edge compatibility"""
+    return Response(status_code=200)
 
 
 @app.post("/resume/customize")
@@ -443,6 +474,12 @@ def resume_customize(
         "version_name": version_name,
         "resume": draft,
     }
+
+
+@app.options("/resume/feedback")
+def resume_feedback_options():
+    """Explicit OPTIONS handler for Railway edge compatibility"""
+    return Response(status_code=200)
 
 
 @app.post("/resume/feedback")
