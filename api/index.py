@@ -72,7 +72,12 @@ JOB_LIBRARY = [
     },
 ]
 
-origins = [os.getenv("PUBLIC_SITE_ORIGIN", "https://whatismydelta.com")]
+origins = [
+    os.getenv("PUBLIC_SITE_ORIGIN", "https://whatismydelta.com"),
+    "https://whatismydelta.com",
+    "https://www.whatismydelta.com",
+    "https://resonant-crostata-90b706.netlify.app"
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
