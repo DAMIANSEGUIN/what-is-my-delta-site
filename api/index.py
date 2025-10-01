@@ -77,28 +77,12 @@ JOB_LIBRARY = [
 
 
 def _build_cors_origins() -> List[str]:
-    candidates = [
-        os.getenv("PUBLIC_SITE_ORIGIN", ""),
+    # Explicit list - don't rely on env var that might be misconfigured
+    return [
         "https://whatismydelta.com",
         "https://www.whatismydelta.com",
         "https://resonant-crostata-90b706.netlify.app",
     ]
-    origins: List[str] = []
-    for value in candidates:
-        if not value:
-            continue
-        for item in value.split(","):
-            origin = item.strip().rstrip("/")
-            if origin:
-                origins.append(origin)
-
-    deduped: List[str] = []
-    seen = set()
-    for origin in origins:
-        if origin not in seen:
-            deduped.append(origin)
-            seen.add(origin)
-    return deduped
 
 
 cors_origins = _build_cors_origins()
