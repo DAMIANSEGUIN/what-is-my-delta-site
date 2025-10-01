@@ -285,6 +285,20 @@ def prompts_active():
     return {"active": reg.get("active")}
 
 
+@app.get("/debug/cors")
+def debug_cors():
+    """Debug endpoint to show configured CORS origins"""
+    return {
+        "cors_origins": cors_origins,
+        "public_site_origin_env": os.getenv("PUBLIC_SITE_ORIGIN", "NOT SET"),
+        "middleware_config": {
+            "allow_credentials": True,
+            "allow_methods": ["GET", "POST", "OPTIONS"],
+            "allow_headers": ["content-type", "authorization", "x-session-id"],
+        }
+    }
+
+
 @app.options("/wimd")
 def wimd_options():
     """Explicit OPTIONS handler for Railway edge compatibility"""
