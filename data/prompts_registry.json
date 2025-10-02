@@ -1,0 +1,13 @@
+{
+  "active": "f19c806ca62c0077e0575bbbe9aabffbdda6f17082516f820ce5613f108fa009",
+  "versions": [
+    {
+      "sha256": "6e488b26db77297b06043404a3843b362dbe4324711e1d6c9f02079cabbb7248",
+      "file": "data/prompts_6e488b26db77.json"
+    },
+    {
+      "sha256": "f19c806ca62c0077e0575bbbe9aabffbdda6f17082516f820ce5613f108fa009",
+      "file": "data/prompts_f19c806ca62c.json"
+    }
+  ]
+}
