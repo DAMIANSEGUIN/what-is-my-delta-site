@@ -45,8 +45,20 @@
   force = true
 
 [[redirects]]
-  from = "/auth/*"
-  to = "https://what-is-my-delta-site-production.up.railway.app/auth/:splat"
+  from = "/auth/register"
+  to = "https://what-is-my-delta-site-production.up.railway.app/auth/register"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/auth/login"
+  to = "https://what-is-my-delta-site-production.up.railway.app/auth/login"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/auth/me"
+  to = "https://what-is-my-delta-site-production.up.railway.app/auth/me"
   status = 200
   force = true
 
