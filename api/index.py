@@ -15,14 +15,20 @@ from fastapi import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+import hashlib
+import secrets
 
 from .settings import get_settings
 from .startup_checks import startup_or_die
 from .storage import (
     UPLOAD_ROOT,
     add_resume_version,
+    authenticate_user,
+    create_user,
     ensure_session,
     fetch_job_matches,
+    get_user_by_email,
+    get_user_by_id,
     latest_metrics,
     list_resume_versions,
     record_wimd_output,
@@ -101,6 +107,20 @@ class WimdRequest(BaseModel):
     prompt: str = Field(..., min_length=1)
     session_id: Optional[str] = None
     context: Optional[Dict[str, Any]] = None
+
+class UserRegister(BaseModel):
+    email: str = Field(..., min_length=1)
+    password: str = Field(..., min_length=6)
+
+class UserLogin(BaseModel):
+    email: str = Field(..., min_length=1)
+    password: str = Field(..., min_length=1)
+
+class UserResponse(BaseModel):
+    user_id: str
+    email: str
+    created_at: str
+    last_login: Optional[str] = None
 
 
 class WimdResponse(BaseModel):
@@ -568,6 +588,58 @@ def resume_feedback(
         "analysis": {"word_count": word_count, "line_count": line_count},
         "suggestions": suggestions,
     }
+
+
+# User Authentication Endpoints
+@app.post("/auth/register", response_model=UserResponse)
+async def register_user(payload: UserRegister):
+    """Register a new user"""
+    # Check if user already exists
+    existing_user = get_user_by_email(payload.email)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User already exists")
+    
+    # Create new user
+    user_id = create_user(payload.email, payload.password)
+    user = get_user_by_id(user_id)
+    
+    return UserResponse(
+        user_id=user["user_id"],
+        email=user["email"],
+        created_at=user["created_at"],
+        last_login=user["last_login"]
+    )
+
+
+@app.post("/auth/login", response_model=UserResponse)
+async def login_user(payload: UserLogin):
+    """Login user and return user data"""
+    user_id = authenticate_user(payload.email, payload.password)
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    user = get_user_by_id(user_id)
+    return UserResponse(
+        user_id=user["user_id"],
+        email=user["email"],
+        created_at=user["created_at"],
+        last_login=user["last_login"]
+    )
+
+
+@app.get("/auth/me", response_model=UserResponse)
+async def get_current_user(user_id: str = Header(..., alias="X-User-ID")):
+    """Get current user data"""
+    user = get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return UserResponse(
+        user_id=user["user_id"],
+        email=user["email"],
+        created_at=user["created_at"],
+        last_login=user["last_login"]
+    )
 
 
 @app.get("/resume/versions", response_model=ResumeVersionResponse)

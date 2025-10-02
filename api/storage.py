@@ -2,6 +2,8 @@ import json
 import os
 import sqlite3
 import uuid
+import hashlib
+import secrets
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -46,11 +48,25 @@ def init_db() -> None:
     with get_conn() as conn:
         conn.execute(
             """
+            CREATE TABLE IF NOT EXISTS users (
+                id TEXT PRIMARY KEY,
+                email TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_login TIMESTAMP
+            )
+            """
+        )
+        
+        conn.execute(
+            """
             CREATE TABLE IF NOT EXISTS sessions (
                 id TEXT PRIMARY KEY,
+                user_id TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 expires_at TIMESTAMP,
-                user_data TEXT
+                user_data TEXT,
+                FOREIGN KEY (user_id) REFERENCES users (id)
             )
             """
         )
@@ -393,6 +409,89 @@ def session_summary(session_id: str) -> Dict[str, Any]:
     data["job_matches"] = fetch_job_matches(session_id)
     return data
 
+def hash_password(password: str) -> str:
+    """Hash a password using SHA-256 with salt"""
+    salt = secrets.token_hex(16)
+    return hashlib.sha256((password + salt).encode()).hexdigest() + ":" + salt
+
+def verify_password(password: str, hashed: str) -> bool:
+    """Verify a password against its hash"""
+    try:
+        hash_part, salt = hashed.split(":")
+        return hashlib.sha256((password + salt).encode()).hexdigest() == hash_part
+    except:
+        return False
+
+def create_user(email: str, password: str) -> str:
+    """Create a new user and return user ID"""
+    user_id = str(uuid.uuid4())
+    password_hash = hash_password(password)
+    now = datetime.utcnow().isoformat()
+    
+    with get_conn() as conn:
+        conn.execute(
+            "INSERT INTO users (id, email, password_hash, created_at, last_login) VALUES (?, ?, ?, ?, ?)",
+            (user_id, email, password_hash, now, now)
+        )
+    return user_id
+
+def authenticate_user(email: str, password: str) -> Optional[str]:
+    """Authenticate user and return user ID if successful"""
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT id, password_hash FROM users WHERE email = ?",
+            (email,)
+        ).fetchone()
+        
+        if not row:
+            return None
+            
+        user_id, password_hash = row
+        if verify_password(password, password_hash):
+            # Update last login
+            conn.execute(
+                "UPDATE users SET last_login = ? WHERE id = ?",
+                (datetime.utcnow().isoformat(), user_id)
+            )
+            return user_id
+        return None
+
+def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
+    """Get user by email"""
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT id, email, created_at, last_login FROM users WHERE email = ?",
+            (email,)
+        ).fetchone()
+        
+        if not row:
+            return None
+            
+        return {
+            "user_id": row[0],
+            "email": row[1],
+            "created_at": row[2],
+            "last_login": row[3]
+        }
+
+def get_user_by_id(user_id: str) -> Optional[Dict[str, Any]]:
+    """Get user by ID"""
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT id, email, created_at, last_login FROM users WHERE id = ?",
+            (user_id,)
+        ).fetchone()
+        
+        if not row:
+            return None
+            
+        return {
+            "user_id": row[0],
+            "email": row[1],
+            "created_at": row[2],
+            "last_login": row[3]
+        }
+
 __all__ = [
     "UPLOAD_ROOT",
     "create_session",
@@ -411,4 +510,10 @@ __all__ = [
     "cleanup_expired_sessions",
     "init_db",
     "session_summary",
+    "create_user",
+    "authenticate_user",
+    "get_user_by_email",
+    "get_user_by_id",
+    "hash_password",
+    "verify_password",
 ]

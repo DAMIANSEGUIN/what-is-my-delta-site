@@ -435,7 +435,7 @@
     try{
       setStatus($('#authStatus'), 'authenticating...');
       
-      // Enhanced authentication with proper validation
+      // Enhanced authentication with backend API
       if(isRegister){
         // Registration validation
         if(password.length < 6){
@@ -445,42 +445,35 @@
           throw new Error('Please enter a valid email address');
         }
         
-        // Check if user already exists in localStorage
-        const existingUsers = JSON.parse(localStorage.getItem('delta_users') || '{}');
-        if(existingUsers[email]){
-          throw new Error('User already exists');
-        }
+        // Register with backend
+        const response = await callJson('/auth/register', {
+          method: 'POST',
+          body: { email, password }
+        });
         
-        // Create new user
-        const userId = Date.now().toString();
-        const newUser = {
-          id: userId,
-          email: email,
-          createdAt: new Date().toISOString(),
-          lastLogin: new Date().toISOString()
+        currentUser = {
+          id: response.user_id,
+          email: response.email,
+          createdAt: response.created_at,
+          lastLogin: response.last_login
         };
         
-        existingUsers[email] = newUser;
-        localStorage.setItem('delta_users', JSON.stringify(existingUsers));
-        
-        currentUser = newUser;
         setStatus($('#authStatus'), 'account created successfully!', 'ok');
         
       } else {
-        // Login validation
-        const existingUsers = JSON.parse(localStorage.getItem('delta_users') || '{}');
-        const user = existingUsers[email];
+        // Login with backend
+        const response = await callJson('/auth/login', {
+          method: 'POST',
+          body: { email, password }
+        });
         
-        if(!user){
-          throw new Error('User not found');
-        }
+        currentUser = {
+          id: response.user_id,
+          email: response.email,
+          createdAt: response.created_at,
+          lastLogin: response.last_login
+        };
         
-        // Update last login
-        user.lastLogin = new Date().toISOString();
-        existingUsers[email] = user;
-        localStorage.setItem('delta_users', JSON.stringify(existingUsers));
-        
-        currentUser = user;
         setStatus($('#authStatus'), 'welcome back!', 'ok');
       }
       
