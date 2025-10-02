@@ -243,8 +243,9 @@
       <div style="text-align:center;margin-top:80px">
         <p style="margin:0 0 20px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">begin anywhere</p>
         <div style="display:flex;gap:8px;justify-content:center;align-items:center">
-          <button id="startDiscovery" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">explore</button>
-          <button id="openUpload" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">upload</button>
+          <button id="startDiscoveryFlow" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">explore</button>
+          <button id="openUploadFlow" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">upload</button>
+          <button id="findOpportunities" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">find jobs</button>
         </div>
       </div>
     </div>
@@ -310,6 +311,19 @@
   <div id="status" class="status" aria-live="polite"></div>
   <div id="jobsStatus" class="status" aria-live="polite"></div>
   <div id="jobsList" aria-live="polite"></div>
+  
+  <!-- RESUME CONTROLS -->
+  <section id="resumeControls" style="margin:40px 0;padding:20px;border:1px solid var(--line);border-radius:4px;background:linear-gradient(145deg, #fafafa 0%, #f5f5f5 100%)" hidden>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="font:600 11px/1 Helvetica,Arial;margin:0;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">resume tools</h3>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button id="resumeRewrite" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">rewrite</button>
+      <button id="resumeCustomize" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">customize</button>
+      <button id="resumeFeedback" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">feedback</button>
+    </div>
+  </section>
+  
   <div id="resumeStatus" class="status" aria-live="polite"></div>
   <pre id="resumeOutput" class="resume-output" hidden></pre>
 
@@ -376,7 +390,7 @@
   const modal = $('#uploadModal');
   const filePick = $('#filePick');
   const uploadStatus = $('#uploadStatus');
-  const jobsButton = $('#jobsFetch');
+  const jobsButton = $('#findOpportunities');
   const jobsStatus = $('#jobsStatus');
   const jobsList = $('#jobsList');
   const resumeRewriteBtn = $('#resumeRewrite');
@@ -621,6 +635,8 @@
     selectedJobId = null;
     if(!jobCache.length){
       setStatus(jobsStatus, 'no opportunities yet — keep working the coach flow', 'info');
+      const resumeControls = $('#resumeControls');
+      if(resumeControls) resumeControls.hidden = true;
       return;
     }
     jobCache.forEach(match=>{
@@ -646,6 +662,10 @@
       jobsList.appendChild(card);
     });
     setStatus(jobsStatus, `found ${jobCache.length} opportunities`, 'ok');
+    
+    // Show resume controls when jobs are available
+    const resumeControls = $('#resumeControls');
+    if(resumeControls) resumeControls.hidden = false;
   }
 
   function selectJob(jobId){
@@ -819,8 +839,13 @@
     $('#userGuide').hidden = true;
   });
 
-  $('#openChat').addEventListener('click', e=>{ e.preventDefault(); chat.style.display='block'; });
-  $('#closeChat').addEventListener('click', ()=>{ chat.style.display='none'; });
+  $('#openChat').addEventListener('click', e=>{
+    e.preventDefault(); 
+    if(chat) chat.style.display='block'; 
+  });
+  $('#closeChat').addEventListener('click', ()=>{
+    if(chat) chat.style.display='none'; 
+  });
   
   $('#startFastTrack').addEventListener('click', e=>{ 
     e.preventDefault(); 
@@ -836,30 +861,42 @@
     addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
   });
 
-  // Add missing event handlers for the new interface
-  $('#findOpportunities').addEventListener('click', async e => {
-    e.preventDefault();
-    setStatus(status, 'finding opportunities...');
-    try {
-      const opportunities = await fetchOpportunities();
-      setStatus(status, `found ${opportunities.length} opportunities`, 'ok');
-    } catch(err) {
-      setStatus(status, err.message, 'error');
-    }
+  // Handle flow section explore button
+  $('#startDiscoveryFlow').addEventListener('click', e=>{ 
+    e.preventDefault(); 
+    saveUserData({path: 'discovery', started: new Date().toISOString()});
+    chat.style.display='block';
+    addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
   });
 
-  $('#resumeRewrite').addEventListener('click', async e => {
-    e.preventDefault();
-    setStatus(resumeStatus, 'rewriting resume...');
-    try {
-      const data = await rewriteResume(selectedJobId, '');
-      setStatus(resumeStatus, `resume rewritten`, 'ok');
-    } catch(err) {
-      setStatus(resumeStatus, err.message, 'error');
-    }
-  });
+  // Add missing event handlers for the new interface
+  if(jobsButton){
+    jobsButton.addEventListener('click', async e => {
+      e.preventDefault();
+      setStatus(jobsStatus, 'finding opportunities...');
+      try {
+        await fetchOpportunities();
+      } catch(err) {
+        setStatus(jobsStatus, err.message, 'error');
+      }
+    });
+  }
+
+  if(resumeRewriteBtn){
+    resumeRewriteBtn.addEventListener('click', async e => {
+      e.preventDefault();
+      setStatus(resumeStatus, 'rewriting resume...');
+      try {
+        const data = await rewriteResume(selectedJobId, '');
+        setStatus(resumeStatus, `resume rewritten`, 'ok');
+      } catch(err) {
+        setStatus(resumeStatus, err.message, 'error');
+      }
+    });
+  }
 
   function addMsg(txt, who='you'){
+    if(!chatLog) return;
     const div = document.createElement('div');
     div.className = 'msg';
     div.textContent = (who==='you'?'> ':'') + txt;
@@ -868,6 +905,7 @@
   }
 
   async function send(){
+    if(!chatInput) return;
     const v = (chatInput.value || '').trim();
     if(!v) return;
     addMsg(v, 'you');
@@ -880,15 +918,26 @@
     }
   }
 
-  chatInput.addEventListener('keydown', e=>{
-    if(e.key === 'Enter'){
-      e.preventDefault();
-      send();
-    }
-  });
-  sendMsg.addEventListener('click', send);
+  if(chatInput){
+    chatInput.addEventListener('keydown', e=>{
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        send();
+      }
+    });
+  }
+  if(sendMsg){
+    sendMsg.addEventListener('click', send);
+  }
 
   $('#openUpload').addEventListener('click', e=>{
+    e.preventDefault();
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  });
+
+  // Handle flow section upload button
+  $('#openUploadFlow').addEventListener('click', e=>{
     e.preventDefault();
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -1019,6 +1068,12 @@
     $('#welcome').hidden = false;
     $('#logoutBtn').hidden = false;
     updateUserProgress();
+    
+    // Ensure chat functionality is enabled for authenticated users
+    if(chat && chatInput && sendMsg){
+      // Chat is ready - make sure event listeners are working
+      console.log('Chat initialized for authenticated user');
+    }
   }
 
   if(!localStorage.getItem(SEEN) && isAuthenticated){
