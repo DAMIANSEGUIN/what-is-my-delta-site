@@ -115,12 +115,78 @@
   <nav class="nav">
     <a id="openUpload" href="#" title="Upload a resume, image, or audio">upload</a>
     <a id="openChat" href="#" title="Open coaching chat">chat</a>
+    <button id="logoutBtn" class="quiet" style="padding:4px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.08em" hidden>logout</button>
   </nav>
 
   <header class="hero" id="top">
     <div class="title">WHAT IS MY DELTA</div>
     <p class="sub">career transition platform. discover your path. find your fit. take action.</p>
   </header>
+
+  <!-- LOGIN/REGISTER MODAL -->
+  <div id="authModal" class="modal" style="display:block">
+    <div class="panel" style="max-width:400px">
+      <h2 style="font:600 14px/1.2 Helvetica,Arial;margin:0 0 20px;text-transform:uppercase;letter-spacing:.08em;text-align:center">welcome to your career transition</h2>
+      
+      <!-- LOGIN FORM -->
+      <form id="loginForm" style="margin-bottom:20px">
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">email</label>
+          <input type="email" id="loginEmail" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">password</label>
+          <input type="password" id="loginPassword" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
+        </div>
+        <button type="submit" class="quiet" style="width:100%;padding:10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">sign in</button>
+      </form>
+      
+      <!-- REGISTER FORM -->
+      <form id="registerForm" style="margin-bottom:20px" hidden>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">email</label>
+          <input type="email" id="registerEmail" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">password</label>
+          <input type="password" id="registerPassword" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">confirm password</label>
+          <input type="password" id="registerConfirm" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
+        </div>
+        <button type="submit" class="quiet" style="width:100%;padding:10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">create account</button>
+      </form>
+      
+      <div style="text-align:center;margin-top:16px">
+        <button id="toggleAuth" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">need an account?</button>
+      </div>
+      
+      <div id="authStatus" class="status" style="margin-top:12px;text-align:center"></div>
+    </div>
+  </div>
+
+  <!-- WELCOME & ONBOARDING -->
+  <section id="welcome" style="margin:60px 0;padding:40px 0;border:1px solid var(--line);border-radius:4px;background:linear-gradient(145deg, #ffffff 0%, #fafafa 100%)" hidden>
+    <div style="max-width:var(--max);margin:0 auto;text-align:center">
+      <h1 style="font:600 18px/1.2 Helvetica,Arial;margin:0 0 16px;text-transform:uppercase;letter-spacing:.08em">welcome to your career transition</h1>
+      <p style="margin:0 0 24px;color:var(--muted);font-size:12px;line-height:1.5;max-width:64ch;margin:0 auto 24px">this is a problem-solving approach to career transition. we'll work through three phases to bridge your skills and passions to meaningful work in the present job market.</p>
+      
+      <div style="display:flex;gap:12px;justify-content:center;margin:24px 0">
+        <button id="startFastTrack" class="quiet" style="padding:10px 20px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">fast track</button>
+        <button id="startDiscovery" class="quiet" style="padding:10px 20px;font-size:11px;text-transform:uppercase;letter-spacing:.08em">explore freely</button>
+      </div>
+      
+      <details style="margin-top:20px;text-align:left;max-width:400px;margin:20px auto 0">
+        <summary style="font-size:10px;color:var(--muted);cursor:pointer;text-transform:uppercase;letter-spacing:.08em">how it works</summary>
+        <div style="margin-top:12px;font-size:10px;color:var(--muted);line-height:1.4">
+          <p><strong>Fast Track:</strong> Guided sequence through analysis → opportunities → application</p>
+          <p><strong>Explore:</strong> Chat with coach, upload files, discover at your own pace</p>
+          <p><strong>Auto-save:</strong> Your progress is saved automatically as you go</p>
+        </div>
+      </details>
+    </div>
+  </section>
 
   <!-- JOURNEY FLOW -->
   <section style="margin:80px 0;padding:40px 0">
@@ -176,6 +242,19 @@
     </div>
   </section>
 
+  <!-- USER PROGRESS & SESSION INFO -->
+  <section id="userProgress" style="margin:40px 0;padding:20px;border:1px solid var(--line);border-radius:4px;background:linear-gradient(145deg, #fafafa 0%, #f5f5f5 100%)" hidden>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="font:600 11px/1 Helvetica,Arial;margin:0;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">your progress</h3>
+      <button id="clearSession" class="quiet" style="padding:4px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">clear session</button>
+    </div>
+    <div id="progressInfo" style="font-size:10px;color:var(--muted);line-height:1.4">
+      <div>Session: <span id="sessionDisplay">not started</span></div>
+      <div>Path: <span id="pathDisplay">-</span></div>
+      <div>Last activity: <span id="lastActivityDisplay">-</span></div>
+    </div>
+  </section>
+
   <!-- STATUS AND OUTPUTS -->
   <div id="status" class="status" aria-live="polite"></div>
   <div id="jobsStatus" class="status" aria-live="polite"></div>
@@ -223,12 +302,17 @@
   const SESSION_KEY = 'delta_session_id';
   const AUTO = 'delta_auto_v2';
   const SEEN = 'delta_seen_intro_v1';
+  const USER_DATA_KEY = 'delta_user_data';
   let sessionId = localStorage.getItem(SESSION_KEY) || '';
   let apiBase = '';
   let configPromise = null;
   let jobCache = [];
   let selectedJobId = null;
   let lastResumeDraft = '';
+  let userData = JSON.parse(localStorage.getItem(USER_DATA_KEY) || '{}');
+  let autoSaveInterval = null;
+  let isAuthenticated = false;
+  let currentUser = null;
 
   if(sessionId) {
     document.body.dataset.session = sessionId;
@@ -268,6 +352,91 @@
     sessionId = id;
     localStorage.setItem(SESSION_KEY, id);
     document.body.dataset.session = id;
+    startAutoSave();
+  }
+
+  function saveUserData(data){
+    userData = {...userData, ...data};
+    localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
+  }
+
+  function startAutoSave(){
+    if(autoSaveInterval) clearInterval(autoSaveInterval);
+    autoSaveInterval = setInterval(() => {
+      if(sessionId && userData){
+        // Auto-save user progress every 30 seconds
+        saveUserData({
+          lastActivity: new Date().toISOString(),
+          sessionId: sessionId
+        });
+      }
+    }, 30000);
+  }
+
+  function stopAutoSave(){
+    if(autoSaveInterval) {
+      clearInterval(autoSaveInterval);
+      autoSaveInterval = null;
+    }
+  }
+
+  async function authenticateUser(email, password, isRegister = false){
+    try{
+      setStatus($('#authStatus'), 'authenticating...');
+      
+      // For now, simulate authentication - in production this would call your auth API
+      if(isRegister){
+        // Simulate registration
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        if(email === 'test@example.com' && password === 'password'){
+          throw new Error('User already exists');
+        }
+      } else {
+        // Simulate login
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        if(email !== 'test@example.com' || password !== 'password'){
+          throw new Error('Invalid credentials');
+        }
+      }
+      
+      // Success - set user data
+      currentUser = {email, id: Date.now().toString()};
+      isAuthenticated = true;
+      saveUserData({user: currentUser, authenticated: true});
+      
+      // Hide auth modal, show welcome
+      $('#authModal').style.display = 'none';
+      $('#welcome').hidden = false;
+      updateUserProgress();
+      
+      setStatus($('#authStatus'), 'welcome back!', 'ok');
+      
+    }catch(err){
+      setStatus($('#authStatus'), err.message, 'error');
+    }
+  }
+
+  function updateUserProgress(){
+    if(currentUser){
+      $('#sessionDisplay').textContent = currentUser.email;
+      $('#pathDisplay').textContent = userData.path || '-';
+      $('#lastActivityDisplay').textContent = userData.lastActivity ? new Date(userData.lastActivity).toLocaleString() : '-';
+      $('#userProgress').hidden = false;
+    }
+  }
+
+  function logout(){
+    isAuthenticated = false;
+    currentUser = null;
+    sessionId = '';
+    userData = {};
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(USER_DATA_KEY);
+    stopAutoSave();
+    
+    $('#authModal').style.display = 'block';
+    $('#welcome').hidden = true;
+    $('#userProgress').hidden = true;
   }
 
   async function ensureConfig(){
@@ -412,7 +581,24 @@
   async function askCoach(prompt){
     const payload = {prompt};
     if(sessionId) payload.session_id = sessionId;
+    saveUserData({lastMessage: prompt, timestamp: new Date().toISOString()});
     const data = await callJson('/wimd', {method:'POST', body: payload});
+    
+    // Save coach response and metrics
+    saveUserData({
+      lastCoachResponse: data.message,
+      metrics: data.metrics,
+      sessionId: data.session_id
+    });
+    
+    // If this is the first meaningful interaction, show opportunities hint
+    if(data.metrics && !userData.hasSeenOpportunities){
+      setTimeout(() => {
+        setStatus(status, 'ready to explore opportunities?', 'ok');
+        saveUserData({hasSeenOpportunities: true});
+      }, 2000);
+    }
+    
     return data.message || 'noted.';
   }
 
@@ -479,11 +665,68 @@
     }
   }).catch(()=>{});
 
+  // Authentication event handlers
+  $('#loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = $('#loginEmail').value;
+    const password = $('#loginPassword').value;
+    await authenticateUser(email, password, false);
+  });
+
+  $('#registerForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = $('#registerEmail').value;
+    const password = $('#registerPassword').value;
+    const confirm = $('#registerConfirm').value;
+    
+    if(password !== confirm){
+      setStatus($('#authStatus'), 'passwords do not match', 'error');
+      return;
+    }
+    
+    await authenticateUser(email, password, true);
+  });
+
+  $('#toggleAuth').addEventListener('click', e => {
+    e.preventDefault();
+    const loginForm = $('#loginForm');
+    const registerForm = $('#registerForm');
+    const isLogin = !loginForm.hidden;
+    
+    if(isLogin){
+      loginForm.hidden = true;
+      registerForm.hidden = false;
+      $('#toggleAuth').textContent = 'already have an account?';
+    } else {
+      loginForm.hidden = false;
+      registerForm.hidden = true;
+      $('#toggleAuth').textContent = 'need an account?';
+    }
+  });
+
+  $('#clearSession').addEventListener('click', e => {
+    e.preventDefault();
+    logout();
+  });
+
+  $('#logoutBtn').addEventListener('click', e => {
+    e.preventDefault();
+    logout();
+  });
+
   $('#openChat').addEventListener('click', e=>{ e.preventDefault(); chat.style.display='block'; });
   $('#closeChat').addEventListener('click', ()=>{ chat.style.display='none'; });
   
+  $('#startFastTrack').addEventListener('click', e=>{ 
+    e.preventDefault(); 
+    saveUserData({path: 'fastTrack', started: new Date().toISOString()});
+    chat.style.display='block';
+    addMsg('hi — let\'s start your fast track career transition. i\'ll guide you through analysis, opportunities, and application. what\'s your current career situation?', 'bot');
+  });
+
   $('#startDiscovery').addEventListener('click', e=>{ 
     e.preventDefault(); 
+    saveUserData({path: 'discovery', started: new Date().toISOString()});
     chat.style.display='block';
     addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
   });
@@ -663,7 +906,17 @@
   }
 
   // Auto-open chat for new users
-  if(!localStorage.getItem(SEEN)){
+  // Check for existing authentication
+  if(userData.authenticated && userData.user){
+    currentUser = userData.user;
+    isAuthenticated = true;
+    $('#authModal').style.display = 'none';
+    $('#welcome').hidden = false;
+    $('#logoutBtn').hidden = false;
+    updateUserProgress();
+  }
+
+  if(!localStorage.getItem(SEEN) && isAuthenticated){
     chat.style.display = 'block';
     addMsg('hi — let\'s work on your career transition. what would you like to explore?', 'bot');
     localStorage.setItem(SEEN, '1');
