@@ -162,6 +162,50 @@ def _update_metrics(prompt: str, current: Dict[str, Any]) -> Dict[str, int]:
 
 
 def _coach_reply(prompt: str, metrics: Dict[str, int]) -> str:
+    """Generate coach reply using actual prompts from CSV"""
+    from .prompts_loader import read_registry
+    import json
+    import random
+    
+    try:
+        reg = read_registry()
+        active_sha = reg.get("active")
+        if not active_sha:
+            return _fallback_reply(metrics)
+        
+        # Find the active prompts file
+        for version in reg.get("versions", []):
+            if version["sha256"] == active_sha:
+                try:
+                    with open(version["file"], "r", encoding="utf-8") as f:
+                        prompts_data = json.load(f)
+                    
+                    # Find matching prompts based on user input
+                    matching_prompts = []
+                    for p in prompts_data:
+                        if any(keyword in prompt.lower() for keyword in p.get("tag", "").lower().split()):
+                            matching_prompts.append(p)
+                    
+                    if matching_prompts:
+                        selected = random.choice(matching_prompts)
+                        return selected.get("completion", _fallback_reply(metrics))
+                    else:
+                        # Fallback to any prompt if no match
+                        if prompts_data:
+                            selected = random.choice(prompts_data)
+                            return selected.get("completion", _fallback_reply(metrics))
+                        else:
+                            return _fallback_reply(metrics)
+                except Exception:
+                    return _fallback_reply(metrics)
+        
+        return _fallback_reply(metrics)
+    except Exception:
+        return _fallback_reply(metrics)
+
+
+def _fallback_reply(metrics: Dict[str, int]) -> str:
+    """Fallback reply when prompts can't be loaded"""
     return (
         "Noted. Here's where you sit right now — "
         f"clarity {metrics['clarity']}%, action {metrics['action']}%, momentum {metrics['momentum']}%. "
@@ -267,6 +311,29 @@ def prompts_active():
 
     reg = read_registry()
     return {"active": reg.get("active")}
+
+
+@app.get("/prompts/{sha}")
+def get_prompts(sha: str):
+    """Get prompts content by SHA"""
+    from .prompts_loader import read_registry
+    import json
+    
+    reg = read_registry()
+    if not reg.get("active"):
+        raise HTTPException(status_code=404, detail="No active prompts")
+    
+    # Find the version with this SHA
+    for version in reg.get("versions", []):
+        if version["sha256"] == sha:
+            try:
+                with open(version["file"], "r", encoding="utf-8") as f:
+                    prompts = json.load(f)
+                return {"sha": sha, "prompts": prompts}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Error loading prompts: {str(e)}")
+    
+    raise HTTPException(status_code=404, detail="Prompts not found")
 
 
 @app.get("/debug/cors")
