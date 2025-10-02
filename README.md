@@ -1,4 +1,15 @@
-# 🚦 WIMD Railway Deploy – Restart Protocol
+# 🚦 MOSAIC Project - Quick Start
+
+**One-word trigger for Claude Code:** `Mosaic`
+
+When you say "Mosaic", Claude Code will automatically:
+1. Load Foundation canon from `/Users/damianseguin/Mosaic/foundation/Mosaic_Foundation_v1.0.md`
+2. Review current project state (CLAUDE_CODE_README.md, CURSOR_CLAUDE_SYNC_README.md)
+3. Assume Senior Debugger role with operational rules
+
+---
+
+## Restart Protocol
 
 Run this to begin every session:
 

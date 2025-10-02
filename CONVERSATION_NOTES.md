@@ -2,7 +2,7 @@
 
 ## 2025-10-01 Updates
 - CODEX added fallback logic in `api/prompts_loader.py` so `/prompts/active` resolves even if `data/prompts_registry.json` is missing from deploy builds.
-- Documented canonical layout in `PROJECT_STRUCTURE.md` and codified multi-agent workflow in `PROTOCOL_ENFORCEMENT_PLAN.md`.
+- Documented canonical layout in `PROJECT_STRUCTURE.md`, codified multi-agent workflow in `PROTOCOL_ENFORCEMENT_PLAN.md`, published `AI_ROUTING_PLAN.md` (CSV → AI → fallback), created `NETLIFY_AGENT_RUNNER_README.md` for external runner handoff, and added `JOB_FEED_DISCOVERY_PLAN.md` to drive real OpportunityBridge data sourcing.
 - Outstanding: surface original resource audit into accessible workspace; decide whether to track `data/prompts_registry.json` in git or rely on fallback regeneration.
 
 ## 2025-10-01 Session Start (Claude in Cursor)

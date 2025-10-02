@@ -30,7 +30,10 @@ Use this note at session start. It captures changes since 2025-09-30, guardrails
 ## 5. Reference Stack
 - `PROJECT_STRUCTURE.md`: canonical layout, remotes, drift detection steps.
 - `PROTOCOL_ENFORCEMENT_PLAN.md`: gates, handoffs, escalation.
+- `AI_ROUTING_PLAN.md`: CSV → AI → metrics fallback contract for coach replies.
+- `JOB_FEED_DISCOVERY_PLAN.md`: vetted-source workflow for OpportunityBridge data.
 - `CONVERSATION_NOTES.md`: latest status log (see 2025-10-01 entry).
+- `NETLIFY_AGENT_RUNNER_README.md`: external handoff for Netlify runners.
 - `CODEX_HANDOFF_2025-10-01.md`: critical context for this cycle.
 
 Review this brief at every handoff to avoid repeating fallbacks or bypassing the new gate system.

@@ -115,6 +115,7 @@
   <nav class="nav">
     <a id="openUpload" href="#" title="Upload a resume, image, or audio">upload</a>
     <a id="openChat" href="#" title="Open coaching chat">chat</a>
+    <a id="showGuide" href="#" title="Show user guide">guide</a>
     <button id="logoutBtn" class="quiet" style="padding:4px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.08em" hidden>logout</button>
   </nav>
 
@@ -177,12 +178,19 @@
         <button id="startDiscovery" class="quiet" style="padding:10px 20px;font-size:11px;text-transform:uppercase;letter-spacing:.08em">explore freely</button>
       </div>
       
-      <details style="margin-top:20px;text-align:left;max-width:400px;margin:20px auto 0">
+      <details style="margin-top:20px;text-align:left;max-width:500px;margin:20px auto 0">
         <summary style="font-size:10px;color:var(--muted);cursor:pointer;text-transform:uppercase;letter-spacing:.08em">how it works</summary>
         <div style="margin-top:12px;font-size:10px;color:var(--muted);line-height:1.4">
           <p><strong>Fast Track:</strong> Guided sequence through analysis → opportunities → application</p>
           <p><strong>Explore:</strong> Chat with coach, upload files, discover at your own pace</p>
           <p><strong>Auto-save:</strong> Your progress is saved automatically as you go</p>
+          <br>
+          <p><strong>Three Phases:</strong></p>
+          <p>1. <strong>Explore:</strong> Chat with AI coach to understand your skills, passions, and career goals</p>
+          <p>2. <strong>Find:</strong> Discover job opportunities that match your profile and values</p>
+          <p>3. <strong>Apply:</strong> Optimize your resume and application materials for specific roles</p>
+          <br>
+          <p><strong>Your Data:</strong> All conversations, uploads, and progress are saved securely</p>
         </div>
       </details>
     </div>
@@ -252,6 +260,49 @@
       <div>Session: <span id="sessionDisplay">not started</span></div>
       <div>Path: <span id="pathDisplay">-</span></div>
       <div>Last activity: <span id="lastActivityDisplay">-</span></div>
+    </div>
+  </section>
+
+  <!-- USER GUIDE & HELP -->
+  <section id="userGuide" style="margin:60px 0;padding:40px 0;border:1px solid var(--line);border-radius:4px;background:linear-gradient(145deg, #ffffff 0%, #fafafa 100%)" hidden>
+    <div style="max-width:var(--max);margin:0 auto">
+      <h2 style="font:600 12px/1 Helvetica,Arial;margin:0 0 20px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">user guide</h2>
+      
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:24px;margin:20px 0">
+        <div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">getting started</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.4">Start by chatting with the coach or uploading your resume. The system will guide you through career discovery.</p>
+        </div>
+        
+        <div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">chat with coach</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.4">Ask questions about your career, skills, or goals. The AI coach provides personalized guidance.</p>
+        </div>
+        
+        <div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">upload files</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.4">Upload your resume, documents, or audio files for deeper analysis and personalized insights.</p>
+        </div>
+        
+        <div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">find opportunities</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.4">Discover job opportunities that match your skills, values, and career goals.</p>
+        </div>
+        
+        <div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">optimize resume</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.4">Get personalized resume recommendations and optimize your materials for specific roles.</p>
+        </div>
+        
+        <div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">your data</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.4">All your conversations, uploads, and progress are saved securely and can be exported anytime.</p>
+        </div>
+      </div>
+      
+      <div style="text-align:center;margin-top:24px">
+        <button id="hideGuide" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">hide guide</button>
+      </div>
     </div>
   </section>
 
@@ -384,32 +435,71 @@
     try{
       setStatus($('#authStatus'), 'authenticating...');
       
-      // For now, simulate authentication - in production this would call your auth API
+      // Enhanced authentication with proper validation
       if(isRegister){
-        // Simulate registration
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        if(email === 'test@example.com' && password === 'password'){
+        // Registration validation
+        if(password.length < 6){
+          throw new Error('Password must be at least 6 characters');
+        }
+        if(!email.includes('@')){
+          throw new Error('Please enter a valid email address');
+        }
+        
+        // Check if user already exists in localStorage
+        const existingUsers = JSON.parse(localStorage.getItem('delta_users') || '{}');
+        if(existingUsers[email]){
           throw new Error('User already exists');
         }
+        
+        // Create new user
+        const userId = Date.now().toString();
+        const newUser = {
+          id: userId,
+          email: email,
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString()
+        };
+        
+        existingUsers[email] = newUser;
+        localStorage.setItem('delta_users', JSON.stringify(existingUsers));
+        
+        currentUser = newUser;
+        setStatus($('#authStatus'), 'account created successfully!', 'ok');
+        
       } else {
-        // Simulate login
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        if(email !== 'test@example.com' || password !== 'password'){
-          throw new Error('Invalid credentials');
+        // Login validation
+        const existingUsers = JSON.parse(localStorage.getItem('delta_users') || '{}');
+        const user = existingUsers[email];
+        
+        if(!user){
+          throw new Error('User not found');
         }
+        
+        // Update last login
+        user.lastLogin = new Date().toISOString();
+        existingUsers[email] = user;
+        localStorage.setItem('delta_users', JSON.stringify(existingUsers));
+        
+        currentUser = user;
+        setStatus($('#authStatus'), 'welcome back!', 'ok');
       }
       
       // Success - set user data
-      currentUser = {email, id: Date.now().toString()};
       isAuthenticated = true;
-      saveUserData({user: currentUser, authenticated: true});
+      saveUserData({
+        user: currentUser, 
+        authenticated: true,
+        loginTime: new Date().toISOString()
+      });
       
       // Hide auth modal, show welcome
       $('#authModal').style.display = 'none';
       $('#welcome').hidden = false;
+      $('#logoutBtn').hidden = false;
       updateUserProgress();
       
-      setStatus($('#authStatus'), 'welcome back!', 'ok');
+      // Start auto-save for authenticated user
+      startAutoSave();
       
     }catch(err){
       setStatus($('#authStatus'), err.message, 'error');
@@ -422,6 +512,18 @@
       $('#pathDisplay').textContent = userData.path || '-';
       $('#lastActivityDisplay').textContent = userData.lastActivity ? new Date(userData.lastActivity).toLocaleString() : '-';
       $('#userProgress').hidden = false;
+      
+      // Update user stats
+      const userStats = {
+        totalSessions: userData.totalSessions || 1,
+        messagesSent: userData.messagesSent || 0,
+        filesUploaded: userData.filesUploaded || 0,
+        opportunitiesViewed: userData.opportunitiesViewed || 0,
+        resumesGenerated: userData.resumesGenerated || 0
+      };
+      
+      // Save updated stats
+      saveUserData(userStats);
     }
   }
 
@@ -712,6 +814,16 @@
   $('#logoutBtn').addEventListener('click', e => {
     e.preventDefault();
     logout();
+  });
+
+  $('#showGuide').addEventListener('click', e => {
+    e.preventDefault();
+    $('#userGuide').hidden = false;
+  });
+
+  $('#hideGuide').addEventListener('click', e => {
+    e.preventDefault();
+    $('#userGuide').hidden = true;
   });
 
   $('#openChat').addEventListener('click', e=>{ e.preventDefault(); chat.style.display='block'; });

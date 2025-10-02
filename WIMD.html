@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Mosaic Minimal UI Sketch</title>
+<style>
+  :root {
+    --bg: #f7f8fb;
+    --panel: #ffffff;
+    --accent: #5165f6;
+    --text: #1c1c28;
+    --muted: #6f738b;
+    --border: #d9dce8;
+  }
+  body {
+    margin: 0;
+    font-family: "Inter", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .shell {
+    display: grid;
+    grid-template-columns: minmax(320px, 480px) minmax(260px, 1fr);
+    gap: 24px;
+    padding: 32px clamp(24px, 6vw, 72px);
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(28, 28, 40, 0.05);
+  }
+  .chat-panel {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .chat-stream {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .message {
+    padding: 16px 18px;
+    border-radius: 14px;
+    line-height: 1.5;
+  }
+  .message.user {
+    background: #edf0ff;
+    align-self: flex-start;
+  }
+  .message.coach {
+    background: #f3f4f9;
+    border-left: 4px solid var(--accent);
+  }
+  .metrics {
+    display: flex;
+    gap: 12px;
+  }
+  .metric-pill {
+    flex: 1;
+    background: #eff2ff;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .metric-pill strong {
+    color: var(--accent);
+    font-size: 16px;
+  }
+  .composer {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    gap: 16px;
+    background: #fafbff;
+  }
+  .composer textarea {
+    flex: 1;
+    border: none;
+    resize: vertical;
+    min-height: 64px;
+    font-family: inherit;
+    font-size: 15px;
+    background: transparent;
+    color: var(--text);
+  }
+  .composer textarea:focus {
+    outline: none;
+  }
+  .focus-select {
+    width: 160px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .submit-btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .sidebar {
+    display: grid;
+    gap: 24px;
+  }
+  .card {
+    padding: 22px 24px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--panel);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 200px;
+  }
+  .card h3 {
+    margin: 0;
+    font-size: 18px;
+  }
+  .card header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .job-card {
+    border: 1px solid #e0e3f3;
+    border-radius: 14px;
+    padding: 16px;
+    background: #f9faff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .job-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .job-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .job-actions button {
+    flex: 1;
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 10px;
+    padding: 8px 0;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .ledger-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+  }
+  .ledger-item {
+    border-left: 3px solid var(--accent);
+    background: #f7f8ff;
+    padding: 12px 16px;
+    border-radius: 12px;
+  }
+  @media (max-width: 960px) {
+    .shell {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+  <main class="shell">
+    <section class="panel chat-panel">
+      <div class="chat-header">
+        <h2>Coach Stream</h2>
+        <p class="muted">Live problem-solving with MOSAIC metrics</p>
+      </div>
+      <div class="chat-stream">
+        <div class="message user">
+          “I’m torn between staying IC or going into platform leadership. How do I de-risk the next 90 days?”
+        </div>
+        <div class="message coach">
+          “Stay with experimentation. Your clarity is climbing (72). Let’s map two pilot bets, then use OpportunityBridge’s Build stream to source matching companies.”
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric-pill"><span>Clarity</span><strong>72</strong></div>
+        <div class="metric-pill"><span>Action</span><strong>51</strong></div>
+        <div class="metric-pill"><span>Momentum</span><strong>44</strong></div>
+      </div>
+      <div class="composer">
+        <textarea placeholder="Ask the coach…"></textarea>
+        <select class="focus-select">
+          <option>MOSAIC focus</option>
+          <option>Problem framing</option>
+          <option>Opportunity bridge</option>
+          <option>Resume rewrite</option>
+        </select>
+        <button class="submit-btn">Send</button>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="card">
+        <header>
+          <h3>Top Opportunities</h3>
+          <span>Build · Buy · Signal</span>
+        </header>
+        <div class="job-card">
+          <div><strong>[Build]</strong> Platform Lead — Mosaic Delta Lab</div>
+          <div class="job-tags">
+            <span>from scratch</span><span>internal SDK</span><span>remote (NA)</span>
+          </div>
+          <p class="muted">“Launch internal developer platform 0→1” · Posted Sep 27 via Lever</p>
+          <div class="job-actions">
+            <button>Save</button>
+            <button>Ignore</button>
+          </div>
+        </div>
+        <div class="job-card">
+          <div><strong>[Buy]</strong> Vendor Integration PM — What Is My Delta</div>
+          <div class="job-tags">
+            <span>evaluate partners</span><span>90-day pilot</span>
+          </div>
+          <p class="muted">“Lead RFP for AI coaching vendors” · Posted Sep 25 via LinkedIn</p>
+          <div class="job-actions">
+            <button>Save</button>
+            <button>Ignore</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <header>
+          <h3>Action Ledger</h3>
+          <span>Next 3 steps</span>
+        </header>
+        <ul class="ledger-list">
+          <li class="ledger-item">
+            Update resume draft with OpportunityBridge insights (Resume tab).
+          </li>
+          <li class="ledger-item">
+            Run OSINT report on Delta Lab’s build signals.
+          </li>
+          <li class="ledger-item">
+            Schedule 30-min debrief to recalibrate MOSAIC metrics after pilot week.
+          </li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>

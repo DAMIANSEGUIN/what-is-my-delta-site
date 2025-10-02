@@ -7,7 +7,7 @@ This plan governs multi-agent collaboration. Follow these gates at every session
 1. `pwd` → confirm `/Users/damianseguin/Downloads/WIMD-Railway-Deploy-Project`.
 2. `git status --short` → ensure clean slate or list inherited diffs.
 3. `git remote -v` → verify `origin` and `railway-origin` URLs.
-4. Read: `CODEX_HANDOFF_*.md` (latest date), `CODEX_INSTRUCTIONS.md:1`, `ROLLING_CHECKLIST.md:1`, `PROJECT_STRUCTURE.md`.
+4. Read: `CODEX_HANDOFF_*.md` (latest date), `CODEX_INSTRUCTIONS.md:1`, `ROLLING_CHECKLIST.md:1`, `PROJECT_STRUCTURE.md`, `AI_ROUTING_PLAN.md`, `JOB_FEED_DISCOVERY_PLAN.md`.
 5. Append a brief session note in `CONVERSATION_NOTES.md` describing intended focus before making changes.
 
 ## Role Boundaries

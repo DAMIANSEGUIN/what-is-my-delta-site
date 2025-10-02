@@ -1,0 +1,31 @@
+# Claude Code - Mosaic Project Configuration
+# Trigger: When user says "Mosaic" in this directory
+
+## Auto-load Context
+When the user mentions "Mosaic", automatically:
+
+1. Load Foundation canon from `/Users/damianseguin/Mosaic/foundation/Mosaic_Foundation_v1.0.md`
+   - First-order canon for all sessions
+   - Environment: Intel MacBook Pro, macOS Monterey, zsh
+   - Code rules: No heredocs, no inline comments, clean quoting, one-shot scripts
+   - Mosaic umbrella: JSM + WIMD + CoachAI
+
+2. Review current Mosaic project state:
+   - Working directory: `/Users/damianseguin/Downloads/WIMD-Railway-Deploy-Project`
+   - Read: `CLAUDE_CODE_README.md` (your role and operational rules)
+   - Read: `CURSOR_CLAUDE_SYNC_README.md` (current team sync state)
+   - Read: `PROJECT_STRUCTURE.md` (if exists - current architecture)
+
+3. Assume role: **Senior Debugger** per CLAUDE_CODE_README.md
+   - Execute tasks directly (no copy-paste commands)
+   - Auto-identify project information
+   - Document troubleshooting
+   - User time is valuable - no syntax errors
+
+## Quick Reference
+- Production: https://whatismydelta.com
+- Railway: https://what-is-my-delta-site-production.up.railway.app
+- Recent fix: Added python-multipart dependency
+- Backend: FastAPI (449 lines, 15 endpoints)
+- Frontend: Netlify
+- Database: SQLite

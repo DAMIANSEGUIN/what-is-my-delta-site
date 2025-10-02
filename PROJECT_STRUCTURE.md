@@ -6,7 +6,7 @@ This document is the single source of truth for where assets live, how they map 
 
 | Path | Role | Git Remote | Notes |
 | --- | --- | --- | --- |
-| `/Users/damianseguin/Downloads/WIMD-Railway-Deploy-Project` | Active workspace, deployment source | `origin` → `wimd-railway-deploy` | Accessible to all agents; use this tree for production edits. |
+| `/Users/damianseguin/Downloads/WIMD-Railway-Deploy-Project` | Active workspace, deployment source | `origin` → `wimd-railway-deploy` | Accessible to all agents; use this tree for production edits. See `AI_ROUTING_PLAN.md` for chat flow contract. |
 | `/Users/damianseguin/projects/mosaic-platform` | Consolidated archive | n/a | Claimed canonical in prior audit but **not** sandbox-accessible; mirror any updates back into Downloads workspace before work continues. |
 | Railway service repo | `railway-origin` → `what-is-my-delta-site` | Mirror of backend used by Railway deploy | Keep branches aligned with active workspace; do not push unrelated assets here. |
 
@@ -40,7 +40,10 @@ This document is the single source of truth for where assets live, how they map 
 │   ├── CODEX_*.md (handoffs, protocols)
 │   ├── ROLLING_CHECKLIST.md (gated tasks)
 │   ├── SESSION_TROUBLESHOOTING_LOG.md
-│   └── OPERATIONS_MANUAL.md
+│   ├── OPERATIONS_MANUAL.md
+│   ├── AI_ROUTING_PLAN.md (CSV → AI → fallback spec)
+│   ├── JOB_FEED_DISCOVERY_PLAN.md (OpportunityBridge sourcing workflow)
+│   └── NETLIFY_AGENT_RUNNER_README.md (handoff instructions)
 ├── Procfile / railway.json (Railway configuration)
 ├── netlify.toml (Netlify proxy rules)
 └── requirements.txt (Backend dependencies)
