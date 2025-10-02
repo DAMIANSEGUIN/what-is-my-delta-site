@@ -44,6 +44,12 @@
   status = 200
   force = true
 
+[[redirects]]
+  from = "/auth/*"
+  to = "https://what-is-my-delta-site-production.up.railway.app/auth/:splat"
+  status = 200
+  force = true
+
 # Fallback to SPA
 [[redirects]]
   from = "/*"
