@@ -1,0 +1,666 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>What Is My Delta — Clean Interface</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{--fg:#000;--muted:#666;--line:#e8e8e8;--hair:#111;--max:980px}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:linear-gradient(135deg, #fafafa 0%, #f8f8f8 100%);color:var(--fg)}
+  body{font:12px/1.75 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  a{color:inherit;text-decoration:none}
+  a:hover,a:focus{text-decoration:underline}
+  .wrap{max-width:var(--max);margin:0 auto;padding:28px 20px;box-shadow:0 1px 3px rgba(0,0,0,0.02);background:#fff;border-radius:2px}
+
+  .nav{display:flex;gap:24px;margin-bottom:60px}
+  .hero{margin:120px 0 40px}
+  .title{font:500 15px/1.4 Helvetica,Arial;letter-spacing:.02em}
+  .sub{color:var(--muted);max-width:64ch}
+  .actions{margin:24px 0 0;display:flex;gap:16px;align-items:center}
+  .quiet{border:1px solid var(--line);padding:6px 10px;background:#fff}
+
+  .chat{position:fixed;right:20px;bottom:20px;width:320px;max-width:90vw;background:#fff;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.06);display:none}
+  .chat header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line)}
+  .chat header .x{border:1px solid var(--line);padding:2px 6px;background:#fff}
+  .chat main{padding:10px 12px;height:220px;overflow:auto}
+  .msg{margin:6px 0}
+  .chat footer{padding:8px 10px;border-top:1px solid var(--line);display:flex;gap:6px}
+  .chat input{flex:1;border:1px solid var(--line);padding:6px 8px}
+
+  .modal{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+  .modal .panel{background:#fff;border:1px solid var(--line);padding:20px;min-width:280px;max-width:92vw}
+  .modal .close{margin-top:16px;border:1px solid var(--line);background:#fff;padding:6px 10px}
+  .drop{border:1px dashed #ccc;padding:24px;text-align:center}
+
+  .status{font-size:11px;color:var(--muted);margin-top:8px}
+  .status.error{color:#b00020}
+  .status.ok{color:#2d7a2d}
+  
+  /* Subtle depth and detail */
+  .flow-circle {
+    box-shadow: 
+      0 1px 3px rgba(0,0,0,0.04),
+      0 0 0 1px rgba(0,0,0,0.02),
+      inset 0 1px 0 rgba(255,255,255,0.8);
+    transition: all 0.2s ease;
+  }
+  
+  .flow-circle:hover {
+    box-shadow: 
+      0 2px 6px rgba(0,0,0,0.06),
+      0 0 0 1px rgba(0,0,0,0.03),
+      inset 0 1px 0 rgba(255,255,255,0.9);
+    transform: translateY(-1px);
+  }
+  
+  .flow-circle.active {
+    box-shadow: 
+      0 3px 8px rgba(0,0,0,0.08),
+      0 0 0 1px rgba(0,0,0,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.95);
+  }
+  
+  .quiet {
+    box-shadow: 
+      0 1px 2px rgba(0,0,0,0.03),
+      inset 0 1px 0 rgba(255,255,255,0.6);
+    transition: all 0.15s ease;
+  }
+  
+  .quiet:hover {
+    box-shadow: 
+      0 2px 4px rgba(0,0,0,0.05),
+      inset 0 1px 0 rgba(255,255,255,0.8);
+    transform: translateY(-0.5px);
+  }
+  
+  .quiet:active {
+    transform: translateY(0);
+    box-shadow: 
+      0 1px 2px rgba(0,0,0,0.02),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  
+  .section-card {
+    box-shadow: 
+      0 1px 3px rgba(0,0,0,0.02),
+      0 0 0 1px rgba(0,0,0,0.01);
+    transition: all 0.2s ease;
+  }
+  
+  .section-card:hover {
+    box-shadow: 
+      0 2px 6px rgba(0,0,0,0.04),
+      0 0 0 1px rgba(0,0,0,0.02);
+  }
+  .job-card{border:1px solid var(--line);padding:12px;margin:12px 0;cursor:pointer;transition:border-color .2s ease}
+  .job-card.selected{border-color:var(--hair)}
+  .job-card.applied{border-style:dashed}
+  .job-actions{display:flex;gap:8px;margin-top:10px}
+  .pill{display:inline-block;border:1px solid var(--line);padding:2px 6px;margin:2px 4px 0 0;font-size:10px;color:var(--muted)}
+  .muted{color:var(--muted);font-size:11px}
+  .resume-output{border:1px solid var(--line);padding:12px;background:#fafafa;margin-top:12px;white-space:pre-wrap}
+  .loading{opacity:.6;pointer-events:none}
+  @media (max-width:860px){.nav{flex-direction:column;gap:12px}}
+</style>
+
+<div class="wrap">
+  <nav class="nav">
+    <a id="openUpload" href="#" title="Upload a resume, image, or audio">upload</a>
+    <a id="openChat" href="#" title="Open coaching chat">chat</a>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="title">WHAT IS MY DELTA</div>
+    <p class="sub">career transition platform. discover your path. find your fit. take action.</p>
+  </header>
+
+  <!-- JOURNEY FLOW -->
+  <section style="margin:80px 0;padding:40px 0">
+    <div style="max-width:var(--max);margin:0 auto">
+      <h2 style="font:600 12px/1 Helvetica,Arial;margin:0 0 40px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">your career transition</h2>
+      
+      <!-- ORGANIC FLOW -->
+      <div style="display:flex;justify-content:center;align-items:center;margin:60px 0;position:relative">
+            <!-- EXPLORE -->
+            <div style="position:absolute;left:0;top:0;text-align:center">
+              <div class="flow-circle" style="width:50px;height:50px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font:600 14px/1 Helvetica,Arial;background:#fff">E</div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">explore</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.3;max-width:100px">skills, passions, and career goals</p>
+        </div>
+        
+            <!-- FIND -->
+            <div style="position:absolute;right:0;top:0;text-align:center">
+              <div class="flow-circle" style="width:50px;height:50px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font:600 14px/1 Helvetica,Arial;background:#fff">F</div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">find</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.3;max-width:100px">opportunities that align with you</p>
+        </div>
+        
+            <!-- APPLY -->
+            <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center">
+              <div class="flow-circle active" style="width:60px;height:60px;border:2px solid var(--hair);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font:600 16px/1 Helvetica,Arial;background:#fff">A</div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">apply</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.3;max-width:100px">optimize for specific roles</p>
+        </div>
+        
+            <!-- CONNECTING LINES -->
+            <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 300 200">
+              <defs>
+                <linearGradient id="lineGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:var(--line);stop-opacity:0.2" />
+                  <stop offset="50%" style="stop-color:var(--line);stop-opacity:0.4" />
+                  <stop offset="100%" style="stop-color:var(--line);stop-opacity:0.2" />
+                </linearGradient>
+              </defs>
+              <path d="M50,25 Q150,100 250,25" stroke="url(#lineGrad1)" stroke-width="1.5" fill="none"/>
+              <path d="M50,25 Q150,150 150,100" stroke="url(#lineGrad1)" stroke-width="1.5" fill="none"/>
+              <path d="M250,25 Q150,150 150,100" stroke="url(#lineGrad1)" stroke-width="1.5" fill="none"/>
+            </svg>
+      </div>
+      
+      <!-- START ACTIONS -->
+      <div style="text-align:center;margin-top:80px">
+        <p style="margin:0 0 20px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">begin anywhere</p>
+        <div style="display:flex;gap:8px;justify-content:center;align-items:center">
+          <button id="startDiscovery" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">explore</button>
+          <button id="openUpload" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">upload</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATUS AND OUTPUTS -->
+  <div id="status" class="status" aria-live="polite"></div>
+  <div id="jobsStatus" class="status" aria-live="polite"></div>
+  <div id="jobsList" aria-live="polite"></div>
+  <div id="resumeStatus" class="status" aria-live="polite"></div>
+  <pre id="resumeOutput" class="resume-output" hidden></pre>
+
+  <!-- FOOTER -->
+  <footer style="border-top:1px solid var(--line);margin-top:140px;padding:14px 0;color:#777;font-size:12px;display:flex;justify-content:space-between">
+    <div>© <span id="y"></span> Delta</div>
+    <div>privacy · terms · support</div>
+  </footer>
+</div>
+
+<!-- CHAT -->
+<aside class="chat" id="chat">
+  <header>
+    <div>coaching</div>
+    <button class="x" id="closeChat" title="Close">×</button>
+  </header>
+  <main id="chatLog" aria-live="polite"></main>
+  <footer>
+    <input id="chatInput" placeholder="type and enter…" aria-label="message">
+    <button class="btn" id="sendMsg">send</button>
+  </footer>
+</aside>
+
+<!-- UPLOAD MODAL -->
+<div class="modal" id="uploadModal">
+  <div class="panel">
+    <div class="drop">
+      <div style="margin-bottom:10px">upload a resume, image, or audio</div>
+      <input type="file" id="filePick" multiple>
+    </div>
+    <div id="uploadStatus" class="status" aria-live="polite"></div>
+    <button class="close" id="closeUpload">close</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+  const SESSION_KEY = 'delta_session_id';
+  const AUTO = 'delta_auto_v2';
+  const SEEN = 'delta_seen_intro_v1';
+  let sessionId = localStorage.getItem(SESSION_KEY) || '';
+  let apiBase = '';
+  let configPromise = null;
+  let jobCache = [];
+  let selectedJobId = null;
+  let lastResumeDraft = '';
+
+  if(sessionId) {
+    document.body.dataset.session = sessionId;
+  }
+
+  const chat = $('#chat');
+  const chatLog = $('#chatLog');
+  const chatInput = $('#chatInput');
+  const sendMsg = $('#sendMsg');
+  const modal = $('#uploadModal');
+  const filePick = $('#filePick');
+  const uploadStatus = $('#uploadStatus');
+  const jobsButton = $('#jobsFetch');
+  const jobsStatus = $('#jobsStatus');
+  const jobsList = $('#jobsList');
+  const resumeRewriteBtn = $('#resumeRewrite');
+  const resumeCustomizeBtn = $('#resumeCustomize');
+  const resumeFeedbackBtn = $('#resumeFeedback');
+  const resumeStatus = $('#resumeStatus');
+  const resumeOutput = $('#resumeOutput');
+  const jobsButtonLabel = jobsButton ? jobsButton.textContent.trim() : '';
+  const status = $('#status');
+
+  $('#y').textContent = new Date().getFullYear();
+
+  function setStatus(el, msg, kind='info'){
+    if(!el) return;
+    el.textContent = msg || '';
+    el.classList.remove('error','ok');
+    if(!msg) return;
+    if(kind === 'error') el.classList.add('error');
+    else if(kind === 'ok') el.classList.add('ok');
+  }
+
+  function setSession(id){
+    if(!id) return;
+    sessionId = id;
+    localStorage.setItem(SESSION_KEY, id);
+    document.body.dataset.session = id;
+  }
+
+  async function ensureConfig(){
+    if(apiBase) return apiBase;
+    if(configPromise) return configPromise;
+    const endpoints = [
+      `${window.location.origin}/config`,
+      'https://what-is-my-delta-site-production.up.railway.app/config',
+      'https://whatismydelta.com/config'
+    ];
+    configPromise = (async ()=>{
+      for(const url of endpoints){
+        try{
+          const res = await fetch(url, {mode:'cors'});
+          if(!res.ok) continue;
+          const data = await res.json();
+          apiBase = (data.apiBase || new URL(url).origin || '').replace(/\/$/,'');
+          if(!apiBase) apiBase = new URL(url).origin;
+          document.body.dataset.apiBase = apiBase;
+          return apiBase;
+        }catch(err){
+          // ignore endpoint failure
+        }
+      }
+      apiBase = 'https://what-is-my-delta-site-production.up.railway.app';
+      document.body.dataset.apiBase = apiBase;
+      return apiBase;
+    })();
+    return configPromise;
+  }
+
+  async function callJson(path, {method='GET', body, headers={}} = {}){
+    await ensureConfig();
+    const init = {method, headers:{...headers}};
+    if(body !== undefined){
+      if(body instanceof FormData){
+        init.body = body;
+      }else{
+        init.headers['Content-Type'] = 'application/json';
+        init.body = JSON.stringify(body);
+      }
+    }
+    if(sessionId){
+      init.headers['X-Session-ID'] = sessionId;
+    }
+    const res = await fetch(`${apiBase}${path}`, init);
+    let data = null;
+    try{ data = await res.json(); } catch(err){ data = null; }
+    if(!res.ok){
+      const message = (data && (data.detail || data.error)) || `request_failed (${res.status})`;
+      throw new Error(message);
+    }
+    if(data && data.session_id) setSession(data.session_id);
+    return data || {};
+  }
+
+  async function uploadToWimd(file){
+    await ensureConfig();
+    const headers = {};
+    if(sessionId) headers['X-Session-ID'] = sessionId;
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch(`${apiBase}/wimd/upload`, {method:'POST', headers, body: form});
+    let data = null;
+    try{ data = await res.json(); } catch(err){ data = null; }
+    if(!res.ok){
+      const message = (data && (data.detail || data.error)) || `upload_failed (${res.status})`;
+      throw new Error(message);
+    }
+    if(data && data.session_id) setSession(data.session_id);
+    return data;
+  }
+
+  function getJob(jobId){
+    return jobCache.find(item => item.job_id === jobId);
+  }
+
+  function highlightSelected(){
+    $$('.job-card').forEach(card => {
+      card.classList.toggle('selected', card.dataset.jobId === selectedJobId);
+    });
+  }
+
+  function renderJobs(matches){
+    jobCache = Array.isArray(matches) ? matches : [];
+    jobsList.innerHTML = '';
+    selectedJobId = null;
+    if(!jobCache.length){
+      setStatus(jobsStatus, 'no opportunities yet — keep working the coach flow', 'info');
+      return;
+    }
+    jobCache.forEach(match=>{
+      const skillsArr = Array.isArray(match.skills_match) ? match.skills_match : [];
+      const valuesArr = Array.isArray(match.values_match) ? match.values_match : [];
+      const card = document.createElement('div');
+      card.className = 'job-card';
+      card.dataset.jobId = match.job_id;
+      const fit = Math.round(match.fit_score || 0);
+      card.innerHTML = `
+        <div><strong>${match.role}</strong> — ${match.company}</div>
+        <div class="muted">${match.location || 'remote'}</div>
+        <div class="muted">fit score: ${fit}%</div>
+        <div class="muted">skills</div>
+        <div>${skillsArr.map(s=>`<span class=\"pill\">${s}</span>`).join(' ')}</div>
+        <div class="muted">values</div>
+        <div>${valuesArr.map(s=>`<span class=\"pill\">${s}</span>`).join(' ')}</div>
+        <div class="job-actions">
+          <button class="quiet job-select" type="button">focus</button>
+          <button class="quiet job-apply" type="button">apply</button>
+        </div>
+      `;
+      jobsList.appendChild(card);
+    });
+    setStatus(jobsStatus, `found ${jobCache.length} opportunities`, 'ok');
+  }
+
+  function selectJob(jobId){
+    if(!jobId) return;
+    selectedJobId = jobId;
+    highlightSelected();
+    const job = getJob(jobId);
+    setStatus(jobsStatus, job ? `focused on ${job.role}` : `focused on ${jobId}`, 'ok');
+  }
+
+  function currentResumeSource(){
+    if(lastResumeDraft) return lastResumeDraft;
+    return '';
+  }
+
+  function setResumeOutput(text){
+    lastResumeDraft = text || '';
+    if(resumeOutput){
+      if(lastResumeDraft){
+        resumeOutput.textContent = lastResumeDraft;
+        resumeOutput.hidden = false;
+      }else{
+        resumeOutput.hidden = true;
+      }
+    }
+  }
+
+  async function askCoach(prompt){
+    const payload = {prompt};
+    if(sessionId) payload.session_id = sessionId;
+    const data = await callJson('/wimd', {method:'POST', body: payload});
+    return data.message || 'noted.';
+  }
+
+  async function fetchOpportunities(){
+    if(!sessionId){
+      throw new Error('start with the coach to unlock matches');
+    }
+    const data = await callJson('/ob/opportunities');
+    renderJobs(data.opportunities || []);
+  }
+
+  async function applyForJob(jobId, notes=''){
+    const data = await callJson('/ob/apply', {
+      method:'POST',
+      body: {job_id: jobId, notes},
+    });
+    const job = getJob(jobId);
+    if(job){
+      job.extras = job.extras || {};
+      job.extras.status = 'applied';
+    }
+    const card = jobsList.querySelector(`.job-card[data-job-id="${jobId}"]`);
+    if(card){
+      card.classList.add('applied');
+    }
+    return data;
+  }
+
+  async function rewriteResume(jobId, source){
+    const body = {};
+    if(sessionId) body.session_id = sessionId;
+    if(jobId) body.job_id = jobId;
+    if(source) body.source_resume = source;
+    const data = await callJson('/resume/rewrite', {method:'POST', body});
+    setResumeOutput(data.resume || '');
+    return data;
+  }
+
+  async function customizeResume(jobId, source, job){
+    if(!jobId) throw new Error('select an opportunity first');
+    if(!source) throw new Error('add resume content first');
+    const body = {
+      job_id: jobId,
+      resume: source,
+      highlight_skills: Array.isArray(job?.skills_match) ? job.skills_match : [],
+    };
+    if(sessionId) body.session_id = sessionId;
+    const data = await callJson('/resume/customize', {method:'POST', body});
+    setResumeOutput(data.resume || '');
+    return data;
+  }
+
+  async function resumeFeedback(source){
+    if(!source) throw new Error('need a resume draft first');
+    const body = {resume: source};
+    if(sessionId) body.session_id = sessionId;
+    const data = await callJson('/resume/feedback', {method:'POST', body});
+    return data;
+  }
+
+  ensureConfig().then(()=>{
+    if(sessionId){
+      callJson('/wimd/metrics').catch(()=>{});
+    }
+  }).catch(()=>{});
+
+  $('#openChat').addEventListener('click', e=>{ e.preventDefault(); chat.style.display='block'; });
+  $('#closeChat').addEventListener('click', ()=>{ chat.style.display='none'; });
+  
+  $('#startDiscovery').addEventListener('click', e=>{ 
+    e.preventDefault(); 
+    chat.style.display='block';
+    addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
+  });
+
+  // Add missing event handlers for the new interface
+  $('#findOpportunities').addEventListener('click', async e => {
+    e.preventDefault();
+    setStatus(status, 'finding opportunities...');
+    try {
+      const opportunities = await fetchOpportunities();
+      setStatus(status, `found ${opportunities.length} opportunities`, 'ok');
+    } catch(err) {
+      setStatus(status, err.message, 'error');
+    }
+  });
+
+  $('#resumeRewrite').addEventListener('click', async e => {
+    e.preventDefault();
+    setStatus(resumeStatus, 'rewriting resume...');
+    try {
+      const data = await rewriteResume(selectedJobId, '');
+      setStatus(resumeStatus, `resume rewritten`, 'ok');
+    } catch(err) {
+      setStatus(resumeStatus, err.message, 'error');
+    }
+  });
+
+  function addMsg(txt, who='you'){
+    const div = document.createElement('div');
+    div.className = 'msg';
+    div.textContent = (who==='you'?'> ':'') + txt;
+    chatLog.appendChild(div);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  async function send(){
+    const v = (chatInput.value || '').trim();
+    if(!v) return;
+    addMsg(v, 'you');
+    chatInput.value = '';
+    try{
+      const r = await askCoach(v);
+      addMsg(r, 'bot');
+    }catch(err){
+      addMsg(err.message || '…connection issue', 'bot');
+    }
+  }
+
+  chatInput.addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      send();
+    }
+  });
+  sendMsg.addEventListener('click', send);
+
+  $('#openUpload').addEventListener('click', e=>{
+    e.preventDefault();
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  });
+  $('#closeUpload').addEventListener('click', ()=>{
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    setStatus(uploadStatus, '');
+  });
+
+  if(filePick){
+    filePick.addEventListener('change', async e=>{
+      const file = (e.target.files || [])[0];
+      if(!file) return;
+      try{
+        setStatus(uploadStatus, `uploading ${file.name}…`);
+        await uploadToWimd(file);
+        setStatus(uploadStatus, `${file.name} uploaded`, 'ok');
+      }catch(err){
+        setStatus(uploadStatus, err.message, 'error');
+      }finally{
+        e.target.value = '';
+      }
+    });
+  }
+
+  if(jobsButton){
+    jobsButton.addEventListener('click', async e=>{
+      e.preventDefault();
+      jobsButton.classList.add('loading');
+      jobsButton.textContent = 'finding…';
+      setStatus(jobsStatus, '');
+      try{
+        await fetchOpportunities();
+      }catch(err){
+        setStatus(jobsStatus, err.message, 'error');
+      }finally{
+        jobsButton.classList.remove('loading');
+        jobsButton.textContent = jobsButtonLabel || 'find opportunities';
+      }
+    });
+  }
+
+  if(jobsList){
+    jobsList.addEventListener('click', async e=>{
+      const card = e.target.closest('.job-card');
+      if(!card) return;
+      const jobId = card.dataset.jobId;
+      if(e.target.classList.contains('job-select')){
+        selectJob(jobId);
+        return;
+      }
+      if(e.target.classList.contains('job-apply')){
+        e.preventDefault();
+        card.classList.add('loading');
+        try{
+          const data = await applyForJob(jobId);
+          selectJob(jobId);
+          setStatus(jobsStatus, `applied to ${data.job?.role || jobId}`, 'ok');
+        }catch(err){
+          setStatus(jobsStatus, err.message, 'error');
+        }finally{
+          card.classList.remove('loading');
+        }
+      }
+    });
+  }
+
+  if(resumeRewriteBtn){
+    resumeRewriteBtn.addEventListener('click', async e=>{
+      e.preventDefault();
+      const source = currentResumeSource();
+      resumeRewriteBtn.classList.add('loading');
+      setStatus(resumeStatus, 'rewriting…');
+      try{
+        const data = await rewriteResume(selectedJobId, source);
+        setStatus(resumeStatus, `saved ${data.version_name}`, 'ok');
+      }catch(err){
+        setStatus(resumeStatus, err.message, 'error');
+      }finally{
+        resumeRewriteBtn.classList.remove('loading');
+      }
+    });
+  }
+
+  if(resumeCustomizeBtn){
+    resumeCustomizeBtn.addEventListener('click', async e=>{
+      e.preventDefault();
+      const job = getJob(selectedJobId);
+      const source = currentResumeSource();
+      resumeCustomizeBtn.classList.add('loading');
+      setStatus(resumeStatus, 'customizing…');
+      try{
+        const data = await customizeResume(selectedJobId, source, job);
+        setStatus(resumeStatus, `customized for ${data.version_name}`, 'ok');
+      }catch(err){
+        setStatus(resumeStatus, err.message, 'error');
+      }finally{
+        resumeCustomizeBtn.classList.remove('loading');
+      }
+    });
+  }
+
+  if(resumeFeedbackBtn){
+    resumeFeedbackBtn.addEventListener('click', async e=>{
+      e.preventDefault();
+      const source = currentResumeSource();
+      resumeFeedbackBtn.classList.add('loading');
+      setStatus(resumeStatus, 'scanning draft…');
+      try{
+        const data = await resumeFeedback(source);
+        const suggestions = data.suggestions || [];
+        setStatus(resumeStatus, suggestions.length ? suggestions.join(' • ') : 'no changes suggested', 'ok');
+      }catch(err){
+        setStatus(resumeStatus, err.message, 'error');
+      }finally{
+        resumeFeedbackBtn.classList.remove('loading');
+      }
+    });
+  }
+
+  // Auto-open chat for new users
+  if(!localStorage.getItem(SEEN)){
+    chat.style.display = 'block';
+    addMsg('hi — let\'s work on your career transition. what would you like to explore?', 'bot');
+    localStorage.setItem(SEEN, '1');
+  }
+})();
+</script>
+</body>
+</html>

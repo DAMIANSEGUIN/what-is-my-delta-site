@@ -29,3 +29,11 @@
 | 5.5 | Resume endpoints (`/resume/*`) wired | AI | `api/index.py` | ✅ |
 | 5.6 | Mosaic UI wired to API flows | AI | `mosaic_ui/index.html` | ✅ |
 | 6.1 | Run `predeploy_sanity.sh` (Phase 3) | AI | `scripts/predeploy_sanity.sh` | ✅ |
+| 7.1 | User authentication system | Claude in Cursor | `mosaic_ui/index.html` | ✅ (2025-10-02) |
+| 7.2 | User onboarding and guide | Claude in Cursor | `mosaic_ui/index.html` | ✅ (2025-10-02) |
+| 7.3 | File organization cleanup | Claude in Cursor | `mosaic_ui/` | ✅ (2025-10-02) |
+| 7.4 | User experience enhancement | Claude in Cursor | `mosaic_ui/index.html` | ✅ (2025-10-02) |
+| 8.1 | Backend user authentication APIs | CODEX | `api/index.py`, `api/storage.py` | ☐ |
+| 8.2 | Database user table | CODEX | Database schema | ☐ |
+| 8.3 | Railway deployment updates | Claude Code | Railway config | ☐ |
+| 8.4 | Production testing | Claude Code | All endpoints | ☐ |
