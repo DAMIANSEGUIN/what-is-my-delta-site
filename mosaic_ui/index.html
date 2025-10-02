@@ -1,15 +1,15 @@
 <!doctype html>
 <meta charset="utf-8">
-<title>What Is My Delta — Unified Minimal Demo</title>
+<title>What Is My Delta — Clean Interface</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root{--fg:#000;--muted:#666;--line:#e8e8e8;--hair:#111;--max:980px}
   *{box-sizing:border-box}
-  html,body{margin:0;background:#fff;color:var(--fg)}
+  html,body{margin:0;background:linear-gradient(135deg, #fafafa 0%, #f8f8f8 100%);color:var(--fg)}
   body{font:12px/1.75 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
   a{color:inherit;text-decoration:none}
   a:hover,a:focus{text-decoration:underline}
-  .wrap{max-width:var(--max);margin:0 auto;padding:28px 20px}
+  .wrap{max-width:var(--max);margin:0 auto;padding:28px 20px;box-shadow:0 1px 3px rgba(0,0,0,0.02);background:#fff;border-radius:2px}
 
   .nav{display:flex;gap:24px;margin-bottom:60px}
   .hero{margin:120px 0 40px}
@@ -17,27 +17,6 @@
   .sub{color:var(--muted);max-width:64ch}
   .actions{margin:24px 0 0;display:flex;gap:16px;align-items:center}
   .quiet{border:1px solid var(--line);padding:6px 10px;background:#fff}
-
-  svg.schema{display:block;width:100%;height:auto;margin:50px 0}
-  .wire{stroke:var(--hair);stroke-width:.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
-  .dot{fill:var(--hair)}
-
-  .rule{border-top:1px solid var(--line);margin:80px 0}
-  .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:30px 0 90px}
-  .card{border:1px solid var(--line);padding:14px}
-  .k{color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:10px}
-  .v{font-size:18px;font-weight:600;margin-top:4px}
-
-  .island{margin:100px 0}
-  .module{margin:70px 0}
-  .module h3{margin:0 0 6px;font:600 12px/1 Helvetica,Arial;text-transform:uppercase;letter-spacing:.06em}
-  .module ul{list-style:none;margin:6px 0 0;padding:0;color:var(--muted)}
-  .module li{margin:3px 0}
-  textarea.small{width:100%;min-height:60px;border:1px solid var(--line);padding:8px;background:#fff}
-
-  .welcome-title{font:600 12px/1 Helvetica,Arial;text-transform:uppercase;letter-spacing:.08em}
-  details.micro{margin-top:16px}
-  details.micro summary{cursor:pointer}
 
   .chat{position:fixed;right:20px;bottom:20px;width:320px;max-width:90vw;background:#fff;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.06);display:none}
   .chat header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line)}
@@ -47,24 +26,72 @@
   .chat footer{padding:8px 10px;border-top:1px solid var(--line);display:flex;gap:6px}
   .chat input{flex:1;border:1px solid var(--line);padding:6px 8px}
 
-  .modal{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center}
+  .modal{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
   .modal .panel{background:#fff;border:1px solid var(--line);padding:20px;min-width:280px;max-width:92vw}
   .modal .close{margin-top:16px;border:1px solid var(--line);background:#fff;padding:6px 10px}
   .drop{border:1px dashed #ccc;padding:24px;text-align:center}
 
-  .savebar{margin:80px 0 0;display:flex;gap:18px}
-  .btn{border:1px solid var(--line);padding:6px 10px;background:#fff}
-
-  .formrow{margin:16px 0}
-  .radio{display:flex;gap:12px;align-items:center}
-  .radio label{display:flex;gap:6px;align-items:center}
-  .notice{position:fixed;left:20px;right:20px;bottom:16px;display:none;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--line);padding:8px 10px}
-  .notice .btn{border:1px solid var(--line);background:#fff;padding:6px 10px}
-
-  .foot{border-top:1px solid var(--line);margin-top:140px;padding:14px 0;color:#777;font-size:12px;display:flex;justify-content:space-between}
   .status{font-size:11px;color:var(--muted);margin-top:8px}
   .status.error{color:#b00020}
   .status.ok{color:#2d7a2d}
+  
+  /* Subtle depth and detail */
+  .flow-circle {
+    box-shadow: 
+      0 1px 3px rgba(0,0,0,0.04),
+      0 0 0 1px rgba(0,0,0,0.02),
+      inset 0 1px 0 rgba(255,255,255,0.8);
+    transition: all 0.2s ease;
+  }
+  
+  .flow-circle:hover {
+    box-shadow: 
+      0 2px 6px rgba(0,0,0,0.06),
+      0 0 0 1px rgba(0,0,0,0.03),
+      inset 0 1px 0 rgba(255,255,255,0.9);
+    transform: translateY(-1px);
+  }
+  
+  .flow-circle.active {
+    box-shadow: 
+      0 3px 8px rgba(0,0,0,0.08),
+      0 0 0 1px rgba(0,0,0,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.95);
+  }
+  
+  .quiet {
+    box-shadow: 
+      0 1px 2px rgba(0,0,0,0.03),
+      inset 0 1px 0 rgba(255,255,255,0.6);
+    transition: all 0.15s ease;
+  }
+  
+  .quiet:hover {
+    box-shadow: 
+      0 2px 4px rgba(0,0,0,0.05),
+      inset 0 1px 0 rgba(255,255,255,0.8);
+    transform: translateY(-0.5px);
+  }
+  
+  .quiet:active {
+    transform: translateY(0);
+    box-shadow: 
+      0 1px 2px rgba(0,0,0,0.02),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  
+  .section-card {
+    box-shadow: 
+      0 1px 3px rgba(0,0,0,0.02),
+      0 0 0 1px rgba(0,0,0,0.01);
+    transition: all 0.2s ease;
+  }
+  
+  .section-card:hover {
+    box-shadow: 
+      0 2px 6px rgba(0,0,0,0.04),
+      0 0 0 1px rgba(0,0,0,0.02);
+  }
   .job-card{border:1px solid var(--line);padding:12px;margin:12px 0;cursor:pointer;transition:border-color .2s ease}
   .job-card.selected{border-color:var(--hair)}
   .job-card.applied{border-style:dashed}
@@ -73,160 +100,86 @@
   .muted{color:var(--muted);font-size:11px}
   .resume-output{border:1px solid var(--line);padding:12px;background:#fafafa;margin-top:12px;white-space:pre-wrap}
   .loading{opacity:.6;pointer-events:none}
-  @media (max-width:860px){.metrics{grid-template-columns:1fr}}
+  @media (max-width:860px){.nav{flex-direction:column;gap:12px}}
 </style>
+
 <div class="wrap">
   <nav class="nav">
-    <a href="#modules" title="Modules">modules</a>
-    <a href="#learn" title="Learn">learn</a>
     <a id="openUpload" href="#" title="Upload a resume, image, or audio">upload</a>
     <a id="openChat" href="#" title="Open coaching chat">chat</a>
   </nav>
 
-  <!-- WELCOME / INTRO -->
-  <section id="welcome" class="island" aria-label="Welcome">
-    <div class="welcome-title" title="a short human hello">welcome</div>
-    <p class="sub" title="what this is">this is your values‑first workspace. pick a path or ask the coach.</p>
-    <div class="actions">
-      <a class="quiet" href="#fast" title="guided route: ps101 → coaching → dashboard" id="linkFast">fast track</a>
-      <a class="quiet" href="#discover" title="wander through modules and notes" id="linkDiscover">discovery</a>
-      <a class="quiet" href="#journey" id="showJourney" title="show the full journey on this page">intro</a>
-      <button class="quiet" id="saveBtn" title="Save progress to file">save</button>
-      <label class="quiet" for="loadFile" title="Load a saved file">load<input id="loadFile" type="file" accept="application/json" hidden></label>
-    </div>
-    <details class="micro"><summary>what’s the difference?</summary>
-      <small>fast track gives you a direct sequence (ps101 → coaching → dashboard). discovery lets you skim modules, read notes, and dip in where you like.</small>
-    </details>
-  </section>
-
   <header class="hero" id="top">
     <div class="title">WHAT IS MY DELTA</div>
-    <p class="sub">values‑first career platform. clear metrics. focused coaching. no clutter.</p>
+    <p class="sub">career transition platform. discover your path. find your fit. take action.</p>
   </header>
 
-  <svg class="schema" viewBox="0 0 980 140" aria-hidden="true">
-    <path class="wire" d="M120 90 H360 C400 90 420 78 450 70 C480 62 520 60 560 68 C600 76 640 60 700 58 C820 54 860 54 900 56"/>
-    <circle class="dot" cx="120" cy="90" r="1.2"/>
-  </svg>
-
-  <div class="rule"></div>
-
-  <section class="metrics" aria-label="Metrics">
-    <div class="card"><div class="k">Clarity</div><div class="v" id="mClarity">75%</div></div>
-    <div class="card"><div class="k">Action</div><div class="v" id="mAction">45%</div></div>
-    <div class="card"><div class="k">Momentum</div><div class="v" id="mMomentum">32%</div></div>
-  </section>
-
-  <section id="modules" class="island" aria-label="Modules">
-    <div class="module" id="ps101">
-      <h3><a href="#ps101" title="open PS101">PS101 — Foundations</a></h3>
-      <ul><li>Values inventory</li><li>Narrative capture</li><li>Signal extraction</li></ul>
-      <textarea class="small" placeholder="your values / narrative / signals…" id="t_ps101"></textarea>
-      <div><a href="#" data-coach="help me start ps101 with 3 values">ask coach: start ps101</a></div>
-    </div>
-    <div class="module" id="coaching">
-      <h3><a href="#coaching" title="open Coaching">Coaching — Sprint</a></h3>
-      <ul><li>Weekly check‑ins</li><li>Action ledger</li><li>Friction mapping</li></ul>
-      <textarea class="small" placeholder="today’s focus / shipped / blocked…" id="t_coaching"></textarea>
-      <div><a href="#" data-coach="help me set today’s focus and 1 action">ask coach: focus</a></div>
-    </div>
-    <div class="module" id="jobs">
-      <h3><a href="#jobs" title="open Jobs">Jobs — Fit Scan</a></h3>
-      <ul><li>Role triage</li><li>Keyword heatmap</li><li>Risk notes</li></ul>
-      <textarea class="small" placeholder="roles / keywords / risks…" id="t_jobs"></textarea>
-      <div><a href="#" data-coach="help me triage 3 roles">ask coach: triage roles</a></div>
-      <div class="actions" style="margin-top:12px;gap:8px;flex-wrap:wrap">
-        <button id="jobsFetch" class="quiet" type="button">find opportunities</button>
+  <!-- JOURNEY FLOW -->
+  <section style="margin:80px 0;padding:40px 0">
+    <div style="max-width:var(--max);margin:0 auto">
+      <h2 style="font:600 12px/1 Helvetica,Arial;margin:0 0 40px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">your career transition</h2>
+      
+      <!-- ORGANIC FLOW -->
+      <div style="display:flex;justify-content:center;align-items:center;margin:60px 0;position:relative">
+            <!-- EXPLORE -->
+            <div style="position:absolute;left:0;top:0;text-align:center">
+              <div class="flow-circle" style="width:50px;height:50px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font:600 14px/1 Helvetica,Arial;background:#fff">E</div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">explore</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.3;max-width:100px">skills, passions, and career goals</p>
+        </div>
+        
+            <!-- FIND -->
+            <div style="position:absolute;right:0;top:0;text-align:center">
+              <div class="flow-circle" style="width:50px;height:50px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font:600 14px/1 Helvetica,Arial;background:#fff">F</div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">find</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.3;max-width:100px">opportunities that align with you</p>
+        </div>
+        
+            <!-- APPLY -->
+            <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center">
+              <div class="flow-circle active" style="width:60px;height:60px;border:2px solid var(--hair);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font:600 16px/1 Helvetica,Arial;background:#fff">A</div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">apply</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.3;max-width:100px">optimize for specific roles</p>
+        </div>
+        
+            <!-- CONNECTING LINES -->
+            <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 300 200">
+              <defs>
+                <linearGradient id="lineGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:var(--line);stop-opacity:0.2" />
+                  <stop offset="50%" style="stop-color:var(--line);stop-opacity:0.4" />
+                  <stop offset="100%" style="stop-color:var(--line);stop-opacity:0.2" />
+                </linearGradient>
+              </defs>
+              <path d="M50,25 Q150,100 250,25" stroke="url(#lineGrad1)" stroke-width="1.5" fill="none"/>
+              <path d="M50,25 Q150,150 150,100" stroke="url(#lineGrad1)" stroke-width="1.5" fill="none"/>
+              <path d="M250,25 Q150,150 150,100" stroke="url(#lineGrad1)" stroke-width="1.5" fill="none"/>
+            </svg>
       </div>
-      <div id="jobsStatus" class="status" aria-live="polite"></div>
-      <div id="jobsList" aria-live="polite"></div>
-    </div>
-    <div class="module" id="resume">
-      <h3><a href="#resume" title="open Resume">Resume — Bridge</a></h3>
-      <ul><li>Evidence mapping</li><li>ATS lines</li><li>Truth filters</li></ul>
-      <textarea class="small" placeholder="evidence → concise ATS lines…" id="t_resume"></textarea>
-      <div><a href="#" data-coach="turn this evidence into one ats line">ask coach: ats line</a></div>
-      <div class="actions" style="margin-top:12px;gap:8px;flex-wrap:wrap">
-        <button id="resumeRewrite" class="quiet" type="button">rewrite from notes</button>
-        <button id="resumeCustomize" class="quiet" type="button">customize for selected job</button>
-        <button id="resumeFeedback" class="quiet" type="button">feedback</button>
+      
+      <!-- START ACTIONS -->
+      <div style="text-align:center;margin-top:80px">
+        <p style="margin:0 0 20px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">begin anywhere</p>
+        <div style="display:flex;gap:8px;justify-content:center;align-items:center">
+          <button id="startDiscovery" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">explore</button>
+          <button id="openUpload" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">upload</button>
+        </div>
       </div>
-      <div id="resumeStatus" class="status" aria-live="polite"></div>
-      <pre id="resumeOutput" class="resume-output" hidden></pre>
-      <details class="micro" id="resumeVersionsWrap" style="margin-top:12px;display:none">
-        <summary>saved versions</summary>
-        <ul id="resumeVersions" style="list-style:none;margin:8px 0;padding:0"></ul>
-      </details>
-    </div>
-    <div class="module" id="dashboard">
-      <h3><a href="#dashboard" title="open Dashboard">Delta — Dashboard</a></h3>
-      <ul><li>Clarity graph</li><li>Action trend</li><li>Next steps</li></ul>
-      <textarea class="small" placeholder="next step (one thing to do)…" id="t_dashboard"></textarea>
-      <div><a href="#" data-coach="suggest 1 next step from my notes">ask coach: next step</a></div>
     </div>
   </section>
 
-  <div class="rule"></div>
+  <!-- STATUS AND OUTPUTS -->
+  <div id="status" class="status" aria-live="polite"></div>
+  <div id="jobsStatus" class="status" aria-live="polite"></div>
+  <div id="jobsList" aria-live="polite"></div>
+  <div id="resumeStatus" class="status" aria-live="polite"></div>
+  <pre id="resumeOutput" class="resume-output" hidden></pre>
 
-  <section id="learn" class="island" aria-label="Learn">
-    <div style="margin:6px 0"><a href="#learn" title="principles">principles</a></div>
-    <div style="margin:24px 0"><a href="#learn" title="getting started">getting started</a></div>
-    <div style="margin:24px 0"><a href="#learn" title="coaching flow">coaching flow</a></div>
-    <div style="margin:24px 0"><a href="#learn" title="jobs & fit">jobs & fit</a></div>
-  </section>
-
-  <!-- FEEDBACK -->
-  <section id="feedback" class="island" aria-label="Feedback">
-    <div class="welcome-title" title="tell us, briefly">feedback</div>
-    <p class="sub">this helps us tune the welcome + flow. optional, quick.</p>
-
-    <div class="formrow">
-      <div class="k">intro clarity</div>
-      <div class="radio">
-        <label><input type="radio" name="fb_clarity" value="very clear"> very clear</label>
-        <label><input type="radio" name="fb_clarity" value="somewhat"> somewhat</label>
-        <label><input type="radio" name="fb_clarity" value="unclear"> unclear</label>
-      </div>
-    </div>
-
-    <div class="formrow">
-      <div class="k">felt welcomed</div>
-      <div class="radio">
-        <label><input type="radio" name="fb_welcome" value="yes"> yes</label>
-        <label><input type="radio" name="fb_welcome" value="partly"> partly</label>
-        <label><input type="radio" name="fb_welcome" value="not really"> not really</label>
-      </div>
-    </div>
-
-    <div class="formrow">
-      <div class="k">preferred path</div>
-      <div class="radio">
-        <label><input type="radio" name="fb_path" value="fast track"> fast track</label>
-        <label><input type="radio" name="fb_path" value="discovery"> discovery</label>
-        <label><input type="radio" name="fb_path" value="unsure"> unsure</label>
-      </div>
-    </div>
-
-    <div class="formrow">
-      <div class="k">one thing to improve</div>
-      <textarea id="fb_comment" class="small" placeholder="tiny note…"></textarea>
-    </div>
-
-    <div class="actions" style="margin-top:20px">
-      <button id="fbSubmit" class="quiet" title="download a copy + (optional) open SurveyMonkey">submit feedback</button>
-      <a id="fbLink" class="quiet" href="#" target="_blank" style="display:none">open survey</a>
-    </div>
-  </section>
-
-  <div class="notice" id="saveNotice" aria-live="polite">
-    <div>save before you leave?</div>
-    <div style="display:flex;gap:8px">
-      <button class="btn" id="noticeSave">save now</button>
-      <button class="btn" id="noticeDismiss">dismiss</button>
-    </div>
-  </div>
-
-  <footer class="foot"><div>© <span id="y"></span> Delta</div><div>privacy · terms · support</div></footer>
+  <!-- FOOTER -->
+  <footer style="border-top:1px solid var(--line);margin-top:140px;padding:14px 0;color:#777;font-size:12px;display:flex;justify-content:space-between">
+    <div>© <span id="y"></span> Delta</div>
+    <div>privacy · terms · support</div>
+  </footer>
 </div>
 
 <!-- CHAT -->
@@ -268,8 +221,6 @@
   let jobCache = [];
   let selectedJobId = null;
   let lastResumeDraft = '';
-  let dirty = false;
-  let savedThisSession = false;
 
   if(sessionId) {
     document.body.dataset.session = sessionId;
@@ -290,15 +241,8 @@
   const resumeFeedbackBtn = $('#resumeFeedback');
   const resumeStatus = $('#resumeStatus');
   const resumeOutput = $('#resumeOutput');
-  const resumeVersionsWrap = $('#resumeVersionsWrap');
-  const resumeVersionsList = $('#resumeVersions');
-  const resumeNotes = $('#t_resume');
   const jobsButtonLabel = jobsButton ? jobsButton.textContent.trim() : '';
-  const metricsEls = {
-    clarity: $('#mClarity'),
-    action: $('#mAction'),
-    momentum: $('#mMomentum'),
-  };
+  const status = $('#status');
 
   $('#y').textContent = new Date().getFullYear();
 
@@ -316,15 +260,6 @@
     sessionId = id;
     localStorage.setItem(SESSION_KEY, id);
     document.body.dataset.session = id;
-  }
-
-  function setMetrics(metrics){
-    if(!metrics) return;
-    ['clarity','action','momentum'].forEach(k=>{
-      if(typeof metrics[k] !== 'undefined' && metricsEls[k]){
-        metricsEls[k].textContent = `${Math.round(metrics[k])}%`;
-      }
-    });
   }
 
   async function ensureConfig(){
@@ -378,7 +313,6 @@
       throw new Error(message);
     }
     if(data && data.session_id) setSession(data.session_id);
-    if(data && data.metrics) setMetrics(data.metrics);
     return data || {};
   }
 
@@ -396,7 +330,6 @@
       throw new Error(message);
     }
     if(data && data.session_id) setSession(data.session_id);
-    if(data && data.file && data.file.metrics) setMetrics(data.file.metrics);
     return data;
   }
 
@@ -453,7 +386,7 @@
 
   function currentResumeSource(){
     if(lastResumeDraft) return lastResumeDraft;
-    return (resumeNotes?.value || '').trim();
+    return '';
   }
 
   function setResumeOutput(text){
@@ -466,102 +399,6 @@
         resumeOutput.hidden = true;
       }
     }
-  }
-
-  async function refreshResumeVersions(){
-    if(!sessionId || !resumeVersionsList) return;
-    try{
-      const data = await callJson('/resume/versions');
-      const list = data.versions || [];
-      resumeVersionsList.innerHTML = '';
-      if(list.length){
-        resumeVersionsWrap.style.display = 'block';
-        list.forEach(item=>{
-          const li = document.createElement('li');
-          const ts = item.created_at ? new Date(item.created_at).toLocaleString() : '';
-          li.textContent = `${item.version_name || 'version'}${ts ? ` — ${ts}` : ''}`;
-          resumeVersionsList.appendChild(li);
-        });
-      }else{
-        resumeVersionsWrap.style.display = 'none';
-      }
-    }catch(err){
-      // versions optional
-    }
-  }
-
-  function markDirty(){
-    dirty = true;
-    $('#saveNotice').style.display = 'flex';
-  }
-
-  function collect(){
-    return {
-      metrics:{
-        clarity: metricsEls.clarity?.textContent || '',
-        action: metricsEls.action?.textContent || '',
-        momentum: metricsEls.momentum?.textContent || '',
-      },
-      notes:{
-        ps101: $('#t_ps101')?.value || '',
-        coaching: $('#t_coaching')?.value || '',
-        jobs: $('#t_jobs')?.value || '',
-        resume: resumeNotes?.value || '',
-        dashboard: $('#t_dashboard')?.value || '',
-      },
-      feedback: collectFeedback(),
-    };
-  }
-
-  function collectFeedback(){
-    const val = name => {
-      const el = [...document.getElementsByName(name)].find(i => i.checked);
-      return el ? el.value : '';
-    };
-    return {
-      clarity: val('fb_clarity'),
-      welcome: val('fb_welcome'),
-      path: val('fb_path'),
-      comment: $('#fb_comment')?.value || '',
-    };
-  }
-
-  function applyData(data){
-    if(data?.metrics){
-      metricsEls.clarity.textContent = data.metrics.clarity || '75%';
-      metricsEls.action.textContent = data.metrics.action || '45%';
-      metricsEls.momentum.textContent = data.metrics.momentum || '32%';
-    }
-    if(data?.notes){
-      $('#t_ps101').value = data.notes.ps101 || '';
-      $('#t_coaching').value = data.notes.coaching || '';
-      $('#t_jobs').value = data.notes.jobs || '';
-      resumeNotes.value = data.notes.resume || '';
-      $('#t_dashboard').value = data.notes.dashboard || '';
-    }
-    if(data?.feedback){
-      const set = (name,val)=>{
-        if(!val) return;
-        const el = [...document.getElementsByName(name)].find(i=>i.value===val);
-        if(el) el.checked = true;
-      };
-      set('fb_clarity', data.feedback.clarity);
-      set('fb_welcome', data.feedback.welcome);
-      set('fb_path', data.feedback.path);
-      $('#fb_comment').value = data.feedback.comment || '';
-    }
-  }
-
-  function download(filename, obj){
-    const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(a.href);
-    savedThisSession = true;
-    $('#saveNotice').style.display = 'none';
-    dirty = false;
   }
 
   async function askCoach(prompt){
@@ -603,10 +440,6 @@
     if(source) body.source_resume = source;
     const data = await callJson('/resume/rewrite', {method:'POST', body});
     setResumeOutput(data.resume || '');
-    if(resumeNotes && data.resume){
-      resumeNotes.value = data.resume;
-    }
-    await refreshResumeVersions();
     return data;
   }
 
@@ -621,10 +454,6 @@
     if(sessionId) body.session_id = sessionId;
     const data = await callJson('/resume/customize', {method:'POST', body});
     setResumeOutput(data.resume || '');
-    if(resumeNotes && data.resume){
-      resumeNotes.value = data.resume;
-    }
-    await refreshResumeVersions();
     return data;
   }
 
@@ -633,19 +462,46 @@
     const body = {resume: source};
     if(sessionId) body.session_id = sessionId;
     const data = await callJson('/resume/feedback', {method:'POST', body});
-    await refreshResumeVersions();
     return data;
   }
 
   ensureConfig().then(()=>{
     if(sessionId){
       callJson('/wimd/metrics').catch(()=>{});
-      refreshResumeVersions();
     }
   }).catch(()=>{});
 
   $('#openChat').addEventListener('click', e=>{ e.preventDefault(); chat.style.display='block'; });
   $('#closeChat').addEventListener('click', ()=>{ chat.style.display='none'; });
+  
+  $('#startDiscovery').addEventListener('click', e=>{ 
+    e.preventDefault(); 
+    chat.style.display='block';
+    addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
+  });
+
+  // Add missing event handlers for the new interface
+  $('#findOpportunities').addEventListener('click', async e => {
+    e.preventDefault();
+    setStatus(status, 'finding opportunities...');
+    try {
+      const opportunities = await fetchOpportunities();
+      setStatus(status, `found ${opportunities.length} opportunities`, 'ok');
+    } catch(err) {
+      setStatus(status, err.message, 'error');
+    }
+  });
+
+  $('#resumeRewrite').addEventListener('click', async e => {
+    e.preventDefault();
+    setStatus(resumeStatus, 'rewriting resume...');
+    try {
+      const data = await rewriteResume(selectedJobId, '');
+      setStatus(resumeStatus, `resume rewritten`, 'ok');
+    } catch(err) {
+      setStatus(resumeStatus, err.message, 'error');
+    }
+  });
 
   function addMsg(txt, who='you'){
     const div = document.createElement('div');
@@ -676,38 +532,6 @@
   });
   sendMsg.addEventListener('click', send);
 
-  (function(){
-    const strip = document.createElement('div');
-    strip.id = 'coachStrip';
-    strip.style.cssText = 'margin:24px 0 60px;border:1px solid #e8e8e8;padding:6px 8px;display:flex;gap:8px;align-items:center';
-    strip.innerHTML = '<span style="color:#666">coach</span><input id="coachAsk" placeholder="ask or try: fast track" style="flex:1;border:1px solid #e8e8e8;padding:6px 8px"><button id="coachSend" class="quiet">send</button>';
-    document.querySelector('.wrap').insertBefore(strip, document.querySelector('.hero'));
-    const coachAsk = $('#coachAsk');
-    const coachSend = $('#coachSend');
-    async function sendStrip(){
-      const v = (coachAsk.value || '').trim();
-      if(!v) return;
-      chat.style.display = 'block';
-      addMsg(v, 'you');
-      coachAsk.value = '';
-      try{
-        const reply = await askCoach(v);
-        addMsg(reply, 'bot');
-        softRoute(v);
-      }catch(err){
-        addMsg(err.message || '…connection issue', 'bot');
-      }
-    }
-    coachSend.addEventListener('click', sendStrip);
-    coachAsk.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); sendStrip(); }});
-  })();
-
-  if(!localStorage.getItem(SEEN)){
-    chat.style.display = 'block';
-    addMsg('hi — prefer fast track or discovery?', 'bot');
-    localStorage.setItem(SEEN, '1');
-  }
-
   $('#openUpload').addEventListener('click', e=>{
     e.preventDefault();
     modal.style.display = 'flex';
@@ -727,9 +551,6 @@
         setStatus(uploadStatus, `uploading ${file.name}…`);
         await uploadToWimd(file);
         setStatus(uploadStatus, `${file.name} uploaded`, 'ok');
-        markDirty();
-        saveAuto();
-        await refreshResumeVersions();
       }catch(err){
         setStatus(uploadStatus, err.message, 'error');
       }finally{
@@ -737,109 +558,6 @@
       }
     });
   }
-
-  $('#saveBtn').addEventListener('click', ()=> download('delta-progress.json', collect()));
-  $('#loadFile').addEventListener('change', e=>{
-    const f = e.target.files?.[0];
-    if(!f) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try{
-        const data = JSON.parse(reader.result);
-        applyData(data);
-      }catch(err){
-        alert('invalid file');
-      }
-    };
-    reader.readAsText(f);
-  });
-
-  ['#t_ps101','#t_coaching','#t_jobs','#t_resume','#t_dashboard','#fb_comment'].forEach(sel=>{
-    const el = $(sel);
-    if(el) el.addEventListener('input', ()=>{
-      markDirty();
-      saveAuto();
-    });
-  });
-  ['fb_clarity','fb_welcome','fb_path'].forEach(name=>{
-    document.getElementsByName(name).forEach(el=>{
-      el.addEventListener('change', ()=>{
-        markDirty();
-        saveAuto();
-      });
-    });
-  });
-
-  function saveAuto(){
-    localStorage.setItem(AUTO, JSON.stringify(collect()));
-  }
-  (function loadAuto(){
-    try{
-      const data = JSON.parse(localStorage.getItem(AUTO) || '{}');
-      if(Object.keys(data).length) applyData(data);
-    }catch(err){
-      // ignore
-    }
-  })();
-
-  window.addEventListener('beforeunload', e=>{
-    if(dirty && !savedThisSession){
-      e.preventDefault();
-      e.returnValue = '';
-    }
-  });
-  $('#noticeSave').addEventListener('click', ()=> download('delta-progress.json', collect()));
-  $('#noticeDismiss').addEventListener('click', ()=> { $('#saveNotice').style.display='none'; });
-
-  const SURVEY_URL = '';
-  $('#fbSubmit').addEventListener('click', ()=>{
-    const payload = {timestamp: new Date().toISOString(), feedback: collectFeedback()};
-    const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'delta-feedback.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
-    if(SURVEY_URL){
-      const link = $('#fbLink');
-      link.href = SURVEY_URL;
-      link.style.display = 'inline-block';
-      link.click();
-    }
-  });
-
-  function smoothTo(id){
-    const el = $(id);
-    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
-  }
-  document.querySelectorAll('a[href^="#"]').forEach(a=>{
-    a.addEventListener('click', evt=>{
-      const href = a.getAttribute('href');
-      if(href && href.length>1){
-        evt.preventDefault();
-        smoothTo(href);
-      }
-    });
-  });
-  function softRoute(txt){
-    const t = (txt || '').toLowerCase();
-    if(t.includes('fast')) smoothTo('#ps101');
-    if(t.includes('discover')) smoothTo('#modules');
-    if(t.includes('dashboard')) smoothTo('#dashboard');
-  }
-  $('#showJourney').addEventListener('click', e=>{ e.preventDefault(); smoothTo('#modules'); });
-  $('#linkFast').addEventListener('click', e=>{ e.preventDefault(); smoothTo('#ps101'); });
-  $('#linkDiscover').addEventListener('click', e=>{ e.preventDefault(); smoothTo('#modules'); });
-
-  document.querySelectorAll('[data-coach]').forEach(a=>{
-    a.addEventListener('click', e=>{
-      e.preventDefault();
-      const msg = a.getAttribute('data-coach');
-      $('#openChat').click();
-      chatInput.value = msg;
-      sendMsg.click();
-    });
-  });
 
   if(jobsButton){
     jobsButton.addEventListener('click', async e=>{
@@ -874,8 +592,6 @@
           const data = await applyForJob(jobId);
           selectJob(jobId);
           setStatus(jobsStatus, `applied to ${data.job?.role || jobId}`, 'ok');
-          markDirty();
-          saveAuto();
         }catch(err){
           setStatus(jobsStatus, err.message, 'error');
         }finally{
@@ -888,14 +604,12 @@
   if(resumeRewriteBtn){
     resumeRewriteBtn.addEventListener('click', async e=>{
       e.preventDefault();
-      const source = (resumeNotes?.value || '').trim();
+      const source = currentResumeSource();
       resumeRewriteBtn.classList.add('loading');
       setStatus(resumeStatus, 'rewriting…');
       try{
         const data = await rewriteResume(selectedJobId, source);
         setStatus(resumeStatus, `saved ${data.version_name}`, 'ok');
-        markDirty();
-        saveAuto();
       }catch(err){
         setStatus(resumeStatus, err.message, 'error');
       }finally{
@@ -914,8 +628,6 @@
       try{
         const data = await customizeResume(selectedJobId, source, job);
         setStatus(resumeStatus, `customized for ${data.version_name}`, 'ok');
-        markDirty();
-        saveAuto();
       }catch(err){
         setStatus(resumeStatus, err.message, 'error');
       }finally{
@@ -934,8 +646,6 @@
         const data = await resumeFeedback(source);
         const suggestions = data.suggestions || [];
         setStatus(resumeStatus, suggestions.length ? suggestions.join(' • ') : 'no changes suggested', 'ok');
-        markDirty();
-        saveAuto();
       }catch(err){
         setStatus(resumeStatus, err.message, 'error');
       }finally{
@@ -943,5 +653,14 @@
       }
     });
   }
+
+  // Auto-open chat for new users
+  if(!localStorage.getItem(SEEN)){
+    chat.style.display = 'block';
+    addMsg('hi — let\'s work on your career transition. what would you like to explore?', 'bot');
+    localStorage.setItem(SEEN, '1');
+  }
 })();
 </script>
+</body>
+</html>
