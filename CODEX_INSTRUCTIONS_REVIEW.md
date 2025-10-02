@@ -1,14 +1,6 @@
-# Multi-AI Handover – Mosaic Platform Project (Access-Based Roles)
-
-🚨 **URGENT HANDOFF**: Read `CODEX_HANDOFF_2025-10-01.md` IMMEDIATELY - Critical protocol breakdown, systematic analysis required
+# Multi-AI Handover – Mosaic Platform Project (Access-Based Roles) - REVIEW VERSION
 
 You are part of a **three-AI collaboration system**. Act as specified by your role and access capabilities.
-
-## CURRENT ACCESS CONTEXT (2025-10-01)
-
-- **Codex CLI**: Active in this repo with shell + file write access (network restricted, port binding may fail). Default implementation agent unless the human reassigns.
-- **Cursor sessions**: Context can reset; do not assume Claude-in-Cursor is operating until the human confirms it is back online and synced with latest repo state.
-- **Claude Code**: Infrastructure/logs specialist; only engage when the human opens the required dashboards or requests infra help.
 
 ## ACCESS-BASED ROLE ASSIGNMENT
 
@@ -97,7 +89,7 @@ You are part of a **three-AI collaboration system**. Act as specified by your ro
 - **Resume Rewrite Tool**: AI-powered resume optimization
 - **Mosaic UI**: Frontend interface (Vercel deployment)
 
-### **Backend Extensions (Codex)**
+### **Backend Extensions (Claude in Cursor)**
 - **POST /wimd**: Chat endpoint for coach interactions
 - **POST /wimd/upload**: File upload handling (resumes, documents)
 - **GET /ob/opportunities**: Job matching based on WIMD output
@@ -107,14 +99,14 @@ You are part of a **three-AI collaboration system**. Act as specified by your ro
 - **POST /resume/feedback**: Get improvement suggestions
 - **GET /resume/versions**: List and manage resume versions
 
-### **Frontend Integration (Codex)**
+### **Frontend Integration (Claude in Cursor)**
 - **Update mosaic_ui/index.html**: Wire real API calls
 - **Add job matching interface**: Display opportunities with fit scores
 - **Add resume rewrite functionality**: User-friendly resume tool
 - **Add error handling**: Graceful failure management
 - **Add loading states**: Clear user feedback
 
-### **Database Schema (Codex)**
+### **Database Schema (Claude in Cursor)**
 - **SQLite with auto-expiry**: 30-day session cleanup
 - **Sessions table**: User session management
 - **WIMD outputs**: Analysis results and metrics
@@ -122,7 +114,7 @@ You are part of a **three-AI collaboration system**. Act as specified by your ro
 - **Resume versions**: Resume iterations and feedback
 - **Storage monitoring**: Usage tracking and cleanup
 
-### **Testing Requirements (Codex)**
+### **Testing Requirements (Claude in Cursor)**
 - **Integration tests**: End-to-end user journey
 - **Error scenario testing**: Failure handling
 - **Performance testing**: Response times and storage
@@ -130,28 +122,28 @@ You are part of a **three-AI collaboration system**. Act as specified by your ro
 
 ## PROJECT PHASES
 
-### **Phase 1: Backend Extensions (Codex)**
+### **Phase 1: Backend Extensions (Claude in Cursor)**
 - Implement missing API endpoints
 - Add SQLite database schema
 - Add error handling and validation
 - Add storage management and cleanup
 - Add session management
 
-### **Phase 2: Frontend Integration (Codex)**
+### **Phase 2: Frontend Integration (Claude in Cursor)**
 - Update Mosaic UI with real API calls
 - Add job matching interface
 - Add resume rewrite functionality
 - Add error handling and loading states
 - Add user feedback mechanisms
 
-### **Phase 3: Testing & Deployment (Codex)**
+### **Phase 3: Testing & Deployment (Claude in Cursor)**
 - Create comprehensive integration tests
 - Deploy frontend to Vercel
 - Test complete user journey
 - Performance optimization
 - Storage monitoring
 
-### **Phase 4: Maintenance & Scaling (Codex)**
+### **Phase 4: Maintenance & Scaling (Claude in Cursor)**
 - Monitor storage usage and cleanup
 - Handle user feedback and improvements
 - Scale system as needed
@@ -198,3 +190,12 @@ You are part of a **three-AI collaboration system**. Act as specified by your ro
 - Code architecture analysis required
 - Dependency mapping needed
 - Systematic troubleshooting documentation
+
+---
+
+**REVIEW REQUEST**: Please review this access-based role division and provide feedback before it replaces the original CODEX_INSTRUCTIONS.md. Key changes:
+1. Access-based role assignment based on actual capabilities
+2. Clear handoff protocols between AIs
+3. Escalation criteria to prevent role boundary violations
+4. Maintains existing workflow but with clearer assignments
+

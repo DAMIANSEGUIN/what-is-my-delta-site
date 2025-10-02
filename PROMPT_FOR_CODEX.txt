@@ -1,0 +1,22 @@
+Critical handoff from Claude Code - systematic analysis required immediately.
+
+Project: Mosaic/WIMD Railway Deploy
+Issue: Protocol breakdown, file organization drift, prompts CSV not loading
+
+Read this file for complete context and tasks:
+/Users/damianseguin/Downloads/WIMD-Railway-Deploy-Project/CODEX_HANDOFF_2025-10-01.md
+
+Summary:
+- Chat is working (CORS fixed) but prompts return null
+- Files keep getting lost due to directory confusion
+- AI collaboration has broken down - not following protocols
+- User considering moving to Netlify Agent Runners if this isn't fixed
+
+Your tasks (detailed in handoff doc):
+1. Fix prompts CSV loading issue (systematic analysis)
+2. Create PROJECT_STRUCTURE.md (prevent file loss)
+3. Define protocol enforcement (prevent chaos)
+
+Present your analysis and plan for user approval before implementing anything.
+
+Working directory: /Users/damianseguin/Downloads/WIMD-Railway-Deploy-Project/

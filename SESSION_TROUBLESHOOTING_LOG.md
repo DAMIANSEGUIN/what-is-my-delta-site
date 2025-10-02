@@ -87,3 +87,28 @@
 - **Solution required**: Connect Railway service to GitHub in Railway dashboard
   - Or: Manual redeploy via Railway dashboard (temporary fix)
   - Or: Install Railway CLI and deploy manually
+
+### Update 2025-09-30 15:50-16:00:
+❌ **Multiple CORS fix attempts FAILED**
+1. ❌ **Commit 1456992**: Added explicit hardcoded origins - No `access-control-allow-origin` header
+2. ❌ **Manual Railway deploy**: Triggered successfully but CORS still broken
+3. ❌ **Commit fcad803**: Added `expose_headers=["*"]` - Still no header
+4. ❌ **Second manual deploy**: Railway deployed but OPTIONS returns HTTP 400
+
+**Critical finding**:
+- curl POST works: HTTP 200 with valid response
+- Browser POST fails: `net::ERR_FAILED` with CORS error
+- OPTIONS preflight returns HTTP 400 (should be 200)
+- Missing `access-control-allow-origin` header in OPTIONS response
+- All other CORS headers present (credentials, methods, headers)
+
+**Root issue**: FastAPI CORSMiddleware not properly handling OPTIONS preflight requests
+
+### Update 2025-09-30 16:00:
+✅ **HANDED OFF TO CODEX/CURSOR**
+- Created `CODEX_HANDOFF_2025-09-30.md` with complete state
+- Documented all attempts and evidence
+- Provided systematic approach: Test locally → Fix → Deploy → Verify
+- Identified missing dependencies in build plan
+- Claude Code operating outside role (making iterative commits without systematic plan)
+- Codex/Cursor should own the frame going forward
