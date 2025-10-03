@@ -802,72 +802,102 @@
     await authenticateUser(email, password, true);
   });
 
-  $('#toggleAuth').addEventListener('click', e => {
-    e.preventDefault();
-    const loginForm = $('#loginForm');
-    const registerForm = $('#registerForm');
-    const isLogin = !loginForm.hidden;
-    
-    if(isLogin){
-      loginForm.hidden = true;
-      registerForm.hidden = false;
-      $('#toggleAuth').textContent = 'already have an account?';
-    } else {
-      loginForm.hidden = false;
-      registerForm.hidden = true;
-      $('#toggleAuth').textContent = 'need an account?';
-    }
-  });
+  const toggleAuth = $('#toggleAuth');
+  if(toggleAuth){
+    toggleAuth.addEventListener('click', e => {
+      e.preventDefault();
+      const loginForm = $('#loginForm');
+      const registerForm = $('#registerForm');
+      const isLogin = !loginForm.hidden;
 
-  $('#clearSession').addEventListener('click', e => {
-    e.preventDefault();
-    logout();
-  });
+      if(isLogin){
+        loginForm.hidden = true;
+        registerForm.hidden = false;
+        toggleAuth.textContent = 'already have an account?';
+      } else {
+        loginForm.hidden = false;
+        registerForm.hidden = true;
+        toggleAuth.textContent = 'need an account?';
+      }
+    });
+  }
 
-  $('#logoutBtn').addEventListener('click', e => {
-    e.preventDefault();
-    logout();
-  });
+  const clearSession = $('#clearSession');
+  if(clearSession){
+    clearSession.addEventListener('click', e => {
+      e.preventDefault();
+      logout();
+    });
+  }
 
-  $('#showGuide').addEventListener('click', e => {
-    e.preventDefault();
-    $('#userGuide').hidden = false;
-  });
+  const logoutBtn = $('#logoutBtn');
+  if(logoutBtn){
+    logoutBtn.addEventListener('click', e => {
+      e.preventDefault();
+      logout();
+    });
+  }
 
-  $('#hideGuide').addEventListener('click', e => {
-    e.preventDefault();
-    $('#userGuide').hidden = true;
-  });
+  const showGuide = $('#showGuide');
+  if(showGuide){
+    showGuide.addEventListener('click', e => {
+      e.preventDefault();
+      $('#userGuide').hidden = false;
+    });
+  }
 
-  $('#openChat').addEventListener('click', e=>{
-    e.preventDefault(); 
-    if(chat) chat.style.display='block'; 
-  });
-  $('#closeChat').addEventListener('click', ()=>{
-    if(chat) chat.style.display='none'; 
-  });
-  
-  $('#startFastTrack').addEventListener('click', e=>{ 
-    e.preventDefault(); 
-    saveUserData({path: 'fastTrack', started: new Date().toISOString()});
-    chat.style.display='block';
-    addMsg('hi — let\'s start your fast track career transition. i\'ll guide you through analysis, opportunities, and application. what\'s your current career situation?', 'bot');
-  });
+  const hideGuide = $('#hideGuide');
+  if(hideGuide){
+    hideGuide.addEventListener('click', e => {
+      e.preventDefault();
+      $('#userGuide').hidden = true;
+    });
+  }
 
-  $('#startDiscovery').addEventListener('click', e=>{ 
-    e.preventDefault(); 
-    saveUserData({path: 'discovery', started: new Date().toISOString()});
-    chat.style.display='block';
-    addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
-  });
+  const openChat = $('#openChat');
+  if(openChat){
+    openChat.addEventListener('click', e=>{
+      e.preventDefault();
+      if(chat) chat.style.display='block';
+    });
+  }
 
-  // Handle flow section explore button
-  $('#startDiscoveryFlow').addEventListener('click', e=>{ 
-    e.preventDefault(); 
-    saveUserData({path: 'discovery', started: new Date().toISOString()});
-    chat.style.display='block';
-    addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
-  });
+  const closeChat = $('#closeChat');
+  if(closeChat){
+    closeChat.addEventListener('click', ()=>{
+      if(chat) chat.style.display='none';
+    });
+  }
+
+  const startFastTrack = $('#startFastTrack');
+  if(startFastTrack){
+    startFastTrack.addEventListener('click', e=>{
+      e.preventDefault();
+      saveUserData({path: 'fastTrack', started: new Date().toISOString()});
+      chat.style.display='block';
+      addMsg('hi — let\'s start your fast track career transition. i\'ll guide you through analysis, opportunities, and application. what\'s your current career situation?', 'bot');
+    });
+  }
+
+  const startDiscovery = $('#startDiscovery');
+  if(startDiscovery){
+    startDiscovery.addEventListener('click', e=>{
+      e.preventDefault();
+      saveUserData({path: 'discovery', started: new Date().toISOString()});
+      chat.style.display='block';
+      addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
+    });
+  }
+
+  const startDiscoveryFlow = $('#startDiscoveryFlow');
+  if(startDiscoveryFlow){
+    startDiscoveryFlow.addEventListener('click', e=>{
+      e.preventDefault();
+      saveUserData({path: 'discovery', started: new Date().toISOString()});
+      chat.style.display='block';
+      addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
+    });
+  }
 
   // Add missing event handlers for the new interface
   if(jobsButton){
