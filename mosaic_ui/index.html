@@ -265,6 +265,58 @@
       <div>Path: <span id="pathDisplay">-</span></div>
       <div>Last activity: <span id="lastActivityDisplay">-</span></div>
     </div>
+    
+    <!-- Self-Efficacy Metrics Toggle -->
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--line)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h4 style="font:600 10px/1 Helvetica,Arial;margin:0;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">self-efficacy metrics</h4>
+        <button id="toggleMetrics" class="quiet" style="padding:4px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">show new metrics</button>
+      </div>
+      
+      <!-- Legacy Metrics (Default Visible) -->
+      <div id="legacyMetrics" style="font-size:10px;color:var(--muted);line-height:1.4">
+        <div>Legacy metrics display (existing functionality)</div>
+      </div>
+      
+      <!-- New Self-Efficacy Metrics (Hidden by Default) -->
+      <div id="newMetrics" style="display:none;font-size:10px;color:var(--muted);line-height:1.4">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:8px">
+          <!-- Experiment Completion -->
+          <div class="metric-card" style="padding:12px;border:1px solid var(--line);border-radius:4px;background:#fff">
+            <div style="font-weight:600;margin-bottom:4px">Experiment Completion</div>
+            <div id="completionRate" style="font-size:14px;font-weight:600;color:var(--hair)">-</div>
+            <div style="font-size:9px;color:var(--muted)">completed/total experiments</div>
+          </div>
+          
+          <!-- Learning Velocity -->
+          <div class="metric-card" style="padding:12px;border:1px solid var(--line);border-radius:4px;background:#fff">
+            <div style="font-weight:600;margin-bottom:4px">Learning Velocity</div>
+            <div id="learningVelocity" style="font-size:14px;font-weight:600;color:var(--hair)">-</div>
+            <div style="font-size:9px;color:var(--muted)">events per day</div>
+          </div>
+          
+          <!-- Confidence Score -->
+          <div class="metric-card" style="padding:12px;border:1px solid var(--line);border-radius:4px;background:#fff">
+            <div style="font-weight:600;margin-bottom:4px">Confidence Score</div>
+            <div id="confidenceScore" style="font-size:14px;font-weight:600;color:var(--hair)">-</div>
+            <div style="font-size:9px;color:var(--muted)">average confidence level</div>
+          </div>
+          
+          <!-- Escalation Risk -->
+          <div class="metric-card" style="padding:12px;border:1px solid var(--line);border-radius:4px;background:#fff">
+            <div style="font-weight:600;margin-bottom:4px">Escalation Risk</div>
+            <div id="escalationRisk" style="font-size:14px;font-weight:600;color:var(--hair)">-</div>
+            <div style="font-size:9px;color:var(--muted)">risk level indicator</div>
+          </div>
+        </div>
+        
+        <!-- Escalation Alert -->
+        <div id="escalationAlert" style="display:none;margin-top:12px;padding:12px;border:1px solid #b00020;border-radius:4px;background:#ffeaea">
+          <div style="font-weight:600;color:#b00020;margin-bottom:4px">🚨 Coach Escalation Needed</div>
+          <div id="escalationMessage" style="font-size:10px;color:#b00020;line-height:1.4"></div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- USER GUIDE & HELP -->
@@ -449,6 +501,107 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
         });
       }
     }, 30000);
+  }
+
+  // Self-Efficacy Metrics Toggle
+  let showNewMetrics = false;
+  $('#toggleMetrics').addEventListener('click', () => {
+    showNewMetrics = !showNewMetrics;
+    const legacyMetrics = $('#legacyMetrics');
+    const newMetrics = $('#newMetrics');
+    const toggleButton = $('#toggleMetrics');
+    
+    if(showNewMetrics) {
+      legacyMetrics.style.display = 'none';
+      newMetrics.style.display = 'block';
+      toggleButton.textContent = 'show legacy metrics';
+      // Load new metrics data
+      loadSelfEfficacyMetrics();
+    } else {
+      legacyMetrics.style.display = 'block';
+      newMetrics.style.display = 'none';
+      toggleButton.textContent = 'show new metrics';
+    }
+  });
+
+  // Load Self-Efficacy Metrics
+  async function loadSelfEfficacyMetrics() {
+    if(!sessionId) return;
+    
+    try {
+      const response = await fetch(`${apiBase}/self-efficacy/metrics`, {
+        headers: { 'X-Session-ID': sessionId }
+      });
+      
+      if(response.ok) {
+        const data = await response.json();
+        updateMetricsDisplay(data);
+        
+        // Check for escalation
+        const escalationResponse = await fetch(`${apiBase}/self-efficacy/escalation`, {
+          headers: { 'X-Session-ID': sessionId }
+        });
+        
+        if(escalationResponse.ok) {
+          const escalationData = await escalationResponse.json();
+          updateEscalationDisplay(escalationData);
+        }
+      }
+    } catch(error) {
+      console.error('Error loading self-efficacy metrics:', error);
+    }
+  }
+
+  // Update Metrics Display
+  function updateMetricsDisplay(data) {
+    const completionRate = (data.experiment_completion_rate * 100).toFixed(1);
+    const learningVelocity = data.learning_velocity.toFixed(2);
+    const confidenceScore = (data.confidence_score * 100).toFixed(1);
+    const escalationRisk = (data.escalation_risk * 100).toFixed(1);
+    
+    $('#completionRate').textContent = `${data.completed_experiments}/${data.total_experiments} (${completionRate}%)`;
+    $('#learningVelocity').textContent = `${learningVelocity} events/day`;
+    $('#confidenceScore').textContent = `${confidenceScore}%`;
+    $('#escalationRisk').textContent = `${escalationRisk}%`;
+    
+    // Color coding based on values
+    const completionEl = $('#completionRate');
+    const velocityEl = $('#learningVelocity');
+    const confidenceEl = $('#confidenceScore');
+    const riskEl = $('#escalationRisk');
+    
+    // Completion rate colors
+    if(data.experiment_completion_rate >= 0.8) completionEl.style.color = '#2d7a2d';
+    else if(data.experiment_completion_rate >= 0.5) completionEl.style.color = '#b8860b';
+    else completionEl.style.color = '#b00020';
+    
+    // Learning velocity colors
+    if(data.learning_velocity >= 1.0) velocityEl.style.color = '#2d7a2d';
+    else if(data.learning_velocity >= 0.5) velocityEl.style.color = '#b8860b';
+    else velocityEl.style.color = '#b00020';
+    
+    // Confidence score colors
+    if(data.confidence_score >= 0.7) confidenceEl.style.color = '#2d7a2d';
+    else if(data.confidence_score >= 0.4) confidenceEl.style.color = '#b8860b';
+    else confidenceEl.style.color = '#b00020';
+    
+    // Escalation risk colors
+    if(data.escalation_risk >= 0.7) riskEl.style.color = '#b00020';
+    else if(data.escalation_risk >= 0.4) riskEl.style.color = '#b8860b';
+    else riskEl.style.color = '#2d7a2d';
+  }
+
+  // Update Escalation Display
+  function updateEscalationDisplay(data) {
+    const escalationAlert = $('#escalationAlert');
+    const escalationMessage = $('#escalationMessage');
+    
+    if(data.should_escalate) {
+      escalationAlert.style.display = 'block';
+      escalationMessage.textContent = data.reason;
+    } else {
+      escalationAlert.style.display = 'none';
+    }
   }
 
   function stopAutoSave(){

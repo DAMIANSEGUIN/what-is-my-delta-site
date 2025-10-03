@@ -37,3 +37,20 @@
 | 8.2 | Database user table | CODEX | Database schema | ☐ |
 | 8.3 | Railway deployment updates | Claude Code | Railway config | ☐ |
 | 8.4 | Production testing | Claude Code | All endpoints | ☐ |
+| 9.1 | Phase 1: Migration framework | Cursor | `api/migrations.py` | ✅ (2025-10-03) |
+| 9.2 | Phase 1: CSV→AI fallback system | Cursor | `api/prompt_selector.py`, `api/ai_clients.py` | ✅ (2025-10-03) |
+| 9.3 | Phase 1: Feature flags system | Cursor | `feature_flags.json` | ✅ (2025-10-03) |
+| 9.4 | Phase 1: Prompt selector integration | Cursor | `api/index.py` | ✅ (2025-10-03) |
+| 9.5 | Phase 1: Health endpoints | Cursor | `api/index.py` | ✅ (2025-10-03) |
+| 10.1 | Phase 2: Experiment schema migration | Cursor | `api/migrations.py` | ✅ (2025-10-03) |
+| 10.2 | Phase 2: Experiment engine APIs | Cursor | `api/experiment_engine.py` | ✅ (2025-10-03) |
+| 10.3 | Phase 2: Experiment endpoints | Cursor | `api/index.py` | ✅ (2025-10-03) |
+| 10.4 | Phase 2: Learning data capture | Cursor | `api/experiment_engine.py` | ✅ (2025-10-03) |
+| 10.5 | Phase 2: Self-efficacy metrics | Cursor | `api/experiment_engine.py` | ✅ (2025-10-03) |
+| 10.6 | Phase 2: Health endpoints | Cursor | `api/index.py` | ✅ (2025-10-03) |
+| 11.1 | Phase 3: Self-efficacy metrics engine | Cursor | `api/self_efficacy_engine.py` | ✅ (2025-10-03) |
+| 11.2 | Phase 3: Coach escalation system | Cursor | `api/self_efficacy_engine.py` | ✅ (2025-10-03) |
+| 11.3 | Phase 3: Frontend UI implementation | Cursor | `mosaic_ui/index.html` | ✅ (2025-10-03) |
+| 11.4 | Phase 3: Toggle system for metrics | Cursor | `mosaic_ui/index.html` | ✅ (2025-10-03) |
+| 11.5 | Phase 3: Feature flags enabled | Cursor | `feature_flags.json` | ✅ (2025-10-03) |
+| 11.6 | Phase 3: System testing complete | Cursor | All components | ✅ (2025-10-03) |

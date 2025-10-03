@@ -1,0 +1,54 @@
+{
+  "version": "1.0",
+  "description": "Mosaic 2.0 Feature Flags - All disabled by default for safe rollout",
+  "flags": {
+    "AI_FALLBACK_ENABLED": {
+      "enabled": false,
+      "description": "Enable AI fallback when CSV prompts fail",
+      "category": "core",
+      "risk_level": "medium"
+    },
+    "EXPERIMENTS_ENABLED": {
+      "enabled": false,
+      "description": "Enable experiment engine functionality",
+      "category": "experiments",
+      "risk_level": "high"
+    },
+    "SELF_EFFICACY_METRICS": {
+      "enabled": true,
+      "description": "Enable self-efficacy metrics collection",
+      "category": "analytics",
+      "risk_level": "medium"
+    },
+    "RAG_BASELINE": {
+      "enabled": false,
+      "description": "Enable RAG baseline functionality",
+      "category": "ai",
+      "risk_level": "high"
+    },
+    "COACH_ESCALATION": {
+      "enabled": true,
+      "description": "Enable coach escalation signals",
+      "category": "coaching",
+      "risk_level": "low"
+    },
+    "NEW_UI_ELEMENTS": {
+      "enabled": false,
+      "description": "Enable new UI elements for experiments and metrics",
+      "category": "ui",
+      "risk_level": "low"
+    }
+  },
+  "rollout_plan": {
+    "phase_1": ["AI_FALLBACK_ENABLED"],
+    "phase_2": ["EXPERIMENTS_ENABLED"],
+    "phase_3": ["SELF_EFFICACY_METRICS", "COACH_ESCALATION"],
+    "phase_4": ["RAG_BASELINE"],
+    "phase_5": ["NEW_UI_ELEMENTS"]
+  },
+  "safety": {
+    "auto_rollback_on_error": true,
+    "max_error_rate": 0.05,
+    "monitoring_window_minutes": 30
+  }
+}

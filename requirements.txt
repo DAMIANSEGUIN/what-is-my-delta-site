@@ -7,3 +7,5 @@ pydantic-settings
 python-multipart
 openai
 anthropic
+numpy
+python-dotenv

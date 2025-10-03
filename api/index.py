@@ -17,6 +17,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import hashlib
 import secrets
+import openai
+import numpy as np
 
 from .settings import get_settings
 from .startup_checks import startup_or_die
@@ -38,6 +40,17 @@ from .storage import (
     store_job_matches,
     update_job_match_status,
     wimd_history,
+)
+from .prompt_selector import get_prompt_response, get_prompt_health
+from .experiment_engine import (
+    ExperimentCreate, ExperimentUpdate, LearningData, CapabilityEvidence, SelfEfficacyMetric,
+    create_experiment, update_experiment, complete_experiment, add_learning_data,
+    capture_evidence, record_self_efficacy_metric, get_experiments, get_learning_data,
+    get_self_efficacy_metrics, get_experiment_health
+)
+from .self_efficacy_engine import (
+    compute_session_metrics, should_escalate, get_escalation_prompt, 
+    cleanup_stale_experiments, record_analytics_entry, get_self_efficacy_health
 )
 
 app = FastAPI()
@@ -181,45 +194,44 @@ def _update_metrics(prompt: str, current: Dict[str, Any]) -> Dict[str, int]:
     return {"clarity": clarity, "action": action, "momentum": momentum}
 
 
-def _coach_reply(prompt: str, metrics: Dict[str, int]) -> str:
-    """Generate coach reply using actual prompts from CSV"""
+def _coach_reply(prompt: str, metrics: Dict[str, int], session_id: str = None) -> str:
+    """Generate coach reply using CSV→AI fallback system"""
     from .prompts_loader import read_registry
     import json
-    import random
     
     try:
-        reg = read_registry()
-        active_sha = reg.get("active")
-        if not active_sha:
+        # Get CSV prompts data
+        csv_prompts = None
+        try:
+            reg = read_registry()
+            active_sha = reg.get("active")
+            if active_sha:
+                for version in reg.get("versions", []):
+                    if version["sha256"] == active_sha:
+                        try:
+                            with open(version["file"], "r", encoding="utf-8") as f:
+                                prompts_data = json.load(f)
+                            csv_prompts = {"prompts": prompts_data}
+                            break
+                        except Exception:
+                            continue
+        except Exception:
+            pass
+        
+        # Use prompt selector with CSV→AI fallback
+        context = {"metrics": metrics}
+        result = get_prompt_response(
+            prompt=prompt,
+            session_id=session_id or "default",
+            csv_prompts=csv_prompts,
+            context=context
+        )
+        
+        if result.get("response"):
+            return result["response"]
+        else:
             return _fallback_reply(metrics)
-        
-        # Find the active prompts file
-        for version in reg.get("versions", []):
-            if version["sha256"] == active_sha:
-                try:
-                    with open(version["file"], "r", encoding="utf-8") as f:
-                        prompts_data = json.load(f)
-                    
-                    # Find matching prompts based on user input
-                    matching_prompts = []
-                    for p in prompts_data:
-                        if any(keyword in prompt.lower() for keyword in p.get("tag", "").lower().split()):
-                            matching_prompts.append(p)
-                    
-                    if matching_prompts:
-                        selected = random.choice(matching_prompts)
-                        return selected.get("completion", _fallback_reply(metrics))
-                    else:
-                        # Fallback to any prompt if no match
-                        if prompts_data:
-                            selected = random.choice(prompts_data)
-                            return selected.get("completion", _fallback_reply(metrics))
-                        else:
-                            return _fallback_reply(metrics)
-                except Exception:
-                    return _fallback_reply(metrics)
-        
-        return _fallback_reply(metrics)
+            
     except Exception:
         return _fallback_reply(metrics)
 
@@ -231,6 +243,70 @@ def _fallback_reply(metrics: Dict[str, int]) -> str:
         f"clarity {metrics['clarity']}%, action {metrics['action']}%, momentum {metrics['momentum']}%. "
         "Pick one lever to nudge next."
     )
+
+
+def cosine_similarity(a: List[float], b: List[float]) -> float:
+    """Calculate cosine similarity between two vectors"""
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+
+def get_embeddings(text: str) -> List[float]:
+    """Get OpenAI embeddings for text"""
+    try:
+        settings = get_settings()
+        if not settings.OPENAI_API_KEY:
+            raise ValueError("OpenAI API key not configured")
+        
+        client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+        response = client.embeddings.create(
+            model="text-embedding-3-small",
+            input=text
+        )
+        return response.data[0].embedding
+    except Exception as e:
+        print(f"Error getting embeddings: {e}")
+        return []
+
+
+def semantic_search(user_prompt: str, prompts_data: List[Dict], session_history: List[str] = None) -> Optional[Dict]:
+    """Find most semantically similar prompt using embeddings"""
+    try:
+        # Include session history for context
+        context_text = user_prompt
+        if session_history:
+            context_text = f"{user_prompt} Context: {' '.join(session_history[-3:])}"
+        
+        # Get user prompt embedding
+        user_embedding = get_embeddings(context_text)
+        if not user_embedding:
+            return None
+        
+        best_match = None
+        best_score = 0.0
+        
+        for prompt in prompts_data:
+            prompt_text = prompt.get("completion", "")
+            if not prompt_text:
+                continue
+                
+            # Get prompt embedding
+            prompt_embedding = get_embeddings(prompt_text)
+            if not prompt_embedding:
+                continue
+            
+            # Calculate similarity
+            similarity = cosine_similarity(user_embedding, prompt_embedding)
+            
+            if similarity > best_score:
+                best_score = similarity
+                best_match = prompt
+        
+        # Return best match if similarity is above threshold
+        return best_match if best_score > 0.7 else None
+        
+    except Exception as e:
+        print(f"Error in semantic search: {e}")
+        return None
 
 
 def _score_job(metrics: Dict[str, int], job: Dict[str, Any]) -> Dict[str, Any]:
@@ -318,6 +394,40 @@ def root():
 def health():
     return {"ok": True, "timestamp": datetime.utcnow().isoformat() + "Z"}
 
+@app.get("/health/prompts")
+def health_prompts():
+    """Health check for prompt selector and AI fallback system"""
+    try:
+        prompt_health = get_prompt_health()
+        return {
+            "ok": True,
+            "prompt_selector": prompt_health,
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+
+@app.get("/health/experiments")
+def health_experiments():
+    """Health check for experiment engine"""
+    try:
+        experiment_health = get_experiment_health()
+        return {
+            "ok": True,
+            "experiment_engine": experiment_health,
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+
 
 @app.get("/config")
 def config():
@@ -384,7 +494,7 @@ async def wimd_chat(
     session_id = _resolve_session(payload.session_id, session_header, allow_create=True)
     current_metrics = latest_metrics(session_id) or DEFAULT_METRICS
     metrics = _update_metrics(payload.prompt, current_metrics)
-    message = _coach_reply(payload.prompt, metrics)
+    message = _coach_reply(payload.prompt, metrics, session_id)
     record_wimd_output(
         session_id,
         payload.prompt,
@@ -653,3 +763,143 @@ def resume_versions(session_header: Optional[str] = Header(None, alias="X-Sessio
 def session_summary_endpoint(session_header: Optional[str] = Header(None, alias="X-Session-ID")):
     session_id = _resolve_session(None, session_header, allow_create=False)
     return session_summary(session_id)
+
+# Experiment Engine Endpoints
+@app.post("/experiments/create")
+def experiments_create(
+    experiment_data: ExperimentCreate,
+    session_header: Optional[str] = Header(None, alias="X-Session-ID")
+):
+    """Create a new experiment"""
+    session_id = _resolve_session(None, session_header, allow_create=True)
+    return create_experiment(session_id, experiment_data)
+
+@app.post("/experiments/update")
+def experiments_update(
+    experiment_data: ExperimentUpdate,
+    session_header: Optional[str] = Header(None, alias="X-Session-ID")
+):
+    """Update an existing experiment"""
+    session_id = _resolve_session(None, session_header, allow_create=False)
+    return update_experiment(session_id, experiment_data)
+
+@app.post("/experiments/complete")
+def experiments_complete(
+    experiment_id: str,
+    session_header: Optional[str] = Header(None, alias="X-Session-ID")
+):
+    """Mark an experiment as completed"""
+    session_id = _resolve_session(None, session_header, allow_create=False)
+    return complete_experiment(session_id, experiment_id)
+
+@app.post("/learning/add")
+def learning_add(
+    learning_data: LearningData,
+    session_header: Optional[str] = Header(None, alias="X-Session-ID")
+):
+    """Add learning data to an experiment"""
+    session_id = _resolve_session(None, session_header, allow_create=False)
+    return add_learning_data(session_id, learning_data)
+
+@app.post("/evidence/capture")
+def evidence_capture(
+    evidence_data: CapabilityEvidence,
+    session_header: Optional[str] = Header(None, alias="X-Session-ID")
+):
+    """Capture capability evidence"""
+    session_id = _resolve_session(None, session_header, allow_create=True)
+    return capture_evidence(session_id, evidence_data)
+
+@app.post("/metrics/self-efficacy")
+def metrics_self_efficacy(
+    metric_data: SelfEfficacyMetric,
+    session_header: Optional[str] = Header(None, alias="X-Session-ID")
+):
+    """Record a self-efficacy metric"""
+    session_id = _resolve_session(None, session_header, allow_create=True)
+    return record_self_efficacy_metric(session_id, metric_data)
+
+@app.get("/experiments")
+def experiments_list(session_header: Optional[str] = Header(None, alias="X-Session-ID")):
+    """Get all experiments for a session"""
+    session_id = _resolve_session(None, session_header, allow_create=False)
+    experiments = get_experiments(session_id)
+    return {"session_id": session_id, "experiments": experiments}
+
+@app.get("/learning")
+def learning_list(
+    experiment_id: Optional[str] = None,
+    session_header: Optional[str] = Header(None, alias="X-Session-ID")
+):
+    """Get learning data for a session or specific experiment"""
+    session_id = _resolve_session(None, session_header, allow_create=False)
+    learning_data = get_learning_data(session_id, experiment_id)
+    return {"session_id": session_id, "learning_data": learning_data}
+
+@app.get("/metrics")
+def metrics_list(session_header: Optional[str] = Header(None, alias="X-Session-ID")):
+    """Get self-efficacy metrics for a session"""
+    session_id = _resolve_session(None, session_header, allow_create=False)
+    metrics = get_self_efficacy_metrics(session_id)
+    return {"session_id": session_id, "metrics": metrics}
+
+# Self-Efficacy Engine Endpoints
+@app.get("/self-efficacy/metrics")
+def self_efficacy_metrics(session_header: Optional[str] = Header(None, alias="X-Session-ID")):
+    """Get computed self-efficacy metrics for a session"""
+    session_id = _resolve_session(None, session_header, allow_create=False)
+    metrics = compute_session_metrics(session_id)
+    
+    # Record analytics entry
+    record_analytics_entry(session_id, metrics)
+    
+    return {
+        "session_id": session_id,
+        "experiment_completion_rate": metrics.experiment_completion_rate,
+        "learning_velocity": metrics.learning_velocity,
+        "confidence_score": metrics.confidence_score,
+        "escalation_risk": metrics.escalation_risk,
+        "total_experiments": metrics.total_experiments,
+        "completed_experiments": metrics.completed_experiments,
+        "learning_events": metrics.learning_events,
+        "days_active": metrics.days_active,
+        "last_activity": metrics.last_activity,
+        "metrics_timestamp": metrics.metrics_timestamp
+    }
+
+@app.get("/self-efficacy/escalation")
+def self_efficacy_escalation(session_header: Optional[str] = Header(None, alias="X-Session-ID")):
+    """Check if session should be escalated to human coach"""
+    session_id = _resolve_session(None, session_header, allow_create=False)
+    should_esc, reason = should_escalate(session_id)
+    prompt = get_escalation_prompt(session_id) if should_esc else None
+    
+    return {
+        "session_id": session_id,
+        "should_escalate": should_esc,
+        "reason": reason,
+        "escalation_prompt": prompt
+    }
+
+@app.post("/self-efficacy/cleanup")
+def self_efficacy_cleanup(days_threshold: int = 30):
+    """Clean up stale experiments (admin endpoint)"""
+    result = cleanup_stale_experiments(days_threshold)
+    return result
+
+@app.get("/health/self-efficacy")
+def health_self_efficacy():
+    """Health check for self-efficacy engine"""
+    try:
+        health = get_self_efficacy_health()
+        return {
+            "ok": True,
+            "self_efficacy_engine": health,
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
