@@ -781,26 +781,32 @@
   }).catch(()=>{});
 
   // Authentication event handlers
-  $('#loginForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const email = $('#loginEmail').value;
-    const password = $('#loginPassword').value;
-    await authenticateUser(email, password, false);
-  });
+  const loginForm = $('#loginForm');
+  if(loginForm){
+    loginForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = $('#loginEmail').value;
+      const password = $('#loginPassword').value;
+      await authenticateUser(email, password, false);
+    });
+  }
 
-  $('#registerForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const email = $('#registerEmail').value;
-    const password = $('#registerPassword').value;
-    const confirm = $('#registerConfirm').value;
-    
-    if(password !== confirm){
-      setStatus($('#authStatus'), 'passwords do not match', 'error');
-      return;
-    }
-    
-    await authenticateUser(email, password, true);
-  });
+  const registerForm = $('#registerForm');
+  if(registerForm){
+    registerForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = $('#registerEmail').value;
+      const password = $('#registerPassword').value;
+      const confirm = $('#registerConfirm').value;
+
+      if(password !== confirm){
+        setStatus($('#authStatus'), 'passwords do not match', 'error');
+        return;
+      }
+
+      await authenticateUser(email, password, true);
+    });
+  }
 
   const toggleAuth = $('#toggleAuth');
   if(toggleAuth){
