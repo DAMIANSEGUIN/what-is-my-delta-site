@@ -54,8 +54,8 @@ from .self_efficacy_engine import (
     cleanup_stale_experiments, record_analytics_entry, get_self_efficacy_health
 )
 from .rag_engine import (
-    compute_embedding, batch_compute_embeddings, retrieve_similar,
-    get_rag_response, get_rag_health
+    compute_embedding, batch_compute_embeddings, retrieve_similar, 
+    get_rag_response, get_rag_health, discover_domain_adjacent_opportunities_rag
 )
 from .rag_source_discovery import (
     discover_sources_for_query, get_optimal_sources_for_query, get_discovery_analytics
@@ -67,6 +67,7 @@ from .competitive_intelligence import (
     get_competitive_intelligence_health
 )
 from .osint_forensics import analyze_company_osint, get_osint_health
+from .domain_adjacent_search import discover_domain_adjacent_opportunities, get_domain_adjacent_health
 from .settings import get_feature_flag
 from .job_sources import (
     GreenhouseSource, SerpApiSource, RedditSource, IndeedSource,
@@ -1050,6 +1051,20 @@ def rag_query(query: str, context: Dict[str, Any] = None):
     except Exception as e:
         return {"error": str(e)}
 
+@app.post("/rag/domain-adjacent")
+def rag_domain_adjacent(request: dict):
+    """Discover domain adjacent opportunities using RAG semantic clustering."""
+    try:
+        user_skills = request.get("user_skills", [])
+        user_domains = request.get("user_domains", [])
+        
+        # Use RAG-powered domain adjacent search
+        results = discover_domain_adjacent_opportunities_rag(user_skills, user_domains)
+        
+        return results
+    except Exception as e:
+        return {"error": str(e)}
+
 @app.get("/health/rag")
 def health_rag():
     """Health check for RAG engine"""
@@ -1464,3 +1479,46 @@ def analyze_company_osint_endpoint(request: dict):
 def get_osint_health_endpoint():
     """Get OSINT forensics health status."""
     return get_osint_health()
+
+# Domain Adjacent Search Endpoints
+@app.post("/domain-adjacent/discover")
+def discover_domain_adjacent_endpoint(request: dict):
+    """Discover domain adjacent opportunities through semantic clustering."""
+    try:
+        user_skills = request.get("user_skills", [])
+        user_domains = request.get("user_domains", [])
+        
+        # Generate domain adjacent search results
+        results = discover_domain_adjacent_opportunities(user_skills, user_domains)
+        
+        return {
+            "user_skills": results.user_skills,
+            "user_domains": results.user_domains,
+            "semantic_clusters": [
+                {
+                    "cluster_id": cluster.cluster_id,
+                    "cluster_name": cluster.cluster_name,
+                    "core_skills": cluster.core_skills,
+                    "adjacent_skills": cluster.adjacent_skills,
+                    "related_domains": cluster.related_domains,
+                    "opportunity_areas": cluster.opportunity_areas,
+                    "skill_gaps": cluster.skill_gaps,
+                    "learning_paths": cluster.learning_paths,
+                    "confidence_score": cluster.confidence_score,
+                    "cluster_strength": cluster.cluster_strength
+                }
+                for cluster in results.semantic_clusters
+            ],
+            "skill_alignment": results.skill_alignment,
+            "domain_expansion": results.domain_expansion,
+            "opportunity_mapping": results.opportunity_mapping,
+            "learning_recommendations": results.learning_recommendations,
+            "career_paths": results.career_paths
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/domain-adjacent/health")
+def get_domain_adjacent_health_endpoint():
+    """Get domain adjacent search health status."""
+    return get_domain_adjacent_health()

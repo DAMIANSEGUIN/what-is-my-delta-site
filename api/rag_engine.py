@@ -16,6 +16,7 @@ from .storage import get_conn
 from .settings import get_settings
 from .ai_clients import get_ai_fallback_response
 from .cost_controls import check_cost_limits, check_resource_limits, record_usage
+from .domain_adjacent_search import discover_domain_adjacent_opportunities
 
 @dataclass
 class EmbeddingResult:
@@ -345,6 +346,40 @@ class RAGEngine:
         
         return "\n".join(formatted)
     
+    def discover_domain_adjacent_opportunities(self, user_skills: List[str], user_domains: List[str]) -> Dict[str, Any]:
+        """Discover domain adjacent opportunities using RAG semantic clustering."""
+        try:
+            # Use domain adjacent search engine
+            results = discover_domain_adjacent_opportunities(user_skills, user_domains)
+            
+            # Convert to RAG-friendly format
+            return {
+                "user_skills": results.user_skills,
+                "user_domains": results.user_domains,
+                "semantic_clusters": [
+                    {
+                        "cluster_id": cluster.cluster_id,
+                        "cluster_name": cluster.cluster_name,
+                        "core_skills": cluster.core_skills,
+                        "adjacent_skills": cluster.adjacent_skills,
+                        "related_domains": cluster.related_domains,
+                        "opportunity_areas": cluster.opportunity_areas,
+                        "skill_gaps": cluster.skill_gaps,
+                        "learning_paths": cluster.learning_paths,
+                        "confidence_score": cluster.confidence_score,
+                        "cluster_strength": cluster.cluster_strength
+                    }
+                    for cluster in results.semantic_clusters
+                ],
+                "skill_alignment": results.skill_alignment,
+                "domain_expansion": results.domain_expansion,
+                "opportunity_mapping": results.opportunity_mapping,
+                "learning_recommendations": results.learning_recommendations,
+                "career_paths": results.career_paths
+            }
+        except Exception as e:
+            return {"error": str(e)}
+    
     def get_health_status(self) -> Dict[str, Any]:
         """Get RAG engine health status."""
         return {
@@ -380,3 +415,7 @@ def get_rag_response(query: str, context: Dict[str, Any] = None) -> Dict[str, An
 def get_rag_health() -> Dict[str, Any]:
     """Get RAG engine health status."""
     return rag_engine.get_health_status()
+
+def discover_domain_adjacent_opportunities_rag(user_skills: List[str], user_domains: List[str]) -> Dict[str, Any]:
+    """Discover domain adjacent opportunities using RAG semantic clustering."""
+    return rag_engine.discover_domain_adjacent_opportunities(user_skills, user_domains)
