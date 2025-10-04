@@ -66,6 +66,7 @@ from .competitive_intelligence import (
     create_strategic_resume_targeting, generate_job_search_ai_prompts,
     get_competitive_intelligence_health
 )
+from .osint_forensics import analyze_company_osint, get_osint_health
 from .settings import get_feature_flag
 from .job_sources import (
     GreenhouseSource, SerpApiSource, RedditSource, IndeedSource,
@@ -1430,3 +1431,36 @@ def generate_ai_prompts(request: dict):
 def get_intelligence_health():
     """Get competitive intelligence health status."""
     return get_competitive_intelligence_health()
+
+# OSINT Forensics Endpoints
+@app.post("/osint/analyze-company")
+def analyze_company_osint_endpoint(request: dict):
+    """Analyze company using OSINT forensics for values-driven job search."""
+    try:
+        company_name = request.get("company_name")
+        job_postings = request.get("job_postings", [])
+        user_values = request.get("user_values", [])
+        user_passions = request.get("user_passions", [])
+        
+        # Generate OSINT report
+        report = analyze_company_osint(company_name, job_postings, user_values, user_passions)
+        
+        return {
+            "company_name": report.company_name,
+            "analysis_date": report.analysis_date,
+            "values_alignment": report.values_alignment,
+            "passion_opportunities": report.passion_opportunities,
+            "cultural_insights": report.cultural_insights,
+            "growth_signals": report.growth_signals,
+            "watch_outs": report.watch_outs,
+            "receipts_table": report.receipts_table,
+            "user_values_match": report.user_values_match,
+            "passion_skills_alignment": report.passion_skills_alignment
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/osint/health")
+def get_osint_health_endpoint():
+    """Get OSINT forensics health status."""
+    return get_osint_health()
