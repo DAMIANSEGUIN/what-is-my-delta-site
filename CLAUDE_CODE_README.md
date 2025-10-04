@@ -1,4 +1,5 @@
 # **CLAUDE CODE - Senior Debugger README**
+# **CLAUDE CODE - Senior Debugger README**
 
 ## **🚨 CURRENT ISSUES – Domain API 404 & Claude API Key Not Detected**
 
