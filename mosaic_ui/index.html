@@ -142,6 +142,9 @@
           <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">password</label>
           <input type="password" id="loginPassword" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
         </div>
+        <div style="margin-bottom:16px;text-align:right">
+          <a href="#" id="forgotPassword" style="font-size:9px;color:var(--muted);text-decoration:underline">forgot password?</a>
+        </div>
         <button type="submit" class="quiet" style="width:100%;padding:10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">sign in</button>
       </form>
       
@@ -167,6 +170,27 @@
       </div>
       
       <div id="authStatus" class="status" style="margin-top:12px;text-align:center"></div>
+    </div>
+  </div>
+
+  <!-- PASSWORD RESET MODAL -->
+  <div id="resetModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1001">
+    <div style="background:#fff;padding:32px;border-radius:4px;max-width:400px;width:90%;box-shadow:0 8px 30px rgba(0,0,0,.12)">
+      <h2 style="font:600 14px/1.2 Helvetica,Arial;margin:0 0 20px;text-transform:uppercase;letter-spacing:.08em;text-align:center">reset password</h2>
+
+      <form id="resetForm" style="margin-bottom:20px">
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">email</label>
+          <input type="email" id="resetEmail" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
+        </div>
+        <button type="submit" class="quiet" style="width:100%;padding:10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">send reset link</button>
+      </form>
+
+      <div style="text-align:center;margin-top:16px">
+        <button id="closeReset" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">cancel</button>
+      </div>
+
+      <div id="resetStatus" class="status" style="margin-top:12px;text-align:center"></div>
     </div>
   </div>
 
@@ -1037,6 +1061,60 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
     logoutBtn.addEventListener('click', e => {
       e.preventDefault();
       logout();
+    });
+  }
+
+  // Password reset
+  const forgotPassword = $('#forgotPassword');
+  const resetModal = $('#resetModal');
+  const resetForm = $('#resetForm');
+  const closeReset = $('#closeReset');
+
+  if(forgotPassword){
+    forgotPassword.addEventListener('click', e => {
+      e.preventDefault();
+      resetModal.style.display = 'flex';
+    });
+  }
+
+  if(closeReset){
+    closeReset.addEventListener('click', () => {
+      resetModal.style.display = 'none';
+      $('#resetStatus').textContent = '';
+      $('#resetEmail').value = '';
+    });
+  }
+
+  if(resetForm){
+    resetForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = $('#resetEmail').value;
+      const resetStatus = $('#resetStatus');
+
+      setStatus(resetStatus, 'sending reset link...');
+
+      try {
+        const response = await fetch(`${apiBase}/auth/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if(response.ok){
+          setStatus(resetStatus, 'password reset link sent to your email', 'ok');
+          setTimeout(() => {
+            resetModal.style.display = 'none';
+            $('#resetStatus').textContent = '';
+            $('#resetEmail').value = '';
+          }, 3000);
+        } else {
+          setStatus(resetStatus, data.detail || 'reset failed', 'error');
+        }
+      } catch(error){
+        setStatus(resetStatus, 'network error - try again', 'error');
+      }
     });
   }
 

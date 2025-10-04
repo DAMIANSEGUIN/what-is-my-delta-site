@@ -743,13 +743,35 @@ async def get_current_user(user_id: str = Header(..., alias="X-User-ID")):
     user = get_user_by_id(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     return UserResponse(
         user_id=user["user_id"],
         email=user["email"],
         created_at=user["created_at"],
         last_login=user["last_login"]
     )
+
+
+@app.post("/auth/reset-password")
+async def reset_password(email: str = Body(..., embed=True)):
+    """Send password reset email (placeholder - needs email service)"""
+    # Check if user exists
+    conn = get_conn()
+    cursor = conn.execute("SELECT user_id FROM users WHERE email = ?", (email,))
+    user = cursor.fetchone()
+
+    if not user:
+        # Don't reveal if user exists - security best practice
+        return {"message": "If that email exists, a reset link has been sent"}
+
+    # TODO: Implement actual email sending with reset token
+    # For now, just return success message
+    # In production, you would:
+    # 1. Generate a secure reset token
+    # 2. Store it in database with expiration
+    # 3. Send email with reset link
+
+    return {"message": "If that email exists, a reset link has been sent"}
 
 
 @app.get("/resume/versions", response_model=ResumeVersionResponse)
