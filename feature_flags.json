@@ -46,11 +46,22 @@
     }
   },
   "rollout_plan": {
-    "phase_1": ["AI_FALLBACK_ENABLED"],
-    "phase_2": ["EXPERIMENTS_ENABLED"],
-    "phase_3": ["SELF_EFFICACY_METRICS", "COACH_ESCALATION"],
-    "phase_4": ["RAG_BASELINE"],
-    "phase_5": ["NEW_UI_ELEMENTS"]
+    "phase_1": [
+      "AI_FALLBACK_ENABLED"
+    ],
+    "phase_2": [
+      "EXPERIMENTS_ENABLED"
+    ],
+    "phase_3": [
+      "SELF_EFFICACY_METRICS",
+      "COACH_ESCALATION"
+    ],
+    "phase_4": [
+      "RAG_BASELINE"
+    ],
+    "phase_5": [
+      "NEW_UI_ELEMENTS"
+    ]
   },
   "safety": {
     "auto_rollback_on_error": true,
