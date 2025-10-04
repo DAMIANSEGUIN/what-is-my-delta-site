@@ -43,9 +43,9 @@ class GreenhouseSource(JobSource):
                     "skills": ["Python", "JavaScript", "React"],
                     "experience_level": "Mid-level"
                 }
-                for i in range(1, min(limit + 1))
+                for i in range(limit)
             ]
-            
+
             return [self._normalize_job_data(job) for job in mock_jobs]
             
         except Exception as e:
