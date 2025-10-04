@@ -840,7 +840,8 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
   }
 
   function getJob(jobId){
-    return jobCache.find(item => item.job_id === jobId);
+    // Phase 4+ compatibility: Support both job_id and id
+    return jobCache.find(item => (item.job_id === jobId || item.id === jobId));
   }
 
   function highlightSelected(){
@@ -860,20 +861,35 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
       return;
     }
     jobCache.forEach(match=>{
-      const skillsArr = Array.isArray(match.skills_match) ? match.skills_match : [];
+      // Phase 4+ compatibility: Support both old (job_id/role) and new (id/title) formats
+      const jobId = match.job_id || match.id;
+      const role = match.role || match.title;
+      const company = match.company;
+      const location = match.location || 'remote';
+
+      // Phase 4+ uses skills array, legacy uses skills_match
+      const skillsArr = Array.isArray(match.skills) ? match.skills : (Array.isArray(match.skills_match) ? match.skills_match : []);
       const valuesArr = Array.isArray(match.values_match) ? match.values_match : [];
+
+      // Phase 4+ doesn't provide fit_score, show source instead
+      const fit = Math.round(match.fit_score || 0);
+      const source = match.source ? `source: ${match.source}` : (fit > 0 ? `fit score: ${fit}%` : '');
+
       const card = document.createElement('div');
       card.className = 'job-card';
-      card.dataset.jobId = match.job_id;
-      const fit = Math.round(match.fit_score || 0);
+      card.dataset.jobId = jobId;
       card.innerHTML = `
-        <div><strong>${match.role}</strong> — ${match.company}</div>
-        <div class="muted">${match.location || 'remote'}</div>
-        <div class="muted">fit score: ${fit}%</div>
-        <div class="muted">skills</div>
-        <div>${skillsArr.map(s=>`<span class=\"pill\">${s}</span>`).join(' ')}</div>
-        <div class="muted">values</div>
-        <div>${valuesArr.map(s=>`<span class=\"pill\">${s}</span>`).join(' ')}</div>
+        <div><strong>${role}</strong> — ${company}</div>
+        <div class="muted">${location}</div>
+        ${source ? `<div class="muted">${source}</div>` : ''}
+        ${skillsArr.length > 0 ? `
+          <div class="muted">skills</div>
+          <div>${skillsArr.map(s=>`<span class=\"pill\">${s}</span>`).join(' ')}</div>
+        ` : ''}
+        ${valuesArr.length > 0 ? `
+          <div class="muted">values</div>
+          <div>${valuesArr.map(s=>`<span class=\"pill\">${s}</span>`).join(' ')}</div>
+        ` : ''}
         <div class="job-actions">
           <button class="quiet job-select" type="button">focus</button>
           <button class="quiet job-apply" type="button">apply</button>
@@ -938,11 +954,27 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
   }
 
   async function fetchOpportunities(){
-    if(!sessionId){
-      throw new Error('start with the coach to unlock matches');
+    // Phase 4+: Use new job search endpoint with RAG
+    const userData = loadUserData();
+    const query = userData.careerGoal || userData.lastCoachResponse || 'career opportunities';
+
+    try {
+      const data = await callJson(`/jobs/search?query=${encodeURIComponent(query)}&limit=10`);
+      renderJobs(data.jobs || []);
+
+      // Show feedback about sources used
+      if(data.sources_used && data.sources_used.length > 0){
+        setStatus(jobsStatus, `found ${data.total_results || 0} opportunities from ${data.sources_used.length} sources`, 'ok');
+      }
+    } catch(err) {
+      // Fallback to legacy endpoint if Phase 4+ not enabled
+      if(sessionId){
+        const data = await callJson('/ob/opportunities');
+        renderJobs(data.opportunities || []);
+      } else {
+        throw new Error('start with the coach to unlock matches');
+      }
     }
-    const data = await callJson('/ob/opportunities');
-    renderJobs(data.opportunities || []);
   }
 
   async function applyForJob(jobId, notes=''){
