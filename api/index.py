@@ -61,6 +61,11 @@ from .rag_source_discovery import (
     discover_sources_for_query, get_optimal_sources_for_query, get_discovery_analytics
 )
 from .cost_controls import check_cost_limits, check_resource_limits, record_usage, get_usage_analytics
+from .competitive_intelligence import (
+    analyze_company_strategic_needs, develop_competitive_positioning_strategy,
+    create_strategic_resume_targeting, generate_job_search_ai_prompts,
+    get_competitive_intelligence_health
+)
 from .settings import get_feature_flag
 from .job_sources import (
     GreenhouseSource, SerpApiSource, RedditSource, IndeedSource,
@@ -1321,3 +1326,107 @@ def get_cost_limits():
         }
     except Exception as e:
         return {"error": str(e)}
+
+# Competitive Intelligence Endpoints
+@app.get("/intelligence/company/{company_name}")
+def analyze_company(company_name: str, industry: str = None):
+    """Analyze company strategic needs and pain points."""
+    try:
+        analysis = analyze_company_strategic_needs(company_name, industry)
+        return {
+            "company_name": analysis.company_name,
+            "industry": analysis.industry,
+            "size": analysis.size,
+            "pain_points": analysis.pain_points,
+            "key_priorities": analysis.key_priorities,
+            "competitive_advantages": analysis.competitive_advantages,
+            "hiring_patterns": analysis.hiring_patterns,
+            "culture_indicators": analysis.culture_indicators,
+            "strategic_challenges": analysis.strategic_challenges,
+            "growth_indicators": analysis.growth_indicators,
+            "analysis_date": analysis.analysis_date
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.post("/intelligence/positioning")
+def develop_positioning(request: dict):
+    """Develop competitive positioning strategy."""
+    try:
+        target_role = request.get("target_role")
+        company_name = request.get("company_name")
+        industry = request.get("industry")
+        
+        # Analyze company first
+        company_analysis = analyze_company_strategic_needs(company_name, industry)
+        
+        # Develop positioning
+        positioning = develop_competitive_positioning_strategy(target_role, company_analysis)
+        
+        return {
+            "target_role": positioning.target_role,
+            "key_differentiators": positioning.key_differentiators,
+            "unique_value_props": positioning.unique_value_props,
+            "skill_gaps_to_address": positioning.skill_gaps_to_address,
+            "experience_highlights": positioning.experience_highlights,
+            "competitive_threats": positioning.competitive_threats,
+            "positioning_strategy": positioning.positioning_strategy
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.post("/intelligence/resume-targeting")
+def create_resume_targeting(request: dict):
+    """Create strategic resume targeting."""
+    try:
+        company_name = request.get("company_name")
+        target_role = request.get("target_role")
+        industry = request.get("industry")
+        
+        # Analyze company
+        company_analysis = analyze_company_strategic_needs(company_name, industry)
+        
+        # Develop positioning
+        positioning = develop_competitive_positioning_strategy(target_role, company_analysis)
+        
+        # Create targeting
+        targeting = create_strategic_resume_targeting(company_analysis, positioning)
+        
+        return {
+            "company_name": targeting.company_name,
+            "target_role": targeting.target_role,
+            "resume_focus_areas": targeting.resume_focus_areas,
+            "keyword_optimization": targeting.keyword_optimization,
+            "experience_prioritization": targeting.experience_prioritization,
+            "skill_emphasis": targeting.skill_emphasis,
+            "achievement_highlights": targeting.achievement_highlights,
+            "pain_point_alignment": targeting.pain_point_alignment
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.post("/intelligence/ai-prompts")
+def generate_ai_prompts(request: dict):
+    """Generate AI prompts for job search optimization."""
+    try:
+        company_name = request.get("company_name")
+        target_role = request.get("target_role")
+        industry = request.get("industry")
+        
+        # Analyze company
+        company_analysis = analyze_company_strategic_needs(company_name, industry)
+        
+        # Develop positioning
+        positioning = develop_competitive_positioning_strategy(target_role, company_analysis)
+        
+        # Generate prompts
+        prompts = generate_job_search_ai_prompts(company_analysis, positioning)
+        
+        return prompts
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/health/intelligence")
+def get_intelligence_health():
+    """Get competitive intelligence health status."""
+    return get_competitive_intelligence_health()

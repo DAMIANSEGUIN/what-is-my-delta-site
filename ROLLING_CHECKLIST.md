@@ -69,3 +69,8 @@
 | 14.4 | Cost Controls: Database migration | Cursor | `api/migrations/006_add_usage_tracking.sql` | ✅ (2025-10-03) |
 | 14.5 | Cost Controls: API integration | Cursor | `api/index.py`, `api/rag_engine.py` | ✅ (2025-10-03) |
 | 14.6 | Cost Controls: Documentation update | Cursor | `docs/job_sources_catalog.md` | ✅ (2025-10-03) |
+|| 17.1 | Competitive Intelligence: Company analysis engine | Cursor | `api/competitive_intelligence.py` | ✅ (2025-10-03) |
+|| 17.2 | Competitive Intelligence: API endpoints | Cursor | `api/index.py` | ✅ (2025-10-03) |
+|| 17.3 | Competitive Intelligence: Documentation | Cursor | `docs/competitive_intelligence_guide.md` | ✅ (2025-10-03) |
+|| 17.4 | Competitive Intelligence: Testing | Cursor | `api/competitive_intelligence.py` | ✅ (2025-10-03) |
+|| 17.5 | Competitive Intelligence: Integration | Cursor | `api/index.py` | ✅ (2025-10-03) |
