@@ -1244,12 +1244,31 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
   if(applyCircle){
     applyCircle.addEventListener('click', e => {
       e.preventDefault();
+
+      // Check if jobs are loaded first
+      if(!jobCache || jobCache.length === 0){
+        setStatus(resumeStatus, 'find jobs first before using resume tools', 'error');
+        return;
+      }
+
       // Show and scroll to resume tools section
       const resumeSection = $('#resumeControls');
       if(resumeSection){
         resumeSection.hidden = false;
-        resumeSection.scrollIntoView({behavior: 'smooth'});
-        setStatus(resumeStatus, 'select a job to customize your resume', 'info');
+        resumeSection.scrollIntoView({behavior: 'smooth', block: 'start'});
+
+        // Highlight the section briefly
+        resumeSection.style.border = '2px solid #2d7a2d';
+        setTimeout(() => {
+          resumeSection.style.border = '1px solid var(--line)';
+        }, 2000);
+
+        // Guide the user
+        if(selectedJobId){
+          setStatus(resumeStatus, `ready to customize resume for selected job`, 'ok');
+        } else {
+          setStatus(resumeStatus, 'select a job below, then use rewrite/customize/feedback buttons', 'info');
+        }
       }
     });
   }
