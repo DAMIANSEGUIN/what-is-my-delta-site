@@ -145,7 +145,6 @@ This document catalogs approved job data sources for the Mosaic platform.
 - **Indeed**: Requires API agreement
 - **LinkedIn**: Requires API partnership
 - **Glassdoor**: Requires API agreement
-- **AngelList**: Requires API agreement
 
 ## Pending Review
 
@@ -157,13 +156,6 @@ This document catalogs approved job data sources for the Mosaic platform.
 - **API Key Required**: No
 - **Implementation**: `api/job_sources/hackernews.py` (planned)
 
-### 5. AngelList
-- **Status**: ⏳ Pending Review
-- **Type**: Job board API
-- **Rate Limit**: TBD
-- **Coverage**: Startup jobs
-- **API Key Required**: Yes
-- **Implementation**: `api/job_sources/angelist.py` (planned)
 
 ## Rejected Sources
 
@@ -184,7 +176,6 @@ This document catalogs approved job data sources for the Mosaic platform.
 - ✅ **SerpApi**: Implemented with mock data  
 - ✅ **Reddit**: Implemented with mock data
 - ⏳ **Hacker News**: Planned
-- ⏳ **AngelList**: Planned
 
 ## Usage Guidelines
 

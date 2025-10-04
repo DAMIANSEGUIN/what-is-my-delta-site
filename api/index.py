@@ -61,10 +61,12 @@ from .rag_source_discovery import (
     discover_sources_for_query, get_optimal_sources_for_query, get_discovery_analytics
 )
 from .cost_controls import check_cost_limits, check_resource_limits, record_usage, get_usage_analytics
+from .settings import get_feature_flag
 from .job_sources import (
     GreenhouseSource, SerpApiSource, RedditSource, IndeedSource,
     LinkedInSource, GlassdoorSource, RemoteOKSource, WeWorkRemotelySource,
-    DiceSource, HackerNewsSource
+    DiceSource, MonsterSource, ZipRecruiterSource, CareerBuilderSource,
+    HackerNewsSource
 )
 
 app = FastAPI()
@@ -1141,17 +1143,28 @@ def jobs_search_rag(query: str, location: str = None, limit: int = 10):
         # Use RAG to discover optimal sources
         optimal_sources = get_optimal_sources_for_query(query, location)
         
-        # Initialize all available sources
+        # Initialize all available sources (production-ready only by default)
         source_map = {
+            # Production-ready sources (no API key required)
             "greenhouse": GreenhouseSource(),
             "serpapi": SerpApiSource(),
             "reddit": RedditSource(),
-            "indeed": IndeedSource(),
-            "linkedin": LinkedInSource(),
-            "glassdoor": GlassdoorSource(),
-            "angelist": AngelListSource(),
+            "remoteok": RemoteOKSource(),
+            "weworkremotely": WeWorkRemotelySource(),
             "hackernews": HackerNewsSource()
         }
+        
+        # Add stubbed sources only if feature flag is enabled
+        if get_feature_flag("JOB_SOURCES_STUBBED_ENABLED"):
+            source_map.update({
+                "indeed": IndeedSource(),
+                "linkedin": LinkedInSource(),
+                "glassdoor": GlassdoorSource(),
+                "dice": DiceSource(),
+                "monster": MonsterSource(),
+                "ziprecruiter": ZipRecruiterSource(),
+                "careerbuilder": CareerBuilderSource()
+            })
         
         all_jobs = []
         used_sources = []

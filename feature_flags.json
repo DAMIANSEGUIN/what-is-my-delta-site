@@ -37,6 +37,12 @@
       "description": "Enable new UI elements for experiments and metrics",
       "category": "ui",
       "risk_level": "low"
+    },
+    "JOB_SOURCES_STUBBED_ENABLED": {
+      "enabled": false,
+      "description": "Enable stubbed job sources that require API keys",
+      "category": "jobs",
+      "risk_level": "high"
     }
   },
   "rollout_plan": {
