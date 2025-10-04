@@ -955,8 +955,7 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
 
   async function fetchOpportunities(){
     // Phase 4+: Use new job search endpoint with RAG
-    const userData = loadUserData();
-    const query = userData.careerGoal || userData.lastCoachResponse || 'career opportunities';
+    const query = userData.careerGoal || userData.lastCoachResponse || 'software engineer';
 
     try {
       const data = await callJson(`/jobs/search?query=${encodeURIComponent(query)}&limit=10`);
