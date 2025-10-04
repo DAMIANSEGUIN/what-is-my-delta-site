@@ -63,7 +63,8 @@ from .rag_source_discovery import (
 from .cost_controls import check_cost_limits, check_resource_limits, record_usage, get_usage_analytics
 from .job_sources import (
     GreenhouseSource, SerpApiSource, RedditSource, IndeedSource,
-    LinkedInSource, GlassdoorSource, AngelListSource, HackerNewsSource
+    LinkedInSource, GlassdoorSource, RemoteOKSource, WeWorkRemotelySource,
+    DiceSource, HackerNewsSource
 )
 
 app = FastAPI()

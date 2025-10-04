@@ -10,7 +10,12 @@ from .reddit import RedditSource
 from .indeed import IndeedSource
 from .linkedin import LinkedInSource
 from .glassdoor import GlassdoorSource
-from .angelist import AngelListSource
+from .remoteok import RemoteOKSource
+from .weworkremotely import WeWorkRemotelySource
+from .dice import DiceSource
+from .monster import MonsterSource
+from .ziprecruiter import ZipRecruiterSource
+from .careerbuilder import CareerBuilderSource
 from .hackernews import HackerNewsSource
 
 __all__ = [
@@ -22,6 +27,11 @@ __all__ = [
     'IndeedSource',
     'LinkedInSource',
     'GlassdoorSource',
-    'AngelListSource',
+    'RemoteOKSource',
+    'WeWorkRemotelySource',
+    'DiceSource',
+    'MonsterSource',
+    'ZipRecruiterSource',
+    'CareerBuilderSource',
     'HackerNewsSource'
 ]

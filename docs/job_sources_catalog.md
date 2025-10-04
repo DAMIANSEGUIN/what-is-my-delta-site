@@ -55,15 +55,61 @@ This document catalogs approved job data sources for the Mosaic platform.
 - **API Key Required**: Yes
 - **Implementation**: `api/job_sources/glassdoor.py`
 
-### 7. AngelList
+### 7. RemoteOK
 - **Status**: ✅ Approved
-- **Type**: Startup job board
+- **Type**: Remote job board
 - **Rate Limit**: 60 requests/minute
-- **Coverage**: Startup jobs, equity positions
-- **API Key Required**: Yes
-- **Implementation**: `api/job_sources/angelist.py`
+- **Coverage**: Remote jobs, tech positions
+- **API Key Required**: No
+- **Implementation**: `api/job_sources/remoteok.py`
+- **Compliance**: ✅ Production-ready (no API key required)
 
-### 8. Hacker News
+### 8. WeWorkRemotely
+- **Status**: ✅ Approved
+- **Type**: Remote job board
+- **Rate Limit**: 60 requests/minute
+- **Coverage**: Remote jobs, all industries
+- **API Key Required**: No
+- **Implementation**: `api/job_sources/weworkremotely.py`
+- **Compliance**: ✅ Production-ready (no API key required)
+
+### 9. Dice
+- **Status**: ✅ Approved
+- **Type**: Tech job board
+- **Rate Limit**: 100 requests/minute
+- **Coverage**: Tech jobs, engineering positions
+- **API Key Required**: Yes
+- **Implementation**: `api/job_sources/dice.py`
+- **Compliance**: ⚠️ API key needed
+
+### 10. Monster
+- **Status**: ✅ Approved
+- **Type**: Traditional job board
+- **Rate Limit**: 100 requests/minute
+- **Coverage**: General jobs, all industries
+- **API Key Required**: Yes
+- **Implementation**: `api/job_sources/monster.py`
+- **Compliance**: ⚠️ API key needed
+
+### 11. ZipRecruiter
+- **Status**: ✅ Approved
+- **Type**: Job matching platform
+- **Rate Limit**: 100 requests/minute
+- **Coverage**: Job matching, all industries
+- **API Key Required**: Yes
+- **Implementation**: `api/job_sources/ziprecruiter.py`
+- **Compliance**: ⚠️ API key needed
+
+### 12. CareerBuilder
+- **Status**: ✅ Approved
+- **Type**: General job board
+- **Rate Limit**: 100 requests/minute
+- **Coverage**: General jobs, all industries
+- **API Key Required**: Yes
+- **Implementation**: `api/job_sources/careerbuilder.py`
+- **Compliance**: ⚠️ API key needed
+
+### 13. Hacker News
 - **Status**: ✅ Approved
 - **Type**: Community forum
 - **Rate Limit**: 60 requests/minute
@@ -78,13 +124,18 @@ This document catalogs approved job data sources for the Mosaic platform.
 - **Greenhouse**: ✅ API key available
 - **SerpApi**: ✅ API key available  
 - **Reddit**: ✅ No API key required
+- **RemoteOK**: ✅ No API key required
+- **WeWorkRemotely**: ✅ No API key required
 - **Hacker News**: ✅ No API key required
 
 ### Stubbed Sources (Require API Keys)
 - **Indeed**: ⚠️ API key needed
 - **LinkedIn**: ⚠️ API key needed
 - **Glassdoor**: ⚠️ API key needed
-- **AngelList**: ⚠️ API key needed
+- **Dice**: ⚠️ API key needed
+- **Monster**: ⚠️ API key needed
+- **ZipRecruiter**: ⚠️ API key needed
+- **CareerBuilder**: ⚠️ API key needed
 
 ### Licensing Requirements
 - **Greenhouse**: Standard API terms
