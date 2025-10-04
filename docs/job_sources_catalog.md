@@ -11,6 +11,7 @@ This document catalogs approved job data sources for the Mosaic platform.
 - **Coverage**: Tech jobs, startups, mid-size companies
 - **API Key Required**: Yes
 - **Implementation**: `api/job_sources/greenhouse.py`
+- **Compliance**: ✅ Production-ready (API key available)
 
 ### 2. SerpApi
 - **Status**: ✅ Approved  
@@ -19,6 +20,7 @@ This document catalogs approved job data sources for the Mosaic platform.
 - **Coverage**: Google Jobs, LinkedIn, Indeed, etc.
 - **API Key Required**: Yes
 - **Implementation**: `api/job_sources/serpapi.py`
+- **Compliance**: ✅ Production-ready (API key available)
 
 ### 3. Reddit
 - **Status**: ✅ Approved
@@ -27,6 +29,7 @@ This document catalogs approved job data sources for the Mosaic platform.
 - **Coverage**: r/forhire, r/remotejs, r/jobs
 - **API Key Required**: No
 - **Implementation**: `api/job_sources/reddit.py`
+- **Compliance**: ✅ Production-ready (no API key required)
 
 ### 4. Indeed
 - **Status**: ✅ Approved
@@ -67,6 +70,31 @@ This document catalogs approved job data sources for the Mosaic platform.
 - **Coverage**: "Who is hiring" threads, tech jobs
 - **API Key Required**: No
 - **Implementation**: `api/job_sources/hackernews.py`
+- **Compliance**: ✅ Production-ready (no API key required)
+
+## Compliance Status
+
+### Production-Ready Sources
+- **Greenhouse**: ✅ API key available
+- **SerpApi**: ✅ API key available  
+- **Reddit**: ✅ No API key required
+- **Hacker News**: ✅ No API key required
+
+### Stubbed Sources (Require API Keys)
+- **Indeed**: ⚠️ API key needed
+- **LinkedIn**: ⚠️ API key needed
+- **Glassdoor**: ⚠️ API key needed
+- **AngelList**: ⚠️ API key needed
+
+### Licensing Requirements
+- **Greenhouse**: Standard API terms
+- **SerpApi**: Standard API terms
+- **Reddit**: Public API (no special licensing)
+- **Hacker News**: Public API (no special licensing)
+- **Indeed**: Requires API agreement
+- **LinkedIn**: Requires API partnership
+- **Glassdoor**: Requires API agreement
+- **AngelList**: Requires API agreement
 
 ## Pending Review
 

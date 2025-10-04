@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS job_search_cache (
     location TEXT,
     results TEXT NOT NULL, -- JSON array of job IDs
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + 3600)
+    expires_at TIMESTAMP DEFAULT (datetime('now', '+1 hour'))
 );
 
 -- RAG usage tracking

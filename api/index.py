@@ -976,6 +976,47 @@ def rag_batch_embed(texts: List[str]):
     except Exception as e:
         return {"error": str(e)}
 
+@app.get("/rag/embed")
+def rag_embed(text: str):
+    """Compute embedding for text"""
+    try:
+        result = compute_embedding(text)
+        if result:
+            return {
+                "text": result.text,
+                "embedding": result.embedding,
+                "model": result.model,
+                "cached": result.cached,
+                "created_at": result.created_at
+            }
+        else:
+            return {"error": "Failed to compute embedding"}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/rag/batch-embed")
+def rag_batch_embed(texts: str):  # Comma-separated texts
+    """Batch compute embeddings for multiple texts"""
+    try:
+        text_list = [t.strip() for t in texts.split(',')]
+        results = batch_compute_embeddings(text_list)
+        return {
+            "texts": text_list,
+            "embeddings": [
+                {
+                    "text": result.text,
+                    "embedding": result.embedding,
+                    "model": result.model,
+                    "cached": result.cached,
+                    "created_at": result.created_at
+                }
+                for result in results
+            ],
+            "total_processed": len(results)
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
 @app.get("/rag/retrieve")
 def rag_retrieve(query: str, limit: int = 5, min_similarity: float = 0.7):
     """Retrieve similar content using RAG"""
