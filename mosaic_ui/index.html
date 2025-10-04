@@ -1245,10 +1245,12 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
   if(applyCircle){
     applyCircle.addEventListener('click', e => {
       e.preventDefault();
-      // Scroll to resume section or show resume tools
-      const resumeSection = $('#resumeTools');
+      // Show and scroll to resume tools section
+      const resumeSection = $('#resumeControls');
       if(resumeSection){
+        resumeSection.hidden = false;
         resumeSection.scrollIntoView({behavior: 'smooth'});
+        setStatus(resumeStatus, 'select a job to customize your resume', 'info');
       }
     });
   }
