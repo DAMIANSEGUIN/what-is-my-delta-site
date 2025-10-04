@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import (
     BackgroundTasks,
+    Body,
     FastAPI,
     File,
     Header,
@@ -17,8 +18,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import hashlib
 import secrets
-import openai
-import numpy as np
+# import openai  # Temporarily disabled for testing
+# import numpy as np  # Temporarily disabled for testing
 
 from .settings import get_settings
 from .startup_checks import startup_or_die
@@ -52,6 +53,11 @@ from .self_efficacy_engine import (
     compute_session_metrics, should_escalate, get_escalation_prompt, 
     cleanup_stale_experiments, record_analytics_entry, get_self_efficacy_health
 )
+from .rag_engine import (
+    compute_embedding, batch_compute_embeddings, retrieve_similar,
+    get_rag_response, get_rag_health
+)
+from .job_sources import GreenhouseSource, SerpApiSource, RedditSource
 
 app = FastAPI()
 
@@ -925,3 +931,168 @@ def health_self_efficacy():
             "error": str(e),
             "timestamp": datetime.utcnow().isoformat() + "Z"
         }
+
+# RAG Engine Endpoints
+@app.post("/rag/embed")
+def rag_embed(text: str):
+    """Compute embedding for text"""
+    try:
+        embedding_result = compute_embedding(text)
+        if embedding_result:
+            return {
+                "text": embedding_result.text,
+                "hash": embedding_result.hash,
+                "model": embedding_result.model,
+                "created_at": embedding_result.created_at
+            }
+        else:
+            return {"error": "Failed to compute embedding"}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.post("/rag/batch-embed")
+def rag_batch_embed(texts: List[str]):
+    """Compute embeddings for multiple texts"""
+    try:
+        results = batch_compute_embeddings(texts)
+        return {
+            "results": [
+                {
+                    "text": result.text,
+                    "hash": result.hash,
+                    "model": result.model,
+                    "created_at": result.created_at
+                }
+                for result in results
+            ]
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/rag/retrieve")
+def rag_retrieve(query: str, limit: int = 5, min_similarity: float = 0.7):
+    """Retrieve similar content using RAG"""
+    try:
+        result = retrieve_similar(query, limit, min_similarity)
+        return {
+            "query": result.query,
+            "matches": result.matches,
+            "confidence": result.confidence,
+            "fallback_used": result.fallback_used,
+            "retrieval_time": result.retrieval_time
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.post("/rag/query")
+def rag_query(query: str, context: Dict[str, Any] = None):
+    """Get RAG response with retrieval and fallback"""
+    try:
+        result = get_rag_response(query, context)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/health/rag")
+def health_rag():
+    """Health check for RAG engine"""
+    try:
+        health = get_rag_health()
+        return {
+            "ok": True,
+            "rag_engine": health,
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+
+# Job Sources Endpoints
+@app.get("/jobs/search")
+def jobs_search(query: str, location: str = None, limit: int = 10):
+    """Search jobs across all sources"""
+    try:
+        # Initialize job sources
+        greenhouse = GreenhouseSource()
+        serpapi = SerpApiSource()
+        reddit = RedditSource()
+        
+        all_jobs = []
+        
+        # Search each source
+        for source in [greenhouse, serpapi, reddit]:
+            try:
+                jobs = source.search_jobs(query, location, limit)
+                all_jobs.extend(jobs)
+            except Exception as e:
+                print(f"Error searching {source.name}: {e}")
+                continue
+        
+        # Remove duplicates and limit results
+        unique_jobs = []
+        seen_ids = set()
+        for job in all_jobs:
+            if job.id not in seen_ids:
+                unique_jobs.append(job)
+                seen_ids.add(job.id)
+        
+        return {
+            "query": query,
+            "location": location,
+            "total_results": len(unique_jobs),
+            "jobs": [
+                {
+                    "id": job.id,
+                    "title": job.title,
+                    "company": job.company,
+                    "location": job.location,
+                    "description": job.description[:200] + "..." if len(job.description) > 200 else job.description,
+                    "url": job.url,
+                    "source": job.source,
+                    "remote": job.remote,
+                    "skills": job.skills,
+                    "experience_level": job.experience_level
+                }
+                for job in unique_jobs[:limit]
+            ]
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/jobs/{job_id}")
+def get_job_details(job_id: str):
+    """Get detailed job information"""
+    try:
+        # Try each source to find the job
+        sources = [GreenhouseSource(), SerpApiSource(), RedditSource()]
+        
+        for source in sources:
+            try:
+                job = source.get_job_details(job_id)
+                if job:
+                    return {
+                        "id": job.id,
+                        "title": job.title,
+                        "company": job.company,
+                        "location": job.location,
+                        "description": job.description,
+                        "url": job.url,
+                        "source": job.source,
+                        "posted_date": job.posted_date.isoformat() if job.posted_date else None,
+                        "salary_range": job.salary_range,
+                        "job_type": job.job_type,
+                        "remote": job.remote,
+                        "skills": job.skills,
+                        "experience_level": job.experience_level,
+                        "metadata": job.metadata
+                    }
+            except Exception as e:
+                print(f"Error getting job details from {source.name}: {e}")
+                continue
+        
+        return {"error": "Job not found"}
+    except Exception as e:
+        return {"error": str(e)}
