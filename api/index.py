@@ -57,7 +57,14 @@ from .rag_engine import (
     compute_embedding, batch_compute_embeddings, retrieve_similar,
     get_rag_response, get_rag_health
 )
-from .job_sources import GreenhouseSource, SerpApiSource, RedditSource
+from .rag_source_discovery import (
+    discover_sources_for_query, get_optimal_sources_for_query, get_discovery_analytics
+)
+from .cost_controls import check_cost_limits, check_resource_limits, record_usage, get_usage_analytics
+from .job_sources import (
+    GreenhouseSource, SerpApiSource, RedditSource, IndeedSource,
+    LinkedInSource, GlassdoorSource, AngelListSource, HackerNewsSource
+)
 
 app = FastAPI()
 
@@ -1015,18 +1022,36 @@ def health_rag():
 def jobs_search(query: str, location: str = None, limit: int = 10):
     """Search jobs across all sources"""
     try:
+        # Check cost limits first
+        cost_check = check_cost_limits("job_search", 0.01)  # $0.01 per job search
+        if not cost_check["allowed"]:
+            return {
+                "error": f"Cost limit exceeded: {cost_check['reason']}",
+                "cost_limit": True
+            }
+        
+        # Check resource limits
+        resource_check = check_resource_limits("job_search")
+        if not resource_check["allowed"]:
+            return {
+                "error": f"Resource limit exceeded: {resource_check['reason']}",
+                "resource_limit": True
+            }
+        
         # Initialize job sources
         greenhouse = GreenhouseSource()
         serpapi = SerpApiSource()
         reddit = RedditSource()
         
         all_jobs = []
+        success_count = 0
         
         # Search each source
         for source in [greenhouse, serpapi, reddit]:
             try:
                 jobs = source.search_jobs(query, location, limit)
                 all_jobs.extend(jobs)
+                success_count += 1
             except Exception as e:
                 print(f"Error searching {source.name}: {e}")
                 continue
@@ -1039,9 +1064,94 @@ def jobs_search(query: str, location: str = None, limit: int = 10):
                 unique_jobs.append(job)
                 seen_ids.add(job.id)
         
+        # Record usage
+        record_usage("job_search", 0.01, success_count > 0)
+        
         return {
             "query": query,
             "location": location,
+            "total_results": len(unique_jobs),
+            "sources_used": success_count,
+            "jobs": [
+                {
+                    "id": job.id,
+                    "title": job.title,
+                    "company": job.company,
+                    "location": job.location,
+                    "description": job.description[:200] + "..." if len(job.description) > 200 else job.description,
+                    "url": job.url,
+                    "source": job.source,
+                    "remote": job.remote,
+                    "skills": job.skills,
+                    "experience_level": job.experience_level
+                }
+                for job in unique_jobs[:limit]
+            ]
+        }
+    except Exception as e:
+        record_usage("job_search", 0.01, False)
+        return {"error": str(e)}
+
+@app.get("/jobs/search/rag")
+def jobs_search_rag(query: str, location: str = None, limit: int = 10):
+    """RAG-powered job search with dynamic source discovery"""
+    try:
+        # Use RAG to discover optimal sources
+        optimal_sources = get_optimal_sources_for_query(query, location)
+        
+        # Initialize all available sources
+        source_map = {
+            "greenhouse": GreenhouseSource(),
+            "serpapi": SerpApiSource(),
+            "reddit": RedditSource(),
+            "indeed": IndeedSource(),
+            "linkedin": LinkedInSource(),
+            "glassdoor": GlassdoorSource(),
+            "angelist": AngelListSource(),
+            "hackernews": HackerNewsSource()
+        }
+        
+        all_jobs = []
+        used_sources = []
+        
+        # Search optimal sources first
+        for source_name in optimal_sources:
+            if source_name in source_map:
+                try:
+                    source = source_map[source_name]
+                    jobs = source.search_jobs(query, location, limit)
+                    all_jobs.extend(jobs)
+                    used_sources.append(source_name)
+                except Exception as e:
+                    print(f"Error searching {source_name}: {e}")
+                    continue
+        
+        # Fallback to other sources if needed
+        if len(all_jobs) < limit:
+            for source_name, source in source_map.items():
+                if source_name not in used_sources:
+                    try:
+                        jobs = source.search_jobs(query, location, limit)
+                        all_jobs.extend(jobs)
+                        used_sources.append(source_name)
+                    except Exception as e:
+                        print(f"Error searching {source_name}: {e}")
+                        continue
+        
+        # Remove duplicates and limit results
+        unique_jobs = []
+        seen_ids = set()
+        for job in all_jobs:
+            if job.id not in seen_ids:
+                unique_jobs.append(job)
+                seen_ids.add(job.id)
+        
+        return {
+            "query": query,
+            "location": location,
+            "rag_optimized": True,
+            "optimal_sources": optimal_sources,
+            "used_sources": used_sources,
             "total_results": len(unique_jobs),
             "jobs": [
                 {
@@ -1094,5 +1204,65 @@ def get_job_details(job_id: str):
                 continue
         
         return {"error": "Job not found"}
+    except Exception as e:
+        return {"error": str(e)}
+
+# RAG Source Discovery Endpoints
+@app.get("/sources/discover")
+def discover_sources(query: str, location: str = None, job_type: str = None):
+    """Discover optimal sources for a job search query using RAG"""
+    try:
+        discoveries = discover_sources_for_query(query, location, job_type)
+        return {
+            "query": query,
+            "location": location,
+            "job_type": job_type,
+            "discoveries": [
+                {
+                    "source_name": discovery.source_name,
+                    "source_type": discovery.source_type,
+                    "api_endpoint": discovery.api_endpoint,
+                    "rate_limit": discovery.rate_limit,
+                    "confidence": discovery.confidence,
+                    "discovery_reason": discovery.discovery_reason,
+                    "integration_status": discovery.integration_status
+                }
+                for discovery in discoveries
+            ]
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/sources/analytics")
+def get_source_analytics():
+    """Get analytics on source discovery and integration"""
+    try:
+        analytics = get_discovery_analytics()
+        return analytics
+    except Exception as e:
+        return {"error": str(e)}
+
+# Cost Control Endpoints
+@app.get("/cost/analytics")
+def get_cost_analytics():
+    """Get cost and usage analytics"""
+    try:
+        analytics = get_usage_analytics()
+        return analytics
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/cost/limits")
+def get_cost_limits():
+    """Get current cost limits and usage"""
+    try:
+        analytics = get_usage_analytics()
+        return {
+            "cost_limits": analytics.get("cost_limits", {}),
+            "resource_limits": analytics.get("resource_limits", {}),
+            "current_usage": analytics.get("current_usage", {}),
+            "emergency_stop": analytics.get("emergency_stop", False),
+            "status": analytics.get("status", "unknown")
+        }
     except Exception as e:
         return {"error": str(e)}

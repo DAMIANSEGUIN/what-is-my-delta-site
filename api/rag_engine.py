@@ -15,6 +15,7 @@ import random
 from .storage import get_conn
 from .settings import get_settings
 from .ai_clients import get_ai_fallback_response
+from .cost_controls import check_cost_limits, check_resource_limits, record_usage
 
 @dataclass
 class EmbeddingResult:
@@ -105,6 +106,18 @@ class RAGEngine:
         if not self.rag_enabled:
             return None
         
+        # Check cost limits first
+        cost_check = check_cost_limits("embedding", 0.0001)  # $0.0001 per embedding
+        if not cost_check["allowed"]:
+            print(f"Cost limit exceeded: {cost_check['reason']}")
+            return None
+        
+        # Check resource limits
+        resource_check = check_resource_limits("embedding")
+        if not resource_check["allowed"]:
+            print(f"Resource limit exceeded: {resource_check['reason']}")
+            return None
+        
         if not self._check_rate_limit("embeddings"):
             print("Rate limit exceeded for embeddings")
             return None
@@ -115,6 +128,7 @@ class RAGEngine:
             cached_embedding = self._get_cached_embedding(text_hash)
             
             if cached_embedding:
+                record_usage("embedding", 0.0, True)  # Cache hit = no cost
                 return EmbeddingResult(
                     text=text,
                     embedding=cached_embedding,
@@ -129,6 +143,9 @@ class RAGEngine:
             # Cache the embedding
             self._cache_embedding(text_hash, embedding)
             
+            # Record usage
+            record_usage("embedding", 0.0001, True)
+            
             return EmbeddingResult(
                 text=text,
                 embedding=embedding,
@@ -137,6 +154,7 @@ class RAGEngine:
             )
             
         except Exception as e:
+            record_usage("embedding", 0.0001, False)
             print(f"Error computing embedding: {e}")
             return None
     
