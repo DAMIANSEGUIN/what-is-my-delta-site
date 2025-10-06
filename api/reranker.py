@@ -48,9 +48,20 @@ class CrossEncoderReranker:
     def _initialize_model(self):
         """Initialize the cross-encoder model."""
         if not SENTENCE_TRANSFORMERS_AVAILABLE:
-            print("Using mock reranker - sentence-transformers not available")
-            self.initialized = True
-            return
+            print("sentence-transformers not available - installing...")
+            try:
+                import subprocess
+                subprocess.run(["pip", "install", "sentence-transformers"], check=True)
+                # Retry import after installation
+                from sentence_transformers import CrossEncoder
+                self.model = CrossEncoder(self.model_name, device='cpu')
+                self.initialized = True
+                print("Cross-encoder model initialized successfully after installation")
+            except Exception as e:
+                print(f"Failed to install sentence-transformers: {e}")
+                print("Using mock reranker")
+                self.initialized = True
+                return
         
         try:
             print(f"Initializing cross-encoder model: {self.model_name}")

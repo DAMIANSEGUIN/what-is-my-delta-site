@@ -153,6 +153,19 @@ class RAGEngine:
                 )
                 embedding = response.data[0].embedding
                 print(f"Generated real embedding for text: {text[:50]}...")
+            except ImportError:
+                print("OpenAI module not available - installing...")
+                import subprocess
+                subprocess.run(["pip", "install", "openai"], check=True)
+                # Retry after installation
+                import openai
+                openai.api_key = os.getenv("OPENAI_API_KEY")
+                response = openai.embeddings.create(
+                    model="text-embedding-3-small",
+                    input=text
+                )
+                embedding = response.data[0].embedding
+                print(f"Generated real embedding for text: {text[:50]}...")
             except Exception as e:
                 print(f"OpenAI API error, using fallback: {e}")
                 # Fallback to simulated embedding for testing
