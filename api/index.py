@@ -68,6 +68,9 @@ from .competitive_intelligence import (
 )
 from .osint_forensics import analyze_company_osint, get_osint_health
 from .domain_adjacent_search import discover_domain_adjacent_opportunities, get_domain_adjacent_health
+from .analytics import get_analytics_dashboard, export_analytics_csv, get_analytics_health
+from .reranker import get_reranker_health
+from .corpus_reindex import reindex_corpus, get_reindex_status
 from .settings import get_feature_flag
 from .job_sources import (
     GreenhouseSource, SerpApiSource, RedditSource, IndeedSource,
@@ -1522,3 +1525,50 @@ def discover_domain_adjacent_endpoint(request: dict):
 def get_domain_adjacent_health_endpoint():
     """Get domain adjacent search health status."""
     return get_domain_adjacent_health()
+
+# Analytics Endpoints
+@app.get("/analytics/dashboard")
+def get_analytics_dashboard_endpoint():
+    """Get comprehensive analytics dashboard data."""
+    return get_analytics_dashboard()
+
+@app.get("/analytics/export")
+def export_analytics_endpoint(days: int = 7):
+    """Export analytics data to CSV."""
+    try:
+        filename = export_analytics_csv(days)
+        if filename:
+            return {"filename": filename, "status": "success"}
+        else:
+            return {"error": "Failed to export analytics", "status": "error"}
+    except Exception as e:
+        return {"error": str(e), "status": "error"}
+
+@app.get("/analytics/health")
+def get_analytics_health_endpoint():
+    """Get analytics engine health status."""
+    return get_analytics_health()
+
+# Reranker Endpoints
+@app.get("/reranker/health")
+def get_reranker_health_endpoint():
+    """Get cross-encoder reranker health status."""
+    return get_reranker_health()
+
+# Corpus Reindex Endpoints
+@app.post("/corpus/reindex")
+def reindex_corpus_endpoint():
+    """Re-index corpus with new embeddings."""
+    try:
+        results = reindex_corpus()
+        return {
+            "status": "success",
+            "results": results
+        }
+    except Exception as e:
+        return {"error": str(e), "status": "error"}
+
+@app.get("/corpus/status")
+def get_corpus_status_endpoint():
+    """Get corpus reindex status."""
+    return get_reindex_status()

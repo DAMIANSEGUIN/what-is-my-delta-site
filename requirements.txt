@@ -9,3 +9,5 @@ openai
 anthropic
 numpy
 python-dotenv
+sentence-transformers>=2.2.2
+scikit-learn>=1.3.0

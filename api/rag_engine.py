@@ -17,6 +17,7 @@ from .settings import get_settings
 from .ai_clients import get_ai_fallback_response
 from .cost_controls import check_cost_limits, check_resource_limits, record_usage
 from .domain_adjacent_search import discover_domain_adjacent_opportunities
+from .reranker import rerank_documents
 
 @dataclass
 class EmbeddingResult:
@@ -25,7 +26,7 @@ class EmbeddingResult:
     embedding: List[float]
     hash: str
     created_at: str
-    model: str = "text-embedding-ada-002"
+    model: str = "text-embedding-3-small"
 
 @dataclass
 class RetrievalResult:
@@ -139,7 +140,7 @@ class RAGEngine:
             
             # Generate embedding (simulated for now - replace with actual OpenAI API call)
             # For now, create a random embedding vector
-            embedding = [random.random() for _ in range(1536)]  # ADA-002 has 1536 dimensions
+            embedding = [random.random() for _ in range(1536)]  # text-embedding-3-small has 1536 dimensions
             
             # Cache the embedding
             self._cache_embedding(text_hash, embedding)
@@ -246,6 +247,17 @@ class RAGEngine:
             
             # Sort by similarity and limit results
             matches.sort(key=lambda x: x["similarity"], reverse=True)
+            
+            # Apply reranking if we have enough candidates
+            if len(matches) > 5:
+                try:
+                    rerank_result = rerank_documents(query, matches)
+                    matches = rerank_result.reranked_documents
+                    # Log reranking improvement
+                    print(f"Reranking improvement: {rerank_result.improvement_pct:.1f}%")
+                except Exception as e:
+                    print(f"Reranking failed, using original results: {e}")
+            
             matches = matches[:limit]
             
             # Calculate confidence
@@ -273,7 +285,7 @@ class RAGEngine:
             )
     
     def _cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
-        """Calculate cosine similarity between two vectors."""
+        """Calculate normalized cosine similarity between two vectors."""
         try:
             # Calculate dot product
             dot_product = sum(a * b for a, b in zip(vec1, vec2))
@@ -285,9 +297,27 @@ class RAGEngine:
             if norm1 == 0 or norm2 == 0:
                 return 0.0
             
-            return dot_product / (norm1 * norm2)
+            # Normalized cosine similarity
+            similarity = dot_product / (norm1 * norm2)
+            
+            # Apply keyword boost if available
+            return self._apply_keyword_boost(similarity, vec1, vec2)
         except Exception:
             return 0.0
+    
+    def _apply_keyword_boost(self, similarity: float, vec1: List[float], vec2: List[float]) -> float:
+        """Apply simple keyword boost to similarity score."""
+        try:
+            # Simple keyword boost based on vector magnitude
+            magnitude1 = sum(a * a for a in vec1) ** 0.5
+            magnitude2 = sum(b * b for b in vec2) ** 0.5
+            
+            # Boost factor based on vector magnitudes (simple heuristic)
+            boost_factor = min(1.2, 1.0 + (magnitude1 + magnitude2) / 1000.0)
+            
+            return min(1.0, similarity * boost_factor)
+        except Exception:
+            return similarity
     
     def get_rag_response(self, query: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
         """Get RAG response with retrieval and fallback logic."""
