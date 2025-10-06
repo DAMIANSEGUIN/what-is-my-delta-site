@@ -15,79 +15,27 @@ class SecureJobSearchKeyLoader:
     def __init__(self):
         self.keys_loaded = False
         self.key_cache = {}
+        # ONLY APIs that actually require keys
         self.required_keys = {
-            'GREENHOUSE_API_TOKEN': {
-                'name': 'Greenhouse API Token',
-                'url': 'https://developers.greenhouse.io/',
-                'required': False,
-                'description': 'Greenhouse job board API'
-            },
             'SERPAPI_API_KEY': {
                 'name': 'SerpApi API Key',
                 'url': 'https://serpapi.com/',
                 'required': True,
-                'description': 'Google Jobs search via SerpApi'
-            },
-            'REDDIT_CLIENT_ID': {
-                'name': 'Reddit Client ID',
-                'url': 'https://www.reddit.com/prefs/apps',
-                'required': False,
-                'description': 'Reddit API for job postings'
-            },
-            'REDDIT_CLIENT_SECRET': {
-                'name': 'Reddit Client Secret',
-                'url': 'https://www.reddit.com/prefs/apps',
-                'required': False,
-                'description': 'Reddit API secret'
-            },
-            'INDEED_PUBLISHER_ID': {
-                'name': 'Indeed Publisher ID',
-                'url': 'https://ads.indeed.com/jobroll/xmlfeed',
-                'required': False,
-                'description': 'Indeed job search API'
-            },
-            'LINKEDIN_CLIENT_ID': {
-                'name': 'LinkedIn Client ID',
-                'url': 'https://www.linkedin.com/developers/',
-                'required': False,
-                'description': 'LinkedIn API for job postings'
-            },
-            'LINKEDIN_CLIENT_SECRET': {
-                'name': 'LinkedIn Client Secret',
-                'url': 'https://www.linkedin.com/developers/',
-                'required': False,
-                'description': 'LinkedIn API secret'
-            },
-            'GLASSDOOR_PARTNER_ID': {
-                'name': 'Glassdoor Partner ID',
-                'url': 'https://www.glassdoor.com/developer/',
-                'required': False,
-                'description': 'Glassdoor company insights API'
-            },
-            'DICE_API_KEY': {
-                'name': 'Dice API Key',
-                'url': 'https://www.dice.com/developer/',
-                'required': False,
-                'description': 'Dice tech jobs API'
-            },
-            'MONSTER_API_KEY': {
-                'name': 'Monster API Key',
-                'url': 'https://www.monster.com/developer/',
-                'required': False,
-                'description': 'Monster job board API'
-            },
-            'ZIPRECRUITER_API_KEY': {
-                'name': 'ZipRecruiter API Key',
-                'url': 'https://www.ziprecruiter.com/developer/',
-                'required': False,
-                'description': 'ZipRecruiter job search API'
-            },
-            'CAREERBUILDER_API_KEY': {
-                'name': 'CareerBuilder API Key',
-                'url': 'https://www.careerbuilder.com/developer/',
-                'required': False,
-                'description': 'CareerBuilder job board API'
+                'description': 'Google Jobs search via SerpApi (PAID SERVICE)'
             }
+        }
+        
+        # Public APIs that don't need keys
+        self.public_apis = {
+            'GREENHOUSE': 'Public job board API - no key needed',
+            'INDEED': 'Public XML feed - no key needed', 
+            'REDDIT': 'Public API - no key needed',
+            'LINKEDIN': 'Public job search - no key needed',
+            'GLASSDOOR': 'Public company data - no key needed',
+            'DICE': 'Public tech jobs - no key needed',
+            'MONSTER': 'Public job board - no key needed',
+            'ZIPRECRUITER': 'Public job search - no key needed',
+            'CAREERBUILDER': 'Public job board - no key needed'
         }
     
     def load_all_keys_securely(self):
