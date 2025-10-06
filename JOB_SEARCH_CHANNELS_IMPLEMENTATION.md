@@ -6,7 +6,7 @@ This document outlines all available job search channels and their implementatio
 
 ## 🔑 API KEYS CONFIGURATION
 
-### **USER-PROVIDED API KEYS (You will add these)**
+### **USER-PROVIDED API KEYS (Fill in the slots below)**
 
 **Required Environment Variables:**
 - `OPENAI_API_KEY` - For semantic search and embeddings
@@ -15,10 +15,15 @@ This document outlines all available job search channels and their implementatio
 **Environment Variables Setup:**
 Create a `.env` file with your API keys:
 ```bash
-# Add your API keys here (do not commit to version control)
-OPENAI_API_KEY=your_key_here
-CLAUDE_API_KEY=your_key_here
+# USER-PROVIDED API KEYS (Add your keys here)
+OPENAI_API_KEY=your_openai_api_key_here
+CLAUDE_API_KEY=your_claude_api_key_here
 ```
+
+**Template File Available:**
+- Copy `env_template.txt` to `.env`
+- Add your actual API keys
+- Never commit `.env` to version control
 
 ### **FREE PUBLIC APIs (No Keys Required)**
 - **Greenhouse**: https://boards-api.greenhouse.io/v1/boards/{board_token}/jobs

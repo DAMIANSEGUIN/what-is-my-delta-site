@@ -1,0 +1,27 @@
+# MOSAIC 2.0 API Keys Configuration
+# Copy this file to .env and add your actual API keys
+
+# USER-PROVIDED API KEYS (Add your keys here)
+OPENAI_API_KEY=your_openai_api_key_here
+CLAUDE_API_KEY=your_claude_api_key_here
+
+# FREE PUBLIC APIs (no keys needed)
+# These work without authentication:
+# - Greenhouse: https://boards-api.greenhouse.io/v1/boards/{board_token}/jobs
+# - Indeed: https://ads.indeed.com/jobroll/xmlfeed
+# - RemoteOK: https://remoteok.io/api
+# - WeWorkRemotely: https://weworkremotely.com/categories/remote-jobs.json
+# - Hacker News: https://hacker-news.firebaseio.com/v0/
+# - Reddit: https://www.reddit.com/r/forhire.json
+# - LinkedIn: Web scraping
+# - Glassdoor: Web scraping
+# - Dice: Web scraping
+# - Monster: Web scraping
+# - ZipRecruiter: Web scraping
+# - CareerBuilder: Web scraping
+
+# SECURITY NOTES:
+# - Never commit .env file to version control
+# - Keep your API keys secure
+# - Rotate keys regularly
+# - Monitor usage to prevent cost overruns

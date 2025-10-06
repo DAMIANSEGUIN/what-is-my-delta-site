@@ -15,13 +15,19 @@ class SecureJobSearchKeyLoader:
     def __init__(self):
         self.keys_loaded = False
         self.key_cache = {}
-        # ONLY APIs that actually require keys
+        # USER-PROVIDED API KEYS (You will add these)
         self.required_keys = {
-            'SERPAPI_API_KEY': {
-                'name': 'SerpApi API Key',
-                'url': 'https://serpapi.com/',
+            'OPENAI_API_KEY': {
+                'name': 'OpenAI API Key',
+                'url': 'https://platform.openai.com/',
                 'required': True,
-                'description': 'Google Jobs search via SerpApi (PAID SERVICE)'
+                'description': 'AI embeddings and semantic search'
+            },
+            'CLAUDE_API_KEY': {
+                'name': 'Claude AI API Key',
+                'url': 'https://docs.anthropic.com/',
+                'required': True,
+                'description': 'Job analysis and competitive intelligence'
             }
         }
         
