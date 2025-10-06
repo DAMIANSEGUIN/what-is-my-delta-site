@@ -18,6 +18,7 @@ from .ai_clients import get_ai_fallback_response
 from .cost_controls import check_cost_limits, check_resource_limits, record_usage
 from .domain_adjacent_search import discover_domain_adjacent_opportunities
 from .reranker import rerank_documents
+from .reranker import rerank_documents
 
 @dataclass
 class EmbeddingResult:
