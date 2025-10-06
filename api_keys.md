@@ -22,10 +22,20 @@
 - **ZipRecruiter** - Public web scraping
 - **CareerBuilder** - Public web scraping
 
+### **✅ USER-PROVIDED APIs (Available)**
+- **OpenAI API Key** - AI embeddings and semantic search
+  - **Status**: ✅ USER PROVIDED
+  - **Usage**: Semantic match upgrade, embeddings
+  - **Integration**: Ready for production
+
+- **Claude AI API Key** - AI analysis and job matching
+  - **Status**: ✅ USER PROVIDED  
+  - **Usage**: Job analysis, competitive intelligence
+  - **Integration**: Ready for production
+
 ### **❌ PAID APIs (Will NOT Use)**
-- **SerpApi** - $50/month (Google Jobs)
-- **OpenAI** - $10-50/month (AI embeddings)
-- **All other paid APIs** - $200-500/month total
+- **SerpApi** - $50/month (Google Jobs) - Will use direct scraping
+- **All other paid APIs** - $200-500/month total - Will use direct scraping
 
 ## 📊 COST SAVINGS
 
@@ -39,6 +49,36 @@
 - **Total Annual Savings**: $3,120-7,200/year
 - **ROI**: Immediate cost reduction
 - **Scalability**: No per-API costs
+
+## 🔑 API KEYS CONFIGURATION
+
+### **USER-PROVIDED API KEYS (You will add these)**
+
+**Required Environment Variables:**
+- `OPENAI_API_KEY` - For semantic search and embeddings
+- `CLAUDE_API_KEY` - For job analysis and competitive intelligence
+
+**Environment Variables Setup:**
+Create a `.env` file with your API keys:
+```bash
+# Add your API keys here (do not commit to version control)
+OPENAI_API_KEY=your_key_here
+CLAUDE_API_KEY=your_key_here
+```
+
+### **FREE PUBLIC APIs (No Keys Required)**
+- **Greenhouse**: https://boards-api.greenhouse.io/v1/boards/{board_token}/jobs
+- **Indeed**: https://ads.indeed.com/jobroll/xmlfeed
+- **RemoteOK**: https://remoteok.io/api
+- **WeWorkRemotely**: https://weworkremotely.com/categories/remote-jobs.json
+- **Hacker News**: https://hacker-news.firebaseio.com/v0/
+- **Reddit**: https://www.reddit.com/r/forhire.json
+- **LinkedIn**: Web scraping
+- **Glassdoor**: Web scraping
+- **Dice**: Web scraping
+- **Monster**: Web scraping
+- **ZipRecruiter**: Web scraping
+- **CareerBuilder**: Web scraping
 
 ## 🔧 IMPLEMENTATION STRATEGY
 
