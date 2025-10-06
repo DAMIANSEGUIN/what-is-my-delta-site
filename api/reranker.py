@@ -54,11 +54,13 @@ class CrossEncoderReranker:
         
         try:
             print(f"Initializing cross-encoder model: {self.model_name}")
-            self.model = CrossEncoder(self.model_name)
+            # Force download and initialization
+            self.model = CrossEncoder(self.model_name, device='cpu')
             self.initialized = True
             print("Cross-encoder model initialized successfully")
         except Exception as e:
             print(f"Error initializing cross-encoder: {e}")
+            print("Falling back to mock reranker")
             self.initialized = False
     
     def rerank_documents(self, query: str, documents: List[Dict[str, Any]]) -> RerankResult:

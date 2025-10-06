@@ -6,6 +6,7 @@ Implements embedding pipeline, retrieval wrapper, and job feeds integration.
 import json
 import time
 import hashlib
+import os
 from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime, timedelta
 from dataclasses import dataclass
@@ -141,11 +142,17 @@ class RAGEngine:
             # Generate embedding using OpenAI text-embedding-3-small
             try:
                 import openai
+                # Set API key from environment
+                openai.api_key = os.getenv("OPENAI_API_KEY")
+                if not openai.api_key:
+                    raise ValueError("OPENAI_API_KEY not found in environment")
+                
                 response = openai.embeddings.create(
                     model="text-embedding-3-small",
                     input=text
                 )
                 embedding = response.data[0].embedding
+                print(f"Generated real embedding for text: {text[:50]}...")
             except Exception as e:
                 print(f"OpenAI API error, using fallback: {e}")
                 # Fallback to simulated embedding for testing
@@ -264,6 +271,16 @@ class RAGEngine:
                     matches = rerank_result.reranked_documents
                     # Log reranking improvement
                     print(f"Reranking improvement: {rerank_result.improvement_pct:.1f}%")
+                    
+                    # Record analytics for telemetry
+                    from .analytics import log_match_analytics
+                    log_match_analytics(
+                        query=query,
+                        pre_scores=rerank_result.pre_rerank_scores,
+                        post_scores=rerank_result.post_rerank_scores,
+                        improvement_pct=rerank_result.improvement_pct,
+                        processing_time=rerank_result.processing_time
+                    )
                 except Exception as e:
                     print(f"Reranking failed, using original results: {e}")
             
