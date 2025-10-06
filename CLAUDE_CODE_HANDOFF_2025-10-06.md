@@ -30,9 +30,10 @@
 
 ### **🔑 API KEYS STATUS**
 
-**✅ USER-PROVIDED API KEYS (Configured):**
+**✅ USER-PROVIDED API KEYS (Configured in .env file):**
 - **OpenAI API Key** - For semantic search and embeddings
 - **Claude AI API Key** - For job analysis and competitive intelligence
+- **Environment file**: `.env` - User has configured API keys
 
 **✅ FREE PUBLIC APIs (No Keys Required):**
 - Greenhouse, Indeed, RemoteOK, WeWorkRemotely, Hacker News, Reddit
@@ -73,6 +74,13 @@ pip install requests beautifulsoup4 selenium openai anthropic uvicorn
 OPENAI_API_KEY=user_provided_key
 CLAUDE_API_KEY=user_provided_key
 ```
+
+### **✅ .ENV FILE STATUS**
+- **File**: `.env` - User has configured API keys
+- **OpenAI API Key**: ✅ Configured and ready
+- **Claude AI API Key**: ✅ Configured and ready
+- **Security**: File is in `.gitignore` (not committed to version control)
+- **Status**: Ready for production deployment
 
 ### **Rate Limiting Strategy**
 - Direct APIs: Standard HTTP rate limits
