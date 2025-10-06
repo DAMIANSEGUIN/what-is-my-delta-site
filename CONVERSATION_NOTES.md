@@ -165,3 +165,10 @@
 - **Issue**: Railway edge servers (`railway-edge`) intercepting OPTIONS preflight requests
 - **Evidence**: Local works, Railway returns HTTP 400 regardless of explicit OPTIONS handlers
 - **Next**: Claude Code to investigate Railway edge server configuration and alternatives
+
+## 2025-10-04 Updates (CODEX Planning Clarification)
+- **21:10 UTC**: Created `docs/mosaic_semantic_match_upgrade_plan.md` outlining low-cost semantic match improvements.
+- **21:20 UTC**: Logged handoff prompt in `SHARE_PROMPTS_2025-10-04.md`; no code changes executed.
+- **21:45 UTC**: Confusion detected between Cursor and Claude Code—neither implemented changes; repository remains unchanged (`git status` clean).
+- **21:50 UTC**: Reaffirmed next steps: Cursor must perform actual implementation per plan before Claude Code handles deployment.
+- **21:55 UTC**: Documentation updated to prevent miscommunication going forward.
