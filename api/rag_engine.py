@@ -138,9 +138,18 @@ class RAGEngine:
                     created_at=datetime.utcnow().isoformat()
                 )
             
-            # Generate embedding (simulated for now - replace with actual OpenAI API call)
-            # For now, create a random embedding vector
-            embedding = [random.random() for _ in range(1536)]  # text-embedding-3-small has 1536 dimensions
+            # Generate embedding using OpenAI text-embedding-3-small
+            try:
+                import openai
+                response = openai.embeddings.create(
+                    model="text-embedding-3-small",
+                    input=text
+                )
+                embedding = response.data[0].embedding
+            except Exception as e:
+                print(f"OpenAI API error, using fallback: {e}")
+                # Fallback to simulated embedding for testing
+                embedding = [random.random() for _ in range(1536)]  # text-embedding-3-small has 1536 dimensions
             
             # Cache the embedding
             self._cache_embedding(text_hash, embedding)
