@@ -21,7 +21,7 @@
       "risk_level": "medium"
     },
     "RAG_BASELINE": {
-      "enabled": false,
+      "enabled": true,
       "description": "Enable RAG baseline functionality",
       "category": "ai",
       "risk_level": "high"

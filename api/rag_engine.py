@@ -10,8 +10,6 @@ import os
 from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime, timedelta
 from dataclasses import dataclass
-# import numpy as np  # Temporarily disabled for testing
-import random
 
 from .storage import get_conn
 from .settings import get_settings
@@ -167,9 +165,9 @@ class RAGEngine:
                 embedding = response.data[0].embedding
                 print(f"Generated real embedding for text: {text[:50]}...")
             except Exception as e:
-                print(f"OpenAI API error, using fallback: {e}")
-                # Fallback to simulated embedding for testing
-                embedding = [random.random() for _ in range(1536)]  # text-embedding-3-small has 1536 dimensions
+                print(f"OpenAI API error: {e}")
+                record_usage("embedding", 0.0001, False)
+                raise Exception(f"Failed to generate embedding: {e}")
             
             # Cache the embedding
             self._cache_embedding(text_hash, embedding)
