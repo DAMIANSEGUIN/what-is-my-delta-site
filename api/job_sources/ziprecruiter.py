@@ -82,24 +82,5 @@ class ZipRecruiterSource(JobSource):
     
     def get_job_details(self, job_id: str) -> Optional[JobPosting]:
         """Get detailed job information from ZipRecruiter."""
-        try:
-            # Extract ID from job_id
-            if job_id.startswith("ziprecruiter_"):
-                job_id = job_id.replace("ziprecruiter_", "")
-            
-            return JobPosting(
-                id=f"ziprecruiter_{job_id}",
-                title="Senior Professional Position",
-                company="ZipRecruiter",
-                location="Various Locations",
-                description="Join ZipRecruiter's professional team...",
-                url=f"https://ziprecruiter.com/jobs/{job_id}",
-                source="ziprecruiter",
-                remote=False,
-                skills=["professional", "matching", "recruitment"],
-                experience_level="senior"
-            )
-            
-        except Exception as e:
-            print(f"Error getting ZipRecruiter job details: {e}")
-            return None
+        # Job details endpoint not implemented - users should click through to source URL
+        return None

@@ -82,29 +82,7 @@ class HackerNewsSource(JobSource):
             return []
     
     def get_job_details(self, job_id: str) -> Optional[JobPosting]:
-        """Get detailed job information from Hacker News."""
-        if not self._check_rate_limit():
-            return None
-        
-        try:
-            # Mock detailed job data
-            job_data = {
-                "id": job_id,
-                "title": "[HIRING] Senior Software Engineer - Remote",
-                "company": "Tech Company",
-                "location": "Remote",
-                "description": "We're a fast-growing tech company looking for a senior software engineer...",
-                "url": f"https://news.ycombinator.com/item?id={job_id}",
-                "posted_date": datetime.now(),
-                "salary_range": "$120,000 - $180,000",
-                "job_type": "Full-time",
-                "remote": True,
-                "skills": ["Python", "Django", "PostgreSQL", "AWS"],
-                "experience_level": "Senior"
-            }
-            
-            return self._normalize_job_data(job_data)
-            
-        except Exception as e:
-            print(f"Error getting Hacker News job details: {e}")
-            return None
+        """Get detailed job information from Hacker News - NOT IMPLEMENTED."""
+        # Job details endpoint not implemented - users should click through to source URL
+        # Implementing this would require fetching full HN item via Firebase API
+        return None

@@ -82,24 +82,5 @@ class MonsterSource(JobSource):
     
     def get_job_details(self, job_id: str) -> Optional[JobPosting]:
         """Get detailed job information from Monster."""
-        try:
-            # Extract ID from job_id
-            if job_id.startswith("monster_"):
-                job_id = job_id.replace("monster_", "")
-            
-            return JobPosting(
-                id=f"monster_{job_id}",
-                title="Senior Professional Position",
-                company="Monster",
-                location="Various Locations",
-                description="Join Monster's professional team...",
-                url=f"https://monster.com/jobs/{job_id}",
-                source="monster",
-                remote=False,
-                skills=["professional", "career", "growth"],
-                experience_level="senior"
-            )
-            
-        except Exception as e:
-            print(f"Error getting Monster job details: {e}")
-            return None
+        # Job details endpoint not implemented - users should click through to source URL
+        return None

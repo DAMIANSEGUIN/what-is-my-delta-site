@@ -69,24 +69,5 @@ class RemoteOKSource(JobSource):
     
     def get_job_details(self, job_id: str) -> Optional[JobPosting]:
         """Get detailed job information from RemoteOK."""
-        try:
-            # Extract ID from job_id
-            if job_id.startswith("remoteok_"):
-                job_id = job_id.replace("remoteok_", "")
-            
-            return JobPosting(
-                id=f"remoteok_{job_id}",
-                title="Senior Remote Developer",
-                company="RemoteOK",
-                location="Remote",
-                description="Join RemoteOK's engineering team...",
-                url=f"https://remoteok.io/remote-jobs/{job_id}",
-                source="remoteok",
-                remote=True,
-                skills=["python", "remote", "flexible"],
-                experience_level="senior"
-            )
-            
-        except Exception as e:
-            print(f"Error getting RemoteOK job details: {e}")
-            return None
+        # Job details endpoint not implemented - users should click through to source URL
+        return None

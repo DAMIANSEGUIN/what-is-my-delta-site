@@ -78,24 +78,5 @@ class DiceSource(JobSource):
     
     def get_job_details(self, job_id: str) -> Optional[JobPosting]:
         """Get detailed job information from Dice."""
-        try:
-            # Extract ID from job_id
-            if job_id.startswith("dice_"):
-                job_id = job_id.replace("dice_", "")
-            
-            return JobPosting(
-                id=f"dice_{job_id}",
-                title="Senior Tech Engineer",
-                company="Dice",
-                location="San Francisco, CA",
-                description="Join Dice's engineering team...",
-                url=f"https://dice.com/jobs/{job_id}",
-                source="dice",
-                remote=False,
-                skills=["python", "tech", "engineering"],
-                experience_level="senior"
-            )
-            
-        except Exception as e:
-            print(f"Error getting Dice job details: {e}")
-            return None
+        # Job details endpoint not implemented - users should click through to source URL
+        return None

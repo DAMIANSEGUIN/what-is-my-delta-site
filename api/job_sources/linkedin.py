@@ -81,28 +81,5 @@ class LinkedInSource(JobSource):
     
     def get_job_details(self, job_id: str) -> Optional[JobPosting]:
         """Get detailed job information from LinkedIn."""
-        if not self._check_rate_limit():
-            return None
-        
-        try:
-            # Mock detailed job data
-            job_data = {
-                "id": job_id,
-                "title": "Software Engineer",
-                "company": "LinkedIn",
-                "location": "Mountain View, CA",
-                "description": "Join LinkedIn's engineering team...",
-                "url": f"https://linkedin.com/jobs/view/{job_id}",
-                "posted_date": datetime.now(),
-                "salary_range": "$130,000 - $200,000",
-                "job_type": "Full-time",
-                "remote": False,
-                "skills": ["Java", "Spring", "Kafka", "Hadoop"],
-                "experience_level": "Mid-level"
-            }
-            
-            return self._normalize_job_data(job_data)
-            
-        except Exception as e:
-            print(f"Error getting LinkedIn job details: {e}")
-            return None
+        # Job details endpoint not implemented - users should click through to source URL
+        return None

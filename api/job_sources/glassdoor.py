@@ -79,28 +79,5 @@ class GlassdoorSource(JobSource):
     
     def get_job_details(self, job_id: str) -> Optional[JobPosting]:
         """Get detailed job information from Glassdoor."""
-        if not self._check_rate_limit():
-            return None
-        
-        try:
-            # Mock detailed job data
-            job_data = {
-                "id": job_id,
-                "title": "Data Analyst",
-                "company": "Glassdoor",
-                "location": "Chicago, IL",
-                "description": "Join Glassdoor's data team...",
-                "url": f"https://glassdoor.com/job-listing/{job_id}",
-                "posted_date": datetime.now(),
-                "salary_range": "$80,000 - $120,000",
-                "job_type": "Full-time",
-                "remote": True,
-                "skills": ["Python", "R", "SQL", "PowerBI"],
-                "experience_level": "Mid-level"
-            }
-            
-            return self._normalize_job_data(job_data)
-            
-        except Exception as e:
-            print(f"Error getting Glassdoor job details: {e}")
-            return None
+        # Job details endpoint not implemented - users should click through to source URL
+        return None

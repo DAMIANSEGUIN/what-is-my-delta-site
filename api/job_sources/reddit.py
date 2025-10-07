@@ -83,29 +83,7 @@ class RedditSource(JobSource):
             return []
     
     def get_job_details(self, job_id: str) -> Optional[JobPosting]:
-        """Get detailed job information from Reddit."""
-        if not self._check_rate_limit():
-            return None
-        
-        try:
-            # Mock detailed job data
-            job_data = {
-                "id": job_id,
-                "title": "[HIRING] Senior Python Developer - Remote",
-                "company": "Tech Startup",
-                "location": "Remote",
-                "description": "We're a fast-growing startup looking for a senior Python developer...",
-                "url": f"https://reddit.com/r/forhire/comments/{job_id}",
-                "posted_date": datetime.now(),
-                "salary_range": "$80,000 - $120,000",
-                "job_type": "Contract",
-                "remote": True,
-                "skills": ["Python", "Django", "PostgreSQL", "Docker"],
-                "experience_level": "Senior"
-            }
-            
-            return self._normalize_job_data(job_data)
-            
-        except Exception as e:
-            print(f"Error getting Reddit job details: {e}")
-            return None
+        """Get detailed job information from Reddit - NOT IMPLEMENTED."""
+        # Job details endpoint not implemented - users should click through to source URL
+        # Implementing this would require fetching full Reddit post via API
+        return None

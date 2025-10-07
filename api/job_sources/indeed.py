@@ -77,29 +77,7 @@ class IndeedSource(JobSource):
             return []
     
     def get_job_details(self, job_id: str) -> Optional[JobPosting]:
-        """Get detailed job information from Indeed."""
-        if not self._check_rate_limit():
-            return None
-        
-        try:
-            # Mock detailed job data
-            job_data = {
-                "id": job_id,
-                "title": "Senior Software Engineer",
-                "company": "Indeed Tech",
-                "location": "Austin, TX",
-                "description": "We're looking for a senior software engineer to join our team...",
-                "url": f"https://indeed.com/viewjob?jk={job_id}",
-                "posted_date": datetime.now(),
-                "salary_range": "$120,000 - $180,000",
-                "job_type": "Full-time",
-                "remote": False,
-                "skills": ["Python", "Django", "PostgreSQL", "Docker"],
-                "experience_level": "Senior"
-            }
-            
-            return self._normalize_job_data(job_data)
-            
-        except Exception as e:
-            print(f"Error getting Indeed job details: {e}")
-            return None
+        """Get detailed job information from Indeed - NOT IMPLEMENTED."""
+        # Job details endpoint not implemented - users should click through to source URL
+        # Implementing this would require parsing individual Indeed job pages
+        return None
