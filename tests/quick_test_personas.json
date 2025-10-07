@@ -1,0 +1,65 @@
+{
+  "personas": [
+    {
+      "id": "quick_test_1",
+      "name": "Maya Rodriguez",
+      "maslow_level": "survival",
+      "current_challenge": "Need stable career with benefits to support family",
+      "self_efficacy_baseline": 45,
+      "constraints": [
+        "time_limited",
+        "financial_pressure"
+      ],
+      "career_stage": "exploration"
+    },
+    {
+      "id": "quick_test_2",
+      "name": "James Chen",
+      "maslow_level": "safety",
+      "current_challenge": "Manufacturing skills becoming obsolete after layoff",
+      "self_efficacy_baseline": 55,
+      "constraints": [
+        "time_limited",
+        "financial_pressure"
+      ],
+      "career_stage": "exploration"
+    },
+    {
+      "id": "quick_test_3",
+      "name": "Aisha Patel",
+      "maslow_level": "belonging",
+      "current_challenge": "Isolated in tech culture, seeking meaningful connections",
+      "self_efficacy_baseline": 65,
+      "constraints": [
+        "time_limited",
+        "financial_pressure"
+      ],
+      "career_stage": "exploration"
+    },
+    {
+      "id": "quick_test_4",
+      "name": "Sarah Kim",
+      "maslow_level": "esteem",
+      "current_challenge": "Undervalued at current company despite strong performance",
+      "self_efficacy_baseline": 75,
+      "constraints": [
+        "time_limited",
+        "financial_pressure"
+      ],
+      "career_stage": "exploration"
+    },
+    {
+      "id": "quick_test_5",
+      "name": "Zara Johnson",
+      "maslow_level": "self_actualization",
+      "current_challenge": "Career success feels hollow, wants systemic change impact",
+      "self_efficacy_baseline": 85,
+      "constraints": [
+        "time_limited",
+        "financial_pressure"
+      ],
+      "career_stage": "exploration"
+    }
+  ],
+  "count": 5
+}
