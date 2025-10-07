@@ -42,19 +42,27 @@ class RemoteOKSource(JobSource):
                 if query_lower not in position and not any(query_lower in tag for tag in tags):
                     continue
 
+                # Build salary range string from min/max if available
+                salary_min = job_data.get('salary_min')
+                salary_max = job_data.get('salary_max')
+                salary_range = None
+                if salary_min and salary_max:
+                    salary_range = f"${salary_min:,} - ${salary_max:,}"
+                elif salary_min:
+                    salary_range = f"${salary_min:,}+"
+
                 job = JobPosting(
                     id=f"remoteok_{job_data.get('id', job_data.get('slug', ''))}",
                     title=job_data.get('position', 'Remote Position'),
                     company=job_data.get('company', 'Company'),
                     location='Remote',
-                    description=job_data.get('description', '')[:500],  # Limit description length
+                    description=job_data.get('description', '')[:500],
                     url=job_data.get('url', f"https://remoteok.io/remote-jobs/{job_data.get('id', '')}"),
                     source='remoteok',
                     remote=True,
-                    skills=job_data.get('tags', [])[:10],  # Limit skills
+                    skills=job_data.get('tags', [])[:10],
                     experience_level='mid',
-                    salary_min=job_data.get('salary_min'),
-                    salary_max=job_data.get('salary_max')
+                    salary_range=salary_range
                 )
                 jobs.append(job)
 

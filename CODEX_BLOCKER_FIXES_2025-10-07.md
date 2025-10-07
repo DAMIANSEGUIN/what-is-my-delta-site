@@ -101,18 +101,21 @@ def get_job_details(self, job_id: str) -> Optional[JobPosting]:
 
 ---
 
-## Updated Source Count
+## Updated Source Count (After CODEX Follow-up)
 
 **Was Claimed**: "12 free job sources"
-**Actually Free & Implemented**: **10 sources**
+**Actually Working**: **5 live sources**
 
-### ✅ 6 Direct API Sources (Free, Production-Ready):
-1. **RemoteOK** - JSON API
+### ✅ 5 Direct API Sources (Free, Production-Ready):
+1. **RemoteOK** - JSON API ✅ FIXED (salary field bug)
 2. **WeWorkRemotely** - RSS feed
 3. **HackerNews** - Firebase API
 4. **Greenhouse** - Multi-board API
 5. **Indeed** - RSS feed
 6. **Reddit** - JSON API
+
+### ❌ Disabled Sources:
+- **SerpAPI** - Requires paid API key (disabled, returns [])
 
 ### ✅ 4 Web Scraping Sources (Free, Needs Testing):
 7. **LinkedIn** - BeautifulSoup
@@ -125,8 +128,8 @@ def get_job_details(self, job_id: str) -> Optional[JobPosting]:
 12. **CareerBuilder** - Implementation exists but untested
 
 ### ❌ 2 Paid API Sources (Disabled):
-- **AngelList** - Requires paid API key
-- **SerpAPI** - Requires paid API key
+- **AngelList** - Requires paid API key (disabled, returns [])
+- **SerpAPI** - Requires paid API key (disabled, returns [])
 
 ---
 
