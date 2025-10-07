@@ -39,8 +39,8 @@
       "risk_level": "low"
     },
     "JOB_SOURCES_STUBBED_ENABLED": {
-      "enabled": false,
-      "description": "Enable stubbed job sources that require API keys",
+      "enabled": true,
+      "description": "Enable all 12 job sources (6 direct APIs + 6 web scraping)",
       "category": "jobs",
       "risk_level": "high"
     }
