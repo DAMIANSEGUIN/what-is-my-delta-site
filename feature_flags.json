@@ -3,7 +3,7 @@
   "description": "Mosaic 2.0 Feature Flags - All disabled by default for safe rollout",
   "flags": {
     "AI_FALLBACK_ENABLED": {
-      "enabled": false,
+      "enabled": true,
       "description": "Enable AI fallback when CSV prompts fail",
       "category": "core",
       "risk_level": "medium"
