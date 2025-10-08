@@ -31,10 +31,11 @@ class AIClientManager:
     
     def _initialize_clients(self):
         """Initialize AI clients with API keys."""
-        # Temporarily disabled for testing
+        # AI clients disabled - requires openai and anthropic packages
+        # Install with: pip install openai anthropic
         self.openai_client = None
         self.anthropic_client = None
-        print("⚠️ AI clients temporarily disabled for testing")
+        print("⚠️ AI clients disabled - install 'openai' and 'anthropic' packages to enable")
     
     def _check_rate_limit(self, provider: str) -> bool:
         """Check if we're within rate limits for a provider."""

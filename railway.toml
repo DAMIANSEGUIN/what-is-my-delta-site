@@ -1,0 +1,20 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[healthcheck]
+httpTimeout = 30
+httpPath = "/health"
+httpMethod = "GET"
+httpHeaders = {}
+
+# Environment variables for monitoring
+[env]
+RAILWAY_HEALTH_CHECK_ENABLED = "true"
+HEALTH_CHECK_INTERVAL = "60"
+AUTO_RESTART_ON_FAILURE = "true"

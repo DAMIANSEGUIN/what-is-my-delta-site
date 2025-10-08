@@ -23,7 +23,7 @@
 - ✅ Phase 4+: Dynamic source discovery + cost controls + competitive intelligence + OSINT + domain-adjacent search
 
 ## API Endpoints
-- Health: `/health`, `/health/rag`
+- Health: `/health`, `/health/comprehensive`, `/health/recover`, `/health/prompts`, `/health/rag`, `/health/experiments`
 - Config: `/config`
 - Prompts: `/prompts/*`
 - WIMD: `/wimd/*`
@@ -82,7 +82,7 @@
 - ⚠️ **Feature Flags**: Phase 4 features NOW ENABLED
   - ✅ `RAG_BASELINE`: **ENABLED** (RAG-powered job search active)
   - ✅ `JOB_SOURCES_STUBBED_ENABLED`: **ENABLED** (all 12 sources active)
-  - ⚠️ `AI_FALLBACK_ENABLED`: disabled (CSV→AI fallback)
+  - ✅ `AI_FALLBACK_ENABLED`: **ENABLED** (CSV→AI fallback now working properly - cache cleared, flag enabled)
   - ⚠️ `EXPERIMENTS_ENABLED`: disabled (experiment engine)
 
 ## Import Patterns
@@ -127,6 +127,20 @@
 - ✅ **Phase 2**: Experiment engine backend implemented (gated by flag)
 - ✅ **Phase 3**: Self-efficacy metrics + coach escalation + Focus Stack UI deployed
 - ✅ **Password reset**: Forgot password flow implemented (email service pending)
+- ✅ **CSV lookup fix**: Fixed prompt selector to properly handle response/completion fields (api/prompt_selector.py:118)
+- ✅ **Auto-restart monitoring**: Railway health checks with automatic restart on prompt system failure
+
+## Monitoring & Auto-Restart System
+- **Railway Health Checks**: Configured via `railway.toml` with `/health` endpoint monitoring
+- **Automatic Recovery**: System attempts cache clearing and flag reset on failure
+- **Multi-layer Monitoring**:
+  - `/health` - Basic health with 503 status on failure (triggers Railway restart)
+  - `/health/comprehensive` - Detailed monitoring with failure rate tracking
+  - `/health/recover` - Manual recovery endpoint for system fixes
+- **Failure Detection**: Tests actual prompt responses, not just API availability
+- **Health Logging**: Stores failure history in `prompt_health_log` table
+- **Recovery Actions**: Cache clearing, feature flag reset, database connectivity checks
+- **Auto-restart Triggers**: 503 HTTP status codes automatically trigger Railway container restart
 
 ## Technical Implementation Notes
 - Frontend uses vanilla JavaScript (ES6+) with IIFE pattern

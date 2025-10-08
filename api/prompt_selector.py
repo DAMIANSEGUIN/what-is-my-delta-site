@@ -115,7 +115,8 @@ class PromptSelector:
                 # Look for matching prompt in CSV data
                 for prompt_data in csv_prompts.get("prompts", []):
                     if prompt_data.get("prompt", "").lower().strip() == prompt.lower().strip():
-                        csv_response = prompt_data.get("response", "")
+                        # CSV rows use "completion"; JSON overrides may use "response"
+                        csv_response = prompt_data.get("response") or prompt_data.get("completion", "")
                         csv_available = True
                         break
             except Exception as e:

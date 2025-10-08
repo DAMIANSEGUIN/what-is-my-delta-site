@@ -43,6 +43,7 @@ from .storage import (
     wimd_history,
 )
 from .prompt_selector import get_prompt_response, get_prompt_health
+from .monitoring import run_health_check, attempt_system_recovery
 from .experiment_engine import (
     ExperimentCreate, ExperimentUpdate, LearningData, CapabilityEvidence, SelfEfficacyMetric,
     create_experiment, update_experiment, complete_experiment, add_learning_data,
@@ -418,7 +419,56 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"ok": True, "timestamp": datetime.utcnow().isoformat() + "Z"}
+    """Enhanced health check with prompt system monitoring for auto-restart"""
+    try:
+        # Test critical prompt system functionality
+        from .prompt_selector import get_prompt_health
+        prompt_health = get_prompt_health()
+
+        # Check if prompt system is working
+        fallback_enabled = prompt_health.get("fallback_enabled", False)
+        ai_available = prompt_health.get("ai_health", {}).get("any_available", False)
+
+        # System is healthy if either CSV works OR AI fallback is available
+        prompt_system_ok = fallback_enabled or ai_available
+
+        # Check database connectivity
+        db_ok = True
+        try:
+            with get_conn() as conn:
+                conn.execute("SELECT 1").fetchone()
+        except Exception:
+            db_ok = False
+
+        # Overall health
+        overall_ok = prompt_system_ok and db_ok
+
+        health_status = {
+            "ok": overall_ok,
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "checks": {
+                "database": db_ok,
+                "prompt_system": prompt_system_ok,
+                "ai_fallback_enabled": fallback_enabled,
+                "ai_available": ai_available
+            }
+        }
+
+        # Return 503 if not healthy (triggers Railway restart)
+        if not overall_ok:
+            raise HTTPException(status_code=503, detail=health_status)
+
+        return health_status
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        # Critical failure - return 503 to trigger restart
+        raise HTTPException(status_code=503, detail={
+            "ok": False,
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        })
 
 @app.get("/health/prompts")
 def health_prompts():
@@ -433,6 +483,43 @@ def health_prompts():
     except Exception as e:
         return {
             "ok": False,
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+
+@app.get("/health/comprehensive")
+def health_comprehensive():
+    """Comprehensive health check with automatic recovery"""
+    try:
+        health_summary = run_health_check()
+
+        # If system needs attention, log it
+        if health_summary.get("requires_attention", False):
+            print(f"⚠️ Prompt system requires attention: {health_summary}")
+
+        # Return 503 if critical failure to trigger Railway restart
+        if not health_summary.get("current_test", {}).get("success", False):
+            raise HTTPException(status_code=503, detail=health_summary)
+
+        return health_summary
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=503, detail={
+            "ok": False,
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        })
+
+@app.post("/health/recover")
+def health_recover():
+    """Attempt automatic system recovery"""
+    try:
+        recovery_result = attempt_system_recovery()
+        return recovery_result
+    except Exception as e:
+        return {
+            "recovery_attempted": False,
             "error": str(e),
             "timestamp": datetime.utcnow().isoformat() + "Z"
         }
