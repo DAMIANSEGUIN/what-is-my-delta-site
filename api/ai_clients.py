@@ -9,8 +9,13 @@ import json
 import hashlib
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timedelta
-# import openai
-# from anthropic import Anthropic
+
+try:
+    import openai
+    from anthropic import Anthropic
+    AI_PACKAGES_AVAILABLE = True
+except ImportError:
+    AI_PACKAGES_AVAILABLE = False
 
 from .settings import get_settings
 
@@ -31,11 +36,36 @@ class AIClientManager:
     
     def _initialize_clients(self):
         """Initialize AI clients with API keys."""
-        # AI clients disabled - requires openai and anthropic packages
-        # Install with: pip install openai anthropic
-        self.openai_client = None
-        self.anthropic_client = None
-        print("⚠️ AI clients disabled - install 'openai' and 'anthropic' packages to enable")
+        if not AI_PACKAGES_AVAILABLE:
+            self.openai_client = None
+            self.anthropic_client = None
+            print("⚠️ AI clients disabled - install 'openai' and 'anthropic' packages to enable")
+            return
+
+        # Initialize OpenAI client
+        if self.settings.OPENAI_API_KEY:
+            try:
+                openai.api_key = self.settings.OPENAI_API_KEY
+                self.openai_client = openai
+                print("✅ OpenAI client initialized")
+            except Exception as e:
+                print(f"⚠️ Failed to initialize OpenAI client: {e}")
+                self.openai_client = None
+        else:
+            self.openai_client = None
+            print("⚠️ OpenAI client not initialized - no API key found")
+
+        # Initialize Anthropic client
+        if self.settings.CLAUDE_API_KEY:
+            try:
+                self.anthropic_client = Anthropic(api_key=self.settings.CLAUDE_API_KEY)
+                print("✅ Anthropic client initialized")
+            except Exception as e:
+                print(f"⚠️ Failed to initialize Anthropic client: {e}")
+                self.anthropic_client = None
+        else:
+            self.anthropic_client = None
+            print("⚠️ Anthropic client not initialized - no API key found")
     
     def _check_rate_limit(self, provider: str) -> bool:
         """Check if we're within rate limits for a provider."""
