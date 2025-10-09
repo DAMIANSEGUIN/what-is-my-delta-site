@@ -429,6 +429,12 @@ def health():
         fallback_enabled = prompt_health.get("fallback_enabled", False)
         ai_available = prompt_health.get("ai_health", {}).get("any_available", False)
 
+        # DEBUG LOGGING - CRITICAL
+        print(f"🔍 HEALTH CHECK DEBUG:")
+        print(f"   fallback_enabled: {fallback_enabled} (type: {type(fallback_enabled)})")
+        print(f"   ai_available: {ai_available}")
+        print(f"   full prompt_health: {prompt_health}")
+
         # System is healthy if either CSV works OR AI fallback is available
         prompt_system_ok = fallback_enabled or ai_available
 
@@ -454,15 +460,20 @@ def health():
             }
         }
 
+        print(f"🔍 HEALTH STATUS: overall_ok={overall_ok}, prompt_system_ok={prompt_system_ok}, db_ok={db_ok}")
+
         # Return 503 if not healthy (triggers Railway restart)
         if not overall_ok:
+            print(f"⚠️ HEALTH CHECK FAILED - Returning 503")
             raise HTTPException(status_code=503, detail=health_status)
 
+        print(f"✅ HEALTH CHECK PASSED")
         return health_status
 
     except HTTPException:
         raise
     except Exception as e:
+        print(f"❌ HEALTH CHECK EXCEPTION: {e}")
         # Critical failure - return 503 to trigger restart
         raise HTTPException(status_code=503, detail={
             "ok": False,
@@ -484,6 +495,41 @@ def health_prompts():
         return {
             "ok": False,
             "error": str(e),
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+
+@app.get("/debug/system-state")
+def debug_system_state():
+    """Diagnostic endpoint to check actual system state"""
+    try:
+        from .ai_clients import ai_client_manager
+        from .prompt_selector import prompt_selector
+
+        # Check AI clients
+        ai_health = ai_client_manager.get_health_status()
+
+        # Check database flags
+        with get_conn() as conn:
+            flags = conn.execute("SELECT flag_name, enabled FROM feature_flags").fetchall()
+
+        # Check prompt selector state
+        prompt_health = prompt_selector.get_health_status()
+
+        return {
+            "ai_clients": {
+                "openai_client": str(type(ai_client_manager.openai_client)),
+                "anthropic_client": str(type(ai_client_manager.anthropic_client)),
+                "health_status": ai_health
+            },
+            "database_flags": {row[0]: bool(row[1]) for row in flags},
+            "prompt_selector": prompt_health,
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+    except Exception as e:
+        import traceback
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc(),
             "timestamp": datetime.utcnow().isoformat() + "Z"
         }
 

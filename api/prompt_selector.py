@@ -29,7 +29,9 @@ class PromptSelector:
                     "SELECT enabled FROM feature_flags WHERE flag_name = ?",
                     (flag_name,)
                 ).fetchone()
-                return row and row[0] if row else False
+                # FORCE BOOLEAN CONVERSION - SQLite returns 0/1, not True/False
+                # This is critical because Python evaluates `0 or False` as False
+                return bool(row[0]) if row else False
         except Exception:
             # If feature flags table doesn't exist, default to False
             return False
