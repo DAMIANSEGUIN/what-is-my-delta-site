@@ -19,7 +19,7 @@ class PromptSelector:
     def __init__(self):
         self.settings = get_settings()
         self.cache_ttl_hours = 24
-        self.fallback_enabled = self._check_feature_flag("AI_FALLBACK_ENABLED")
+        # Don't cache feature flag - check dynamically to allow runtime updates
     
     def _check_feature_flag(self, flag_name: str) -> bool:
         """Check if a feature flag is enabled."""
@@ -134,7 +134,8 @@ class PromptSelector:
             }
         
         # CSV failed, try AI fallback if enabled
-        if self.fallback_enabled:
+        fallback_enabled = self._check_feature_flag("AI_FALLBACK_ENABLED")
+        if fallback_enabled:
             ai_health = get_ai_health_status()
             if ai_health.get("any_available", False):
                 try:
@@ -198,7 +199,7 @@ class PromptSelector:
                         "total_fallbacks": row[0] or 0,
                         "avg_response_time_ms": int(row[1] or 0),
                         "unique_prompts": row[2] or 0,
-                        "fallback_enabled": self.fallback_enabled
+                        "fallback_enabled": self._check_feature_flag("AI_FALLBACK_ENABLED")
                     }
         except Exception as e:
             print(f"⚠️ Stats query failed: {e}")
@@ -207,13 +208,13 @@ class PromptSelector:
             "total_fallbacks": 0,
             "avg_response_time_ms": 0,
             "unique_prompts": 0,
-            "fallback_enabled": self.fallback_enabled
+            "fallback_enabled": self._check_feature_flag("AI_FALLBACK_ENABLED")
         }
     
     def get_health_status(self) -> Dict[str, Any]:
         """Get prompt selector health status."""
         return {
-            "fallback_enabled": self.fallback_enabled,
+            "fallback_enabled": self._check_feature_flag("AI_FALLBACK_ENABLED"),
             "ai_health": get_ai_health_status(),
             "cache_ttl_hours": self.cache_ttl_hours
         }
