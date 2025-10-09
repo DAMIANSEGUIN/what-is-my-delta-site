@@ -204,7 +204,7 @@ MIGRATIONS = {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (session_id) REFERENCES sessions (id)
         );
-        
+
         CREATE TABLE IF NOT EXISTS prompt_selector_cache (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             prompt_hash TEXT UNIQUE,
@@ -212,10 +212,18 @@ MIGRATIONS = {
             ai_fallback_used BOOLEAN,
             last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
-        
+
         CREATE INDEX IF NOT EXISTS idx_ai_fallback_session_id ON ai_fallback_logs (session_id);
         CREATE INDEX IF NOT EXISTS idx_ai_fallback_prompt_hash ON ai_fallback_logs (prompt_hash);
         CREATE INDEX IF NOT EXISTS idx_prompt_selector_hash ON prompt_selector_cache (prompt_hash);
+    """,
+
+    "004_sync_feature_flags_from_json": """
+        UPDATE feature_flags SET enabled = TRUE WHERE flag_name = 'AI_FALLBACK_ENABLED';
+        UPDATE feature_flags SET enabled = TRUE WHERE flag_name = 'RAG_BASELINE';
+        UPDATE feature_flags SET enabled = TRUE WHERE flag_name = 'SELF_EFFICACY_METRICS';
+        UPDATE feature_flags SET enabled = TRUE WHERE flag_name = 'COACH_ESCALATION';
+        UPDATE feature_flags SET enabled = TRUE WHERE flag_name = 'JOB_SOURCES_STUBBED_ENABLED';
     """
 }
 
