@@ -9,6 +9,7 @@
 __pycache__/
 *.pyc
 .venv/
+.test-venv/
 .envrc
 .DS_Store
 

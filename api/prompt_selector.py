@@ -96,18 +96,20 @@ class PromptSelector:
         """Select the best prompt response using CSV→AI fallback logic."""
         start_time = time.time()
         prompt_hash = self._hash_prompt(prompt)
-        
-        # Check cache first
-        cached = self._get_cached_response(prompt_hash)
-        if cached and cached["cached"]:
-            return {
-                "response": "Cached response",
-                "source": "cache",
-                "cached": True,
-                "csv_available": cached["csv_available"],
-                "ai_fallback_used": cached["ai_fallback_used"]
-            }
-        
+
+        # Check if PS101 is active - disable cache for PS101 sessions
+        from .storage import get_session_data
+        session_data = get_session_data(session_id) if session_id else {}
+        ps101_active = session_data.get("ps101_active", False)
+
+        # CACHE DISABLED: The cache stores only metadata (csv_available, ai_fallback_used)
+        # but returns placeholder string "Cached response" instead of actual response.
+        # This breaks PS101 tangent handling and other flows.
+        # TODO: Either store actual responses in cache OR remove caching entirely
+        # For now: cache lookup disabled
+        # cached = self._get_cached_response(prompt_hash)
+        # if cached and cached["cached"]: ...
+
         # Try CSV prompts first using semantic search
         csv_response = None
         csv_available = False

@@ -134,8 +134,8 @@ def get_ps101_step(step_number: int) -> Optional[Dict[str, Any]]:
 def is_tangent(user_response: str, current_step: int) -> bool:
     """Detect if user's response is a tangent (not addressing current step)
 
-    Simple heuristic: Check if response contains any keywords from current step.
-    If no keywords found, likely a tangent.
+    Lenient approach: Only flag as tangent if response is very short (yes/no)
+    OR clearly off-topic. Most substantive responses are accepted.
     """
     step_data = get_ps101_step(current_step)
     if not step_data:
@@ -147,11 +147,20 @@ def is_tangent(user_response: str, current_step: int) -> bool:
     # Check if response contains at least one keyword from the step
     keyword_match = any(keyword in response_lower for keyword in keywords)
 
-    # Also check for explicit exit signals
+    # Also check for explicit exit signals - if exiting, not a tangent
     exit_signals = ["stop", "quit", "exit", "i'm done", "im done", "no more", "enough"]
     is_exit = any(signal in response_lower for signal in exit_signals)
 
-    return not keyword_match and not is_exit
+    # Check if response seems substantive (more than just yes/no/ok)
+    word_count = len(response_lower.split())
+    is_very_brief = word_count <= 2
+
+    # Short confirmations like "yes" or "ok" when resuming
+    is_simple_confirmation = response_lower.strip() in ["yes", "no", "ok", "sure", "yeah", "nope"]
+
+    # Only tangent if: no keyword match AND not an exit AND (very brief OR simple confirmation)
+    # This means anything 3+ words is accepted as on-topic
+    return not keyword_match and not is_exit and (is_very_brief or is_simple_confirmation)
 
 
 def get_redirect_message(step_number: int) -> str:

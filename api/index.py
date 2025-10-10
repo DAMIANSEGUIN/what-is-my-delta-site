@@ -256,22 +256,30 @@ def _coach_reply(prompt: str, metrics: Dict[str, int], session_id: str = None) -
         # PS101 guided flow handling
         current_step = session_data.get("ps101_step", 1)
 
+        # Check if user is responding to exit confirmation (must check FIRST)
+        if session_data.get("ps101_exit_pending"):
+            # User was asked to confirm exit, check response
+            if "yes" in prompt.lower():
+                # Confirmed exit
+                session_data = exit_ps101_flow(session_data)
+                session_data["ps101_exit_pending"] = False
+                update_session_data(session_id, session_data)
+                return "Understood. You can return to the guided process anytime by selecting 'Fast Track'. What would you like to explore next?"
+            else:
+                # User didn't confirm, clear flag and continue
+                session_data["ps101_exit_pending"] = False
+                update_session_data(session_id, session_data)
+                # Fall through to normal processing
+
         # Check for explicit exit signals
         exit_signals = ["stop", "quit", "exit", "i'm done", "im done", "no more", "enough"]
         user_wants_exit = any(signal in prompt.lower() for signal in exit_signals)
 
         if user_wants_exit:
-            # User wants to exit - ask for confirmation
-            if "yes" in prompt.lower() and session_data.get("ps101_exit_pending"):
-                # Confirmed exit
-                session_data = exit_ps101_flow(session_data)
-                update_session_data(session_id, session_data)
-                return "Understood. You can return to the guided process anytime by selecting 'Fast Track'. What would you like to explore next?"
-            else:
-                # First exit attempt - ask for confirmation
-                session_data["ps101_exit_pending"] = True
-                update_session_data(session_id, session_data)
-                return get_exit_confirmation()
+            # First exit attempt - ask for confirmation
+            session_data["ps101_exit_pending"] = True
+            update_session_data(session_id, session_data)
+            return get_exit_confirmation()
 
         # Check if step is complete
         if ps101_is_complete(current_step):
