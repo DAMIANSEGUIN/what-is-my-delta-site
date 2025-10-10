@@ -170,6 +170,24 @@ def session_exists(session_id: str) -> bool:
     return row is not None
 
 
+def get_session_data(session_id: str) -> Optional[Dict[str, Any]]:
+    """Get user_data for a session"""
+    with get_conn() as conn:
+        row = conn.execute("SELECT user_data FROM sessions WHERE id = ?", (session_id,)).fetchone()
+        if row:
+            return _json_load(row[0]) or {}
+    return {}
+
+
+def update_session_data(session_id: str, data: Dict[str, Any]) -> None:
+    """Update user_data for a session"""
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE sessions SET user_data = ?, expires_at = ? WHERE id = ?",
+            (_json_dump(data), _expiry_ts(), session_id),
+        )
+
+
 def record_wimd_output(
     session_id: str,
     prompt: str,

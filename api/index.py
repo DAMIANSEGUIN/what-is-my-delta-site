@@ -33,6 +33,8 @@ from .storage import (
     ensure_session,
     fetch_job_matches,
     get_conn,
+    get_session_data,
+    update_session_data,
     get_user_by_email,
     get_user_by_id,
     latest_metrics,
@@ -47,6 +49,20 @@ from .storage import (
 )
 from .prompt_selector import get_prompt_response, get_prompt_health
 from .monitoring import run_health_check, attempt_system_recovery
+from .ps101_flow import (
+    create_ps101_session_data,
+    get_ps101_step,
+    is_tangent,
+    get_redirect_message,
+    format_step_for_user,
+    record_ps101_response,
+    handle_tangent,
+    advance_ps101_step,
+    exit_ps101_flow,
+    get_exit_confirmation,
+    is_complete as ps101_is_complete,
+    get_completion_message,
+)
 from .experiment_engine import (
     ExperimentCreate, ExperimentUpdate, LearningData, CapabilityEvidence, SelfEfficacyMetric,
     create_experiment, update_experiment, complete_experiment, add_learning_data,
@@ -228,10 +244,92 @@ def _update_metrics(prompt: str, current: Dict[str, Any]) -> Dict[str, int]:
 
 
 def _coach_reply(prompt: str, metrics: Dict[str, int], session_id: str = None) -> str:
-    """Generate coach reply using CSV→AI fallback system"""
+    """Generate coach reply using PS101 flow or CSV→AI fallback system"""
     from .prompts_loader import read_registry
     import json
-    
+
+    # Check if PS101 is active for this session
+    session_data = get_session_data(session_id) if session_id else {}
+    ps101_active = session_data.get("ps101_active", False)
+
+    if ps101_active:
+        # PS101 guided flow handling
+        current_step = session_data.get("ps101_step", 1)
+
+        # Check for explicit exit signals
+        exit_signals = ["stop", "quit", "exit", "i'm done", "im done", "no more", "enough"]
+        user_wants_exit = any(signal in prompt.lower() for signal in exit_signals)
+
+        if user_wants_exit:
+            # User wants to exit - ask for confirmation
+            if "yes" in prompt.lower() and session_data.get("ps101_exit_pending"):
+                # Confirmed exit
+                session_data = exit_ps101_flow(session_data)
+                update_session_data(session_id, session_data)
+                return "Understood. You can return to the guided process anytime by selecting 'Fast Track'. What would you like to explore next?"
+            else:
+                # First exit attempt - ask for confirmation
+                session_data["ps101_exit_pending"] = True
+                update_session_data(session_id, session_data)
+                return get_exit_confirmation()
+
+        # Check if step is complete
+        if ps101_is_complete(current_step):
+            session_data = exit_ps101_flow(session_data)
+            update_session_data(session_id, session_data)
+            return get_completion_message()
+
+        # Check if this is a tangent (user not addressing current step)
+        if is_tangent(prompt, current_step):
+            # Handle tangent: provide CSV response, then redirect
+            session_data = handle_tangent(session_data)
+            update_session_data(session_id, session_data)
+
+            # Get CSV response for the tangent
+            csv_prompts = None
+            try:
+                reg = read_registry()
+                active_sha = reg.get("active")
+                if active_sha:
+                    for version in reg.get("versions", []):
+                        if version["sha256"] == active_sha:
+                            try:
+                                with open(version["file"], "r", encoding="utf-8") as f:
+                                    prompts_data = json.load(f)
+                                csv_prompts = {"prompts": prompts_data}
+                                break
+                            except Exception:
+                                continue
+            except Exception:
+                pass
+
+            context = {"metrics": metrics}
+            result = get_prompt_response(
+                prompt=prompt,
+                session_id=session_id or "default",
+                csv_prompts=csv_prompts,
+                context=context
+            )
+
+            tangent_response = result.get("response", _fallback_reply(metrics))
+            redirect_msg = get_redirect_message(current_step)
+
+            return f"{tangent_response}\n\n{redirect_msg}"
+
+        # User is on-topic - record response and advance
+        session_data = record_ps101_response(session_data, current_step, prompt)
+        session_data = advance_ps101_step(session_data)
+        update_session_data(session_id, session_data)
+
+        # Get next step
+        next_step = get_ps101_step(session_data["ps101_step"])
+        if next_step:
+            return format_step_for_user(next_step)
+        else:
+            # Completed all steps
+            return get_completion_message()
+
+    # Normal CSV→AI fallback flow (PS101 not active)
     try:
         # Get CSV prompts data
         csv_prompts = None
@@ -250,7 +348,7 @@ def _coach_reply(prompt: str, metrics: Dict[str, int], session_id: str = None) -
                             continue
         except Exception:
             pass
-        
+
         # Use prompt selector with CSV→AI fallback
         context = {"metrics": metrics}
         result = get_prompt_response(
@@ -259,12 +357,12 @@ def _coach_reply(prompt: str, metrics: Dict[str, int], session_id: str = None) -
             csv_prompts=csv_prompts,
             context=context
         )
-        
+
         if result.get("response"):
             return result["response"]
         else:
             return _fallback_reply(metrics)
-            
+
     except Exception:
         return _fallback_reply(metrics)
 
@@ -675,6 +773,29 @@ def wimd_analysis(session_header: Optional[str] = Header(None, alias="X-Session-
     session_id = _resolve_session(None, session_header, allow_create=False)
     history = wimd_history(session_id)
     return {"session_id": session_id, "history": history}
+
+
+@app.post("/wimd/start-ps101")
+def start_ps101_flow(session_header: Optional[str] = Header(None, alias="X-Session-ID")):
+    """Start PS101 guided problem-solving sequence"""
+    session_id = _resolve_session(None, session_header, allow_create=True)
+
+    # Initialize PS101 session data
+    session_data = get_session_data(session_id)
+    ps101_data = create_ps101_session_data()
+    session_data.update(ps101_data)
+    update_session_data(session_id, session_data)
+
+    # Get first step
+    first_step = get_ps101_step(1)
+    message = format_step_for_user(first_step)
+
+    return {
+        "session_id": session_id,
+        "message": message,
+        "ps101_active": True,
+        "ps101_step": 1
+    }
 
 
 async def _save_upload(session_id: str, file: UploadFile) -> Dict[str, Any]:

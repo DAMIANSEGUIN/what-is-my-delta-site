@@ -934,14 +934,14 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
     if(sessionId) payload.session_id = sessionId;
     saveUserData({lastMessage: prompt, timestamp: new Date().toISOString()});
     const data = await callJson('/wimd', {method:'POST', body: payload});
-    
+
     // Save coach response and metrics
     saveUserData({
       lastCoachResponse: data.message,
       metrics: data.metrics,
       sessionId: data.session_id
     });
-    
+
     // If this is the first meaningful interaction, show opportunities hint
     if(data.metrics && !userData.hasSeenOpportunities){
       setTimeout(() => {
@@ -949,8 +949,28 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
         saveUserData({hasSeenOpportunities: true});
       }, 2000);
     }
-    
+
     return data.message || 'noted.';
+  }
+
+  async function startPS101(){
+    const headers = {};
+    if(sessionId) headers['X-Session-ID'] = sessionId;
+    const data = await callJson('/wimd/start-ps101', {method:'POST', headers});
+
+    // Save session info
+    if(!sessionId && data.session_id){
+      sessionId = data.session_id;
+      saveUserData({sessionId: data.session_id});
+    }
+
+    saveUserData({
+      path: 'fastTrack',
+      ps101Active: true,
+      started: new Date().toISOString()
+    });
+
+    return data.message || 'Starting PS101 guided sequence...';
   }
 
   async function fetchOpportunities(){
@@ -1182,11 +1202,16 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
 
   const startFastTrack = $('#startFastTrack');
   if(startFastTrack){
-    startFastTrack.addEventListener('click', e=>{
+    startFastTrack.addEventListener('click', async e=>{
       e.preventDefault();
-      saveUserData({path: 'fastTrack', started: new Date().toISOString()});
       chat.style.display='block';
-      addMsg('hi — let\'s start your fast track career transition. i\'ll guide you through analysis, opportunities, and application. what\'s your current career situation?', 'bot');
+      try{
+        const welcomeMsg = await startPS101();
+        addMsg(welcomeMsg, 'bot');
+      }catch(err){
+        addMsg('Unable to start PS101 guided sequence. Please try again.', 'bot');
+        console.error('PS101 start error:', err);
+      }
     });
   }
 
