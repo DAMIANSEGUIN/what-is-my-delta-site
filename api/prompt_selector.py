@@ -108,19 +108,25 @@ class PromptSelector:
                 "ai_fallback_used": cached["ai_fallback_used"]
             }
         
-        # Try CSV prompts first
+        # Try CSV prompts first using semantic search
         csv_response = None
         csv_available = False
-        
+
         if csv_prompts:
             try:
-                # Look for matching prompt in CSV data
-                for prompt_data in csv_prompts.get("prompts", []):
-                    if prompt_data.get("prompt", "").lower().strip() == prompt.lower().strip():
-                        # CSV rows use "completion"; JSON overrides may use "response"
-                        csv_response = prompt_data.get("response") or prompt_data.get("completion", "")
-                        csv_available = True
-                        break
+                # Use semantic search to find best matching prompt
+                from .index import semantic_search
+
+                prompts_data = csv_prompts.get("prompts", [])
+                best_match = semantic_search(prompt, prompts_data, session_history=None)
+
+                if best_match:
+                    # CSV rows use "completion"; JSON overrides may use "response"
+                    csv_response = best_match.get("response") or best_match.get("completion", "")
+                    csv_available = True
+                    print(f"✓ Semantic match found for '{prompt[:50]}...' -> '{best_match.get('prompt', '')[:50]}...'")
+                else:
+                    print(f"⚠️ No semantic match found for '{prompt[:50]}...'")
             except Exception as e:
                 print(f"⚠️ CSV prompt lookup failed: {e}")
         

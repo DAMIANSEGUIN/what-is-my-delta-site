@@ -308,35 +308,36 @@ def semantic_search(user_prompt: str, prompts_data: List[Dict], session_history:
         context_text = user_prompt
         if session_history:
             context_text = f"{user_prompt} Context: {' '.join(session_history[-3:])}"
-        
+
         # Get user prompt embedding
         user_embedding = get_embeddings(context_text)
         if not user_embedding:
             return None
-        
+
         best_match = None
         best_score = 0.0
-        
+
         for prompt in prompts_data:
-            prompt_text = prompt.get("completion", "")
+            # Compare against the prompt field (user's potential input), not completion
+            prompt_text = prompt.get("prompt", "")
             if not prompt_text:
                 continue
-                
+
             # Get prompt embedding
             prompt_embedding = get_embeddings(prompt_text)
             if not prompt_embedding:
                 continue
-            
+
             # Calculate similarity
             similarity = cosine_similarity(user_embedding, prompt_embedding)
-            
+
             if similarity > best_score:
                 best_score = similarity
                 best_match = prompt
-        
-        # Return best match if similarity is above threshold
-        return best_match if best_score > 0.7 else None
-        
+
+        # Return best match if similarity is above threshold (lowered to 0.6 for better matching)
+        return best_match if best_score > 0.6 else None
+
     except Exception as e:
         print(f"Error in semantic search: {e}")
         return None
