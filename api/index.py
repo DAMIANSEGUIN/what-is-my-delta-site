@@ -32,6 +32,7 @@ from .storage import (
     create_user,
     ensure_session,
     fetch_job_matches,
+    get_conn,
     get_user_by_email,
     get_user_by_id,
     latest_metrics,
