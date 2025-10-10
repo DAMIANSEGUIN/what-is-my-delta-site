@@ -499,6 +499,16 @@ def _resolve_session(
 @app.on_event("startup")
 async def _startup():
     await startup_or_die()
+
+    # Clear prompt cache on startup (cache was returning placeholder "Cached response")
+    try:
+        from .storage import get_conn
+        with get_conn() as conn:
+            conn.execute("DELETE FROM prompt_selector_cache")
+            print("✓ Cleared prompt_selector_cache on startup")
+    except Exception as e:
+        print(f"⚠️ Failed to clear cache on startup: {e}")
+
     SERVICE_READY.set()
 
 
