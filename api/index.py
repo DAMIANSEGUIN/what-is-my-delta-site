@@ -465,7 +465,8 @@ def health():
         try:
             with get_conn() as conn:
                 conn.execute("SELECT 1").fetchone()
-        except Exception:
+        except Exception as e:
+            logger.error("Database connectivity check failed: %s", e, exc_info=True)
             db_ok = False
 
         # Overall health
