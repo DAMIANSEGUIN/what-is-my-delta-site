@@ -250,6 +250,20 @@ def _coach_reply(prompt: str, metrics: Dict[str, int], session_id: str = None) -
 
     # Check if PS101 is active for this session
     session_data = get_session_data(session_id) if session_id else {}
+
+    # Auto-activate PS101 for new sessions (first message)
+    is_first_message = not session_data or (not session_data.get("ps101_active") and not session_data.get("ps101_completed_at"))
+    if is_first_message:
+        # This is a new session or user hasn't started PS101 yet
+        ps101_data = create_ps101_session_data()
+        session_data.update(ps101_data)
+        update_session_data(session_id, session_data)
+
+        # Return first PS101 step prompt
+        first_step = get_ps101_step(1)
+        if first_step:
+            return format_step_for_user(first_step)
+
     ps101_active = session_data.get("ps101_active", False)
 
     if ps101_active:
