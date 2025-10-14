@@ -755,70 +755,27 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
   }
 
   async function logout(){
-    // Call backend logout endpoint to delete session
+    // Store old session ID before clearing
+    const oldSessionId = sessionId;
+
+    // Set logout flag in sessionStorage (survives the reload)
+    sessionStorage.setItem('LOGGING_OUT', '1');
+
+    // Clear ALL localStorage
+    localStorage.clear();
+
+    // Call backend logout endpoint (fire and forget)
     try {
       await callJson('/auth/logout', {
         method: 'POST',
-        headers: sessionId ? { 'X-Session-ID': sessionId } : {}
+        headers: oldSessionId ? { 'X-Session-ID': oldSessionId } : {}
       });
     } catch(err) {
-      // Continue logout even if API call fails
       console.error('Logout API error:', err);
     }
 
-    // Clear frontend state
-    isAuthenticated = false;
-    currentUser = null;
-    sessionId = '';
-    userData = {};
-
-    // Clear ALL localStorage including session
-    localStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem(USER_DATA_KEY);
-    localStorage.removeItem('delta_seen_intro_v1'); // Reset first-visit flag
-
-    stopAutoSave();
-
-    // Clear chat history UI
-    const chatLog = $('#chatLog');
-    if(chatLog){
-      chatLog.innerHTML = '';
-    }
-
-    // Hide chat panel
-    if(chat){
-      chat.style.display = 'none';
-    }
-
-    // Clear login/register form fields
-    const loginEmail = $('#loginEmail');
-    const loginPassword = $('#loginPassword');
-    const registerEmail = $('#registerEmail');
-    const registerPassword = $('#registerPassword');
-    const registerConfirm = $('#registerConfirm');
-    if(loginEmail) loginEmail.value = '';
-    if(loginPassword) loginPassword.value = '';
-    if(registerEmail) registerEmail.value = '';
-    if(registerPassword) registerPassword.value = '';
-    if(registerConfirm) registerConfirm.value = '';
-
-    // Reset to login form (not register)
-    const loginForm = $('#loginForm');
-    const registerForm = $('#registerForm');
-    const toggleAuth = $('#toggleAuth');
-    if(loginForm) loginForm.hidden = false;
-    if(registerForm) registerForm.hidden = true;
-    if(toggleAuth) toggleAuth.textContent = 'need an account?';
-
-    // Reset welcome screen
-    $('#authModal').style.display = 'block';
-    $('#welcome').hidden = true;
-    $('#userProgress').hidden = true;
-
-    // Force page reload to ensure clean state
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
+    // Reload page - logout flag will be checked on load
+    window.location.reload();
   }
 
   async function ensureConfig(){
@@ -1541,27 +1498,52 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
     });
   }
 
-  // Auto-open chat for new users
-  // Check for existing authentication
-  if(userData.authenticated && userData.user){
-    currentUser = userData.user;
-    isAuthenticated = true;
-    $('#authModal').style.display = 'none';
-    $('#welcome').hidden = false;
-    $('#logoutBtn').hidden = false;
-    updateUserProgress();
-    
-    // Ensure chat functionality is enabled for authenticated users
-    if(chat && chatInput && sendMsg){
-      // Chat is ready - make sure event listeners are working
-      console.log('Chat initialized for authenticated user');
-    }
-  }
+  // Check if we just logged out (flag set in sessionStorage)
+  if(sessionStorage.getItem('LOGGING_OUT')){
+    // Clear the flag
+    sessionStorage.removeItem('LOGGING_OUT');
 
-  if(!localStorage.getItem(SEEN) && isAuthenticated){
-    chat.style.display = 'block';
-    addMsg('hi — let\'s work on your career transition. what would you like to explore?', 'bot');
-    localStorage.setItem(SEEN, '1');
+    // Force clean state - don't restore anything
+    isAuthenticated = false;
+    currentUser = null;
+    sessionId = '';
+    userData = {};
+    localStorage.clear();
+
+    // Clear chat UI
+    const chatLog = $('#chatLog');
+    if(chatLog) chatLog.innerHTML = '';
+    if(chat) chat.style.display = 'none';
+
+    // Show auth modal
+    $('#authModal').style.display = 'block';
+    $('#welcome').hidden = true;
+    $('#userProgress').hidden = true;
+    $('#logoutBtn').hidden = true;
+
+    // Don't run any auto-login or welcome message logic
+  } else {
+    // Normal page load - check for existing authentication
+    if(userData.authenticated && userData.user){
+      currentUser = userData.user;
+      isAuthenticated = true;
+      $('#authModal').style.display = 'none';
+      $('#welcome').hidden = false;
+      $('#logoutBtn').hidden = false;
+      updateUserProgress();
+
+      // Ensure chat functionality is enabled for authenticated users
+      if(chat && chatInput && sendMsg){
+        // Chat is ready - make sure event listeners are working
+        console.log('Chat initialized for authenticated user');
+      }
+    }
+
+    if(!localStorage.getItem(SEEN) && isAuthenticated){
+      chat.style.display = 'block';
+      addMsg('hi — let\'s work on your career transition. what would you like to explore?', 'bot');
+      localStorage.setItem(SEEN, '1');
+    }
   }
 
   // Start trial mode for unauthenticated users
