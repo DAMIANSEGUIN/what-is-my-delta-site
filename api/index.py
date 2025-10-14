@@ -30,6 +30,7 @@ from .storage import (
     add_resume_version,
     authenticate_user,
     create_user,
+    delete_session,
     ensure_session,
     fetch_job_matches,
     get_conn,
@@ -1084,6 +1085,21 @@ async def reset_password(email: str = Body(..., embed=True)):
     # 3. Send email with reset link
 
     return {"message": "If that email exists, a reset link has been sent"}
+
+
+@app.post("/auth/logout")
+async def logout_user(session_header: Optional[str] = Header(None, alias="X-Session-ID")):
+    """Logout user and delete session from database"""
+    if not session_header:
+        raise HTTPException(status_code=400, detail="No session to logout")
+
+    # Delete the session and all related data
+    try:
+        delete_session(session_header)
+        return {"message": "Logged out successfully"}
+    except Exception as e:
+        # Even if deletion fails, return success (session might not exist)
+        return {"message": "Logged out successfully"}
 
 
 @app.get("/resume/versions", response_model=ResumeVersionResponse)

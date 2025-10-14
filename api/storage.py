@@ -386,6 +386,32 @@ def list_files(session_id: str) -> List[Dict[str, Any]]:
     return [dict(row) for row in rows]
 
 
+def delete_session(session_id: str) -> None:
+    """Delete a session and all related data (used for logout)"""
+    with get_conn() as conn:
+        # Get file paths to delete from disk
+        file_rows = conn.execute(
+            "SELECT file_path FROM file_uploads WHERE session_id = ?",
+            (session_id,)
+        ).fetchall()
+
+        # Delete all related data (foreign key order)
+        conn.execute("DELETE FROM file_uploads WHERE session_id = ?", (session_id,))
+        conn.execute("DELETE FROM resume_versions WHERE session_id = ?", (session_id,))
+        conn.execute("DELETE FROM job_matches WHERE session_id = ?", (session_id,))
+        conn.execute("DELETE FROM wimd_outputs WHERE session_id = ?", (session_id,))
+        conn.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
+
+        # Clean up uploaded files from disk
+        for row in file_rows:
+            try:
+                path = Path(row[0])
+                if path.exists() and path.is_file():
+                    path.unlink()
+            except OSError:
+                pass
+
+
 def cleanup_expired_sessions() -> None:
     cutoff = datetime.utcnow()
     with get_conn() as conn:

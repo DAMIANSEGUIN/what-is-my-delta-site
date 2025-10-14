@@ -754,7 +754,19 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
     }
   }
 
-  function logout(){
+  async function logout(){
+    // Call backend logout endpoint to delete session
+    try {
+      await callJson('/auth/logout', {
+        method: 'POST',
+        headers: sessionId ? { 'X-Session-ID': sessionId } : {}
+      });
+    } catch(err) {
+      // Continue logout even if API call fails
+      console.error('Logout API error:', err);
+    }
+
+    // Clear frontend state
     isAuthenticated = false;
     currentUser = null;
     sessionId = '';
