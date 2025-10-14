@@ -759,13 +759,34 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
     currentUser = null;
     sessionId = '';
     userData = {};
+
+    // Clear ALL localStorage including session
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem(USER_DATA_KEY);
+    localStorage.removeItem('delta_seen_intro_v1'); // Reset first-visit flag
+
     stopAutoSave();
-    
+
+    // Clear chat history UI
+    const chatLog = $('#chatLog');
+    if(chatLog){
+      chatLog.innerHTML = '';
+    }
+
+    // Hide chat panel
+    if(chat){
+      chat.style.display = 'none';
+    }
+
+    // Reset welcome screen
     $('#authModal').style.display = 'block';
     $('#welcome').hidden = true;
     $('#userProgress').hidden = true;
+
+    // Force page reload to ensure clean state
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   }
 
   async function ensureConfig(){
