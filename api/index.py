@@ -268,8 +268,23 @@ def _coach_reply(prompt: str, metrics: Dict[str, int], session_id: str = None) -
     ps101_active = session_data.get("ps101_active", False)
 
     if ps101_active:
-        # PS101 guided flow handling
+        # PS101 guided flow handling with conversational layer
+        from api.conversational_coach import (
+            detect_intent, generate_conversational_response, should_exit_ps101
+        )
+
         current_step = session_data.get("ps101_step", 1)
+        current_prompt_idx = session_data.get("ps101_prompt_index", 0)
+
+        # Build conversation history for context
+        conversation_history = session_data.get("ps101_responses", [])
+
+        # Get current question
+        current_step_data = get_ps101_step(current_step)
+        current_question = current_step_data["prompts"][current_prompt_idx] if current_step_data else ""
+
+        # Detect user intent and tone
+        intent, tone = detect_intent(prompt, current_question, conversation_history)
 
         # Check if user is responding to exit confirmation (must check FIRST)
         if session_data.get("ps101_exit_pending"):
@@ -284,13 +299,10 @@ def _coach_reply(prompt: str, metrics: Dict[str, int], session_id: str = None) -
                 # User didn't confirm, clear flag and continue
                 session_data["ps101_exit_pending"] = False
                 update_session_data(session_id, session_data)
-                # Fall through to normal processing
+                # Fall through to conversational handling
 
-        # Check for explicit exit signals
-        exit_signals = ["stop", "quit", "exit", "i'm done", "im done", "no more", "enough"]
-        user_wants_exit = any(signal in prompt.lower() for signal in exit_signals)
-
-        if user_wants_exit:
+        # Check for exit intent (more careful now)
+        if should_exit_ps101(prompt, intent):
             # First exit attempt - ask for confirmation
             session_data["ps101_exit_pending"] = True
             update_session_data(session_id, session_data)
@@ -302,58 +314,30 @@ def _coach_reply(prompt: str, metrics: Dict[str, int], session_id: str = None) -
             update_session_data(session_id, session_data)
             return get_completion_message()
 
-        # Check if this is a tangent (user not addressing current step)
-        if is_tangent(prompt, current_step):
-            # Handle tangent: provide CSV response, then redirect
-            session_data = handle_tangent(session_data)
-            update_session_data(session_id, session_data)
+        # Generate conversational response
+        response, should_advance = generate_conversational_response(
+            user_message=prompt,
+            intent=intent,
+            tone=tone,
+            ps101_context=session_data,
+            current_question=current_question,
+            conversation_history=conversation_history,
+            session_data=session_data
+        )
 
-            # Get CSV response for the tangent
-            csv_prompts = None
-            try:
-                reg = read_registry()
-                active_sha = reg.get("active")
-                if active_sha:
-                    for version in reg.get("versions", []):
-                        if version["sha256"] == active_sha:
-                            try:
-                                with open(version["file"], "r", encoding="utf-8") as f:
-                                    prompts_data = json.load(f)
-                                csv_prompts = {"prompts": prompts_data}
-                                break
-                            except Exception:
-                                continue
-            except Exception:
-                pass
+        # Record response if it's an answer
+        from api.conversational_coach import UserIntent
+        if intent in [UserIntent.ANSWER, UserIntent.POSSIBILITY_THINKING, UserIntent.CIRCULAR_THINKING]:
+            session_data = record_ps101_response(session_data, current_step, prompt)
 
-            context = {"metrics": metrics}
-            result = get_prompt_response(
-                prompt=prompt,
-                session_id=session_id or "default",
-                csv_prompts=csv_prompts,
-                context=context
-            )
+        # Advance if appropriate
+        if should_advance:
+            session_data = advance_ps101_step(session_data)
 
-            tangent_response = result.get("response", _fallback_reply(metrics))
-            redirect_msg = get_redirect_message(current_step)
-
-            return f"{tangent_response}\n\n{redirect_msg}"
-
-        # User is on-topic - record response and advance
-        session_data = record_ps101_response(session_data, current_step, prompt)
-        session_data = advance_ps101_step(session_data)  # Now advances prompts correctly
         update_session_data(session_id, session_data)
 
-        # Get next prompt (could be same step, next prompt OR next step)
-        next_step_num = session_data.get("ps101_step", 1)
-        next_prompt_index = session_data.get("ps101_prompt_index", 0)
-        next_step = get_ps101_step(next_step_num)
-
-        if next_step:
-            return format_step_for_user(next_step, next_prompt_index)
-        else:
-            # Completed all steps
-            return get_completion_message()
+        # Return the conversational response (includes next question if advanced)
+        return response
 
     # Normal CSV→AI fallback flow (PS101 not active)
     try:
@@ -522,7 +506,8 @@ async def _startup():
     try:
         from .storage import get_conn
         with get_conn() as conn:
-            conn.execute("DELETE FROM prompt_selector_cache")
+            cursor = conn.cursor()  # OK: PostgreSQL pattern
+            cursor.execute("DELETE FROM prompt_selector_cache")
             print("✓ Cleared prompt_selector_cache on startup")
     except Exception as e:
         print(f"⚠️ Failed to clear cache on startup: {e}")
@@ -600,7 +585,9 @@ def health():
         db_ok = True
         try:
             with get_conn() as conn:
-                conn.execute("SELECT 1").fetchone()
+                cursor = conn.cursor()  # OK: PostgreSQL pattern
+                cursor.execute("SELECT 1")
+                cursor.fetchone()
         except Exception as e:
             logger.error("Database connectivity check failed: %s", e, exc_info=True)
             db_ok = False
