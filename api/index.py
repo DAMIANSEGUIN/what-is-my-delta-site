@@ -1069,9 +1069,10 @@ async def get_current_user(user_id: str = Header(..., alias="X-User-ID")):
 async def reset_password(email: str = Body(..., embed=True)):
     """Send password reset email (placeholder - needs email service)"""
     # Check if user exists
-    conn = get_conn()
-    cursor = conn.execute("SELECT user_id FROM users WHERE email = ?", (email,))
-    user = cursor.fetchone()
+    with get_conn() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+        user = cursor.fetchone()
 
     if not user:
         # Don't reveal if user exists - security best practice
