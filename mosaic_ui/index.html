@@ -755,14 +755,19 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
   }
 
   async function logout(){
+    console.log('[LOGOUT] Starting logout process...');
+
     // Store old session ID before clearing
     const oldSessionId = sessionId;
+    console.log('[LOGOUT] Session ID:', oldSessionId);
 
     // Set logout flag in sessionStorage (survives the reload)
     sessionStorage.setItem('LOGGING_OUT', '1');
+    console.log('[LOGOUT] Set LOGGING_OUT flag in sessionStorage');
 
     // Clear ALL localStorage
     localStorage.clear();
+    console.log('[LOGOUT] Cleared localStorage');
 
     // Call backend logout endpoint (fire and forget)
     try {
@@ -770,11 +775,13 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
         method: 'POST',
         headers: oldSessionId ? { 'X-Session-ID': oldSessionId } : {}
       });
+      console.log('[LOGOUT] Backend logout API called successfully');
     } catch(err) {
-      console.error('Logout API error:', err);
+      console.error('[LOGOUT] Logout API error:', err);
     }
 
     // Reload page - logout flag will be checked on load
+    console.log('[LOGOUT] Reloading page...');
     window.location.reload();
   }
 
@@ -1499,9 +1506,15 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
   }
 
   // Check if we just logged out (flag set in sessionStorage)
-  if(sessionStorage.getItem('LOGGING_OUT')){
+  const loggingOutFlag = sessionStorage.getItem('LOGGING_OUT');
+  console.log('[PAGE LOAD] Checking LOGGING_OUT flag:', loggingOutFlag);
+
+  if(loggingOutFlag){
+    console.log('[PAGE LOAD] LOGGING_OUT flag detected - executing clean state');
+
     // Clear the flag
     sessionStorage.removeItem('LOGGING_OUT');
+    console.log('[PAGE LOAD] Removed LOGGING_OUT flag');
 
     // Force clean state - don't restore anything
     isAuthenticated = false;
@@ -1509,20 +1522,34 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
     sessionId = '';
     userData = {};
     localStorage.clear();
+    console.log('[PAGE LOAD] Cleared all state variables and localStorage');
 
     // Clear chat UI
     const chatLog = $('#chatLog');
-    if(chatLog) chatLog.innerHTML = '';
-    if(chat) chat.style.display = 'none';
+    if(chatLog){
+      console.log('[PAGE LOAD] Clearing chat log, current content:', chatLog.innerHTML.substring(0, 100));
+      chatLog.innerHTML = '';
+      console.log('[PAGE LOAD] Chat log cleared');
+    } else {
+      console.log('[PAGE LOAD] WARNING: chatLog element not found!');
+    }
+
+    if(chat){
+      chat.style.display = 'none';
+      console.log('[PAGE LOAD] Hidden chat panel');
+    }
 
     // Show auth modal
     $('#authModal').style.display = 'block';
     $('#welcome').hidden = true;
     $('#userProgress').hidden = true;
     $('#logoutBtn').hidden = true;
+    console.log('[PAGE LOAD] Reset UI to login state');
 
     // Don't run any auto-login or welcome message logic
+    console.log('[PAGE LOAD] Logout cleanup complete - skipping normal auth restore');
   } else {
+    console.log('[PAGE LOAD] Normal page load - no LOGGING_OUT flag');
     // Normal page load - check for existing authentication
     if(userData.authenticated && userData.user){
       currentUser = userData.user;
