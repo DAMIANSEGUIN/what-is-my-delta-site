@@ -778,6 +778,26 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
       chat.style.display = 'none';
     }
 
+    // Clear login/register form fields
+    const loginEmail = $('#loginEmail');
+    const loginPassword = $('#loginPassword');
+    const registerEmail = $('#registerEmail');
+    const registerPassword = $('#registerPassword');
+    const registerConfirm = $('#registerConfirm');
+    if(loginEmail) loginEmail.value = '';
+    if(loginPassword) loginPassword.value = '';
+    if(registerEmail) registerEmail.value = '';
+    if(registerPassword) registerPassword.value = '';
+    if(registerConfirm) registerConfirm.value = '';
+
+    // Reset to login form (not register)
+    const loginForm = $('#loginForm');
+    const registerForm = $('#registerForm');
+    const toggleAuth = $('#toggleAuth');
+    if(loginForm) loginForm.hidden = false;
+    if(registerForm) registerForm.hidden = true;
+    if(toggleAuth) toggleAuth.textContent = 'need an account?';
+
     // Reset welcome screen
     $('#authModal').style.display = 'block';
     $('#welcome').hidden = true;
