@@ -103,3 +103,4 @@ If build fails with "secret NAME: not found":
 - Toggle it on and redeploy.
 # Force rebuild: 1759167655
 
+# PostgreSQL connection test
