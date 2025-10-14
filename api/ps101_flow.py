@@ -173,14 +173,21 @@ def get_redirect_message(step_number: int) -> str:
     return f"Are you ready to resume with the clarifying questions?\n\nLet's return to: {first_prompt}"
 
 
-def format_step_for_user(step: Dict[str, Any]) -> str:
-    """Format a step into a user-friendly message"""
-    prompts_text = "\n\n".join([f"• {prompt}" for prompt in step["prompts"]])
+def format_step_for_user(step: Dict[str, Any], prompt_index: int = 0) -> str:
+    """Format a step into a user-friendly message - shows ONE prompt at a time
+
+    Args:
+        step: PS101 step dictionary
+        prompt_index: Which prompt within the step (0-based index)
+    """
+    prompts = step.get("prompts", [])
+    if prompt_index >= len(prompts):
+        prompt_index = 0  # Fallback to first
+
+    current_prompt = prompts[prompt_index]
     return f"""**Step {step['step']}: {step['title']}**
 
-{prompts_text}
-
-Take your time to reflect on these questions. You can answer as many or as few as feel relevant."""
+{current_prompt}"""
 
 
 def create_ps101_session_data() -> Dict[str, Any]:
@@ -188,6 +195,7 @@ def create_ps101_session_data() -> Dict[str, Any]:
     return {
         "ps101_active": True,
         "ps101_step": 1,
+        "ps101_prompt_index": 0,  # Track which prompt within current step
         "ps101_started_at": datetime.utcnow().isoformat(),
         "ps101_responses": [],
         "ps101_tangent_count": 0  # Track tangents per step
@@ -210,11 +218,37 @@ def handle_tangent(session_data: Dict[str, Any]) -> Dict[str, Any]:
     return session_data
 
 
-def advance_ps101_step(session_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Advance to next step in PS101 sequence"""
-    session_data["ps101_step"] = min(session_data["ps101_step"] + 1, 10)
-    session_data["ps101_tangent_count"] = 0  # Reset tangent count for new step
+def advance_ps101_prompt(session_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Advance to next prompt within current step, or next step if all prompts done
+
+    Returns:
+        Updated session_data with new prompt_index or step number
+    """
+    current_step = session_data.get("ps101_step", 1)
+    prompt_index = session_data.get("ps101_prompt_index", 0)
+
+    step_data = get_ps101_step(current_step)
+    if not step_data:
+        return session_data
+
+    total_prompts = len(step_data.get("prompts", []))
+
+    # Check if there are more prompts in current step
+    if prompt_index + 1 < total_prompts:
+        # Move to next prompt within same step
+        session_data["ps101_prompt_index"] = prompt_index + 1
+    else:
+        # All prompts done - advance to next step
+        session_data["ps101_step"] = min(current_step + 1, 10)
+        session_data["ps101_prompt_index"] = 0  # Reset to first prompt of new step
+        session_data["ps101_tangent_count"] = 0  # Reset tangent count for new step
+
     return session_data
+
+
+def advance_ps101_step(session_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Advance to next step in PS101 sequence (legacy function - now calls advance_ps101_prompt)"""
+    return advance_ps101_prompt(session_data)
 
 
 def exit_ps101_flow(session_data: Dict[str, Any]) -> Dict[str, Any]:

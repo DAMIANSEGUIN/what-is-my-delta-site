@@ -340,13 +340,16 @@ def _coach_reply(prompt: str, metrics: Dict[str, int], session_id: str = None) -
 
         # User is on-topic - record response and advance
         session_data = record_ps101_response(session_data, current_step, prompt)
-        session_data = advance_ps101_step(session_data)
+        session_data = advance_ps101_step(session_data)  # Now advances prompts correctly
         update_session_data(session_id, session_data)
 
-        # Get next step
-        next_step = get_ps101_step(session_data["ps101_step"])
+        # Get next prompt (could be same step, next prompt OR next step)
+        next_step_num = session_data.get("ps101_step", 1)
+        next_prompt_index = session_data.get("ps101_prompt_index", 0)
+        next_step = get_ps101_step(next_step_num)
+
         if next_step:
-            return format_step_for_user(next_step)
+            return format_step_for_user(next_step, next_prompt_index)
         else:
             # Completed all steps
             return get_completion_message()
