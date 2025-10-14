@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Logout Debug Tool</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #00ff00; }
+    .section { border: 1px solid #00ff00; padding: 15px; margin: 10px 0; }
+    button {
+      background: #00ff00;
+      color: #1e1e1e;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .log { background: #000; padding: 10px; margin: 5px 0; border-left: 3px solid #00ff00; }
+    .error { color: #ff0000; }
+    .success { color: #00ff00; }
+    .warning { color: #ffff00; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Logout Debug Tool</h1>
+  <p>This page helps diagnose what's happening with logout/chat clearing</p>
+
+  <div class="section">
+    <h2>Current State</h2>
+    <div id="currentState"></div>
+  </div>
+
+  <div class="section">
+    <h2>Actions</h2>
+    <button onclick="checkStorage()">Check Storage</button>
+    <button onclick="simulateLogout()">Simulate Logout</button>
+    <button onclick="clearEverything()">Nuclear Clear</button>
+    <button onclick="checkMainSite()">Check Main Site</button>
+  </div>
+
+  <div class="section">
+    <h2>Logs</h2>
+    <div id="logs"></div>
+  </div>
+
+  <script>
+    const SESSION_KEY = 'wimd_session_id';
+    const USER_DATA_KEY = 'wimd_user_data';
+    const SEEN = 'delta_seen_intro_v1';
+    const TRIAL_START_KEY = 'delta_trial_start';
+
+    function log(msg, type = 'log') {
+      const div = document.createElement('div');
+      div.className = `log ${type}`;
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      document.getElementById('logs').appendChild(div);
+    }
+
+    function checkStorage() {
+      log('Checking all storage...', 'log');
+
+      // LocalStorage
+      log(`localStorage items: ${localStorage.length}`, 'log');
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const value = localStorage.getItem(key);
+        log(`  - ${key}: ${value.substring(0, 100)}${value.length > 100 ? '...' : ''}`, 'log');
+      }
+
+      // SessionStorage
+      log(`sessionStorage items: ${sessionStorage.length}`, 'log');
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        const value = sessionStorage.getItem(key);
+        log(`  - ${key}: ${value}`, 'log');
+      }
+
+      // Check specific keys
+      const loggingOut = sessionStorage.getItem('LOGGING_OUT');
+      if (loggingOut) {
+        log('⚠️ LOGGING_OUT flag is SET - this means you just logged out', 'warning');
+      } else {
+        log('✓ LOGGING_OUT flag not set', 'success');
+      }
+
+      updateCurrentState();
+    }
+
+    function updateCurrentState() {
+      const state = document.getElementById('currentState');
+      state.innerHTML = `
+        <div class="log">sessionStorage.LOGGING_OUT: ${sessionStorage.getItem('LOGGING_OUT') || 'null'}</div>
+        <div class="log">localStorage.${SESSION_KEY}: ${localStorage.getItem(SESSION_KEY) || 'null'}</div>
+        <div class="log">localStorage.${USER_DATA_KEY}: ${localStorage.getItem(USER_DATA_KEY) || 'null'}</div>
+        <div class="log">localStorage.${SEEN}: ${localStorage.getItem(SEEN) || 'null'}</div>
+        <div class="log">localStorage count: ${localStorage.length}</div>
+        <div class="log">sessionStorage count: ${sessionStorage.length}</div>
+      `;
+    }
+
+    function simulateLogout() {
+      log('=== SIMULATING LOGOUT ===', 'warning');
+
+      // This is what the logout function does
+      log('1. Setting LOGGING_OUT flag in sessionStorage', 'log');
+      sessionStorage.setItem('LOGGING_OUT', '1');
+
+      log('2. Clearing localStorage', 'log');
+      localStorage.clear();
+
+      log('3. Would call backend /auth/logout (skipping for test)', 'log');
+
+      log('4. Would reload page (window.location.reload())', 'warning');
+      log('   >>> On real site, this would trigger LOGGING_OUT check', 'warning');
+
+      updateCurrentState();
+
+      log('✓ Logout simulation complete', 'success');
+      log('If this was the real site, page would reload now', 'warning');
+    }
+
+    function clearEverything() {
+      log('=== NUCLEAR CLEAR ===', 'error');
+      localStorage.clear();
+      sessionStorage.clear();
+      log('✓ All storage cleared', 'success');
+      updateCurrentState();
+    }
+
+    function checkMainSite() {
+      log('Opening main site in new tab...', 'log');
+      window.open('https://whatismydelta.com/', '_blank');
+    }
+
+    // Initialize
+    log('Debug tool loaded', 'success');
+    updateCurrentState();
+    checkStorage();
+  </script>
+</body>
+</html>
