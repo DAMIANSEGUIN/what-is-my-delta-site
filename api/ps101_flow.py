@@ -179,6 +179,8 @@ def format_step_for_user(step: Dict[str, Any], prompt_index: int = 0) -> str:
     Args:
         step: PS101 step dictionary
         prompt_index: Which prompt within the step (0-based index)
+
+    Cache bust: 2025-10-14
     """
     prompts = step.get("prompts", [])
     if prompt_index >= len(prompts):
