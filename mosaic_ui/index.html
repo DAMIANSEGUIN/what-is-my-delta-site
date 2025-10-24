@@ -1588,6 +1588,46 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
       }
     }
   }
+
+  // Draggable windows functionality (minimal, mobile-aware)
+  const makeWindowDraggable = (el) => {
+    if(!el || window.innerWidth < 768) return;
+    const header = el.querySelector('[data-drag-handle]') || el.querySelector('header');
+    if(!header) return;
+    let pos = {x: 0, y: 0, startX: 0, startY: 0};
+    header.style.cursor = 'move';
+    header.onmousedown = (e) => {
+      e.preventDefault();
+      pos.startX = e.clientX;
+      pos.startY = e.clientY;
+      document.onmousemove = drag;
+      document.onmouseup = stopDrag;
+    };
+    const drag = (e) => {
+      pos.x = pos.startX - e.clientX;
+      pos.y = pos.startY - e.clientY;
+      pos.startX = e.clientX;
+      pos.startY = e.clientY;
+      const newTop = (el.offsetTop - pos.y);
+      const newLeft = (el.offsetLeft - pos.x);
+      if(newTop >= 0 && newTop + el.offsetHeight <= window.innerHeight){
+        el.style.top = newTop + 'px';
+      }
+      if(newLeft >= 0 && newLeft + el.offsetWidth <= window.innerWidth){
+        el.style.left = newLeft + 'px';
+      }
+    };
+    const stopDrag = () => {
+      document.onmousemove = null;
+      document.onmouseup = null;
+    };
+  };
+
+  // Make chat draggable (if it exists and is fixed position)
+  if(chat && window.innerWidth >= 768){
+    chat.style.position = 'fixed';
+    makeWindowDraggable(chat);
+  }
 })();
 </script>
 </body>
