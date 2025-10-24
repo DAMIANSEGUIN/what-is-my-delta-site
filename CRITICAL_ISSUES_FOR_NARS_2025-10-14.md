@@ -1,7 +1,8 @@
 # CRITICAL ISSUES REPORT FOR NARS
 **Date:** 2025-10-14
 **Session:** Claude Code troubleshooting session
-**Status:** Multiple symptoms, underlying root cause not yet identified
+**Status:** ✅ ROOT CAUSE CONFIRMED - Railway SQLite Ephemeral Storage
+**Updated:** 2025-10-14 (Post-NARs Investigation)
 
 ---
 
@@ -315,8 +316,50 @@ Register → Works → Deploy → DB wiped → Login fails → Repeat
 
 ---
 
-**Status:** Awaiting NARs investigation of Railway database persistence
+## NARs INVESTIGATION RESULTS (2025-10-14)
 
-**Escalation Level:** P0 CRITICAL - Production blocker
+**Status:** ✅ **ROOT CAUSE CONFIRMED**
 
-**Estimated Fix Time:** 4 hours (PostgreSQL migration) OR 30 minutes (Railway volume config)
+### NARs Findings
+
+1. **Railway Configuration Analysis:**
+   - `railway.json` contains `"include": ["data/**/*"]` directive
+   - This directive **only copies files into build** - does NOT create persistent storage
+   - No Railway Volume configured in project dashboard
+   - SQLite database stored in ephemeral container filesystem
+
+2. **Technical Confirmation:**
+   - **Ephemeral Storage:** Files included via directive are wiped on each deployment
+   - **Persistent Storage:** Would require explicit Railway Volume or managed database service
+   - **Current Behavior:** `data/mosaic.db` recreated fresh on every Railway rebuild
+
+3. **Root Cause Validated:**
+   - ✅ Pattern matches: User registers → deploy → DB wiped → "Invalid credentials"
+   - ✅ All symptoms (authentication, sessions, PS101) explained by DB resets
+   - ✅ Hypothesis 1 from original report **CONFIRMED**
+
+### Conclusion
+
+**The `railway.json` include directive is insufficient for database persistence.** Every deployment triggers Railway container rebuild, wiping the SQLite database and all user accounts/sessions.
+
+---
+
+## IMMEDIATE ACTION REQUIRED
+
+**Status:** P0 CRITICAL - Production blocker **CONFIRMED**
+
+**Solution:** Migrate to Railway PostgreSQL (managed database service)
+
+**Estimated Fix Time:** 4 hours (PostgreSQL migration + schema migration + testing)
+
+**DO NOT:**
+- Deploy any more symptom fixes
+- Continue troubleshooting authentication/session issues
+- Create new user accounts for testing (will be wiped on next deploy)
+
+**DO:**
+- Provision Railway PostgreSQL database immediately
+- Migrate schema from SQLite to PostgreSQL
+- Update `api/storage.py` connection logic
+- Deploy and verify database persists across deployments
+- THEN retest all symptoms

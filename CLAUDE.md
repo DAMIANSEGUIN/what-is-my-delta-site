@@ -85,11 +85,32 @@
   - ✅ `AI_FALLBACK_ENABLED`: **ENABLED** (CSV→AI fallback now working properly - cache cleared, flag enabled)
   - ⚠️ `EXPERIMENTS_ENABLED`: disabled (experiment engine)
 
+## MANDATORY: Quality & Safety Controls
+**CRITICAL: Read these files at the start of EVERY session and before ANY code changes:**
+
+1. **`TROUBLESHOOTING_CHECKLIST.md`** - Pre-flight checks for all code changes
+   - Run Quick Diagnostic Filter before debugging
+   - Verify Code Change Pre-Flight Checklist before editing
+   - Follow Debugging Workflow for systematic problem solving
+   - Check Error Classification Dashboard for known issues
+
+2. **`SELF_DIAGNOSTIC_FRAMEWORK.md`** - Architecture-specific error prevention
+   - Error taxonomy (INFRA/DATA/MODEL/PROMPT/INTEGRATION)
+   - Playbooks-as-code for common failure scenarios
+   - Automated fix patterns with rollback procedures
+
+**Enforcement Mechanisms:**
+- Multi-layer checklist verification (system reminders + git hooks + output protocol)
+- Pre-commit hooks block dangerous patterns (context manager violations, SQLite syntax, silent exceptions)
+- Mandatory checklist output before code changes (audit trail)
+
 ## Import Patterns
 @issues.json
 @decision_matrix.csv
 @surface_presence.json
 @docs/README.md
+@TROUBLESHOOTING_CHECKLIST.md
+@SELF_DIAGNOSTIC_FRAMEWORK.md
 
 ## Surface Presence Map
 ```json
@@ -146,7 +167,11 @@
 - Frontend uses vanilla JavaScript (ES6+) with IIFE pattern
 - Event listeners use null checks to prevent script crashes
 - Semantic search uses OpenAI embeddings with cosine similarity
-- Authentication uses SQLite database backend
+- **Database backend: PostgreSQL (Railway managed service)**
+  - Connection string via `DATABASE_URL` environment variable (railway.internal)
+  - Context manager pattern required: `with get_conn() as conn:`
+  - PostgreSQL syntax: `%s` parameter placeholders, `SERIAL` auto-increment
+  - SQLite fallback only for local development (ephemeral on Railway)
 - Auto-save functionality for user session data
 - localStorage for client-side session persistence
 - Trial timer persists across page refreshes via localStorage

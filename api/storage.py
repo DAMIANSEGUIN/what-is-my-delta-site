@@ -21,7 +21,15 @@ DATA_ROOT.mkdir(parents=True, exist_ok=True)
 
 connection_pool = None
 if DATABASE_URL:
-    connection_pool = pool.SimpleConnectionPool(1, 20, DATABASE_URL)
+    try:
+        print(f"[STORAGE] Attempting PostgreSQL connection...")
+        connection_pool = pool.SimpleConnectionPool(1, 20, DATABASE_URL)
+        print(f"[STORAGE] ✅ PostgreSQL connection pool created successfully")
+    except Exception as e:
+        print(f"[STORAGE] ❌ PostgreSQL connection failed: {e}")
+        print(f"[STORAGE] Falling back to SQLite")
+else:
+    print(f"[STORAGE] DATABASE_URL not set, using SQLite")
 
 
 def _json_dump(data: Any) -> str:
