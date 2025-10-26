@@ -106,6 +106,15 @@ logger = logging.getLogger(__name__)
 # Register booking routes
 from api.booking import router as booking_router
 app.include_router(booking_router)
+
+# Run database migrations on startup
+from api.run_migrations import run_migrations
+try:
+    run_migrations()
+    logger.info("✅ Database migrations completed")
+except Exception as e:
+    logger.error(f"❌ Database migrations failed: {e}")
+
 HEALTH_DEBUG_ENABLED = os.getenv("HEALTH_DEBUG", "").lower() in {"1", "true", "yes", "on"}
 SERVICE_READY = threading.Event()
 
