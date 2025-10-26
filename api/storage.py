@@ -524,7 +524,8 @@ def verify_password(password: str, hashed: str) -> bool:
     except:
         return False
 
-def create_user(email: str, password: str) -> str:
+def create_user(email: str, password: str, subscription_tier: str = 'free',
+                subscription_status: str = 'active', discount_code: str = None) -> str:
     """Create a new user and return user ID"""
     user_id = str(uuid.uuid4())
     password_hash = hash_password(password)
@@ -532,10 +533,11 @@ def create_user(email: str, password: str) -> str:
 
     with get_conn() as conn:
         cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO users (id, email, password_hash, created_at, last_login) VALUES (%s, %s, %s, %s, %s)",
-            (user_id, email, password_hash, now, now)
-        )
+        cursor.execute("""
+            INSERT INTO users (id, email, password_hash, created_at, last_login,
+                             subscription_tier, subscription_status, discount_code)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (user_id, email, password_hash, now, now, subscription_tier, subscription_status, discount_code))
     return user_id
 
 def authenticate_user(email: str, password: str) -> Optional[str]:

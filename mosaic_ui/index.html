@@ -162,6 +162,10 @@
           <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">confirm password</label>
           <input type="password" id="registerConfirm" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
         </div>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">discount code <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+          <input type="text" id="registerDiscountCode" style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px;text-transform:uppercase" placeholder="BETA2025">
+        </div>
         <button type="submit" class="quiet" style="width:100%;padding:10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">create account</button>
       </form>
       
@@ -273,6 +277,7 @@
           <button id="startDiscoveryFlow" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">explore</button>
           <button id="openUploadFlow" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">upload</button>
           <button id="findOpportunities" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">find jobs</button>
+          <a href="https://calendar.app.google/EAnDSz2CcTtH849x6" target="_blank" rel="noopener noreferrer" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;display:inline-block" title="Book a 1-on-1 coaching session">book session</a>
         </div>
       </div>
     </div>
@@ -635,10 +640,10 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
     }
   }
 
-  async function authenticateUser(email, password, isRegister = false){
+  async function authenticateUser(email, password, isRegister = false, discountCode = null){
     try{
       setStatus($('#authStatus'), 'authenticating...');
-      
+
       // Enhanced authentication with backend API
       if(isRegister){
         // Registration validation
@@ -648,22 +653,28 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
         if(!email.includes('@')){
           throw new Error('Please enter a valid email address');
         }
-        
-        // Register with backend
+
+        // Register with backend (include discount code if provided)
+        const body = { email, password };
+        if(discountCode) body.discount_code = discountCode;
+
         const response = await callJson('/auth/register', {
           method: 'POST',
-          body: { email, password }
+          body
         });
-        
+
         currentUser = {
           id: response.user_id,
           email: response.email,
           createdAt: response.created_at,
-          lastLogin: response.last_login
+          lastLogin: response.last_login,
+          subscriptionTier: response.subscription_tier,
+          subscriptionStatus: response.subscription_status
         };
-        
-        setStatus($('#authStatus'), 'account created successfully!', 'ok');
-        
+
+        const tierMessage = response.subscription_tier === 'beta' ? ' (beta access granted)' : '';
+        setStatus($('#authStatus'), `account created successfully!${tierMessage}`, 'ok');
+
       } else {
         // Login with backend
         const response = await callJson('/auth/login', {
@@ -1086,13 +1097,14 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
       const email = $('#registerEmail').value;
       const password = $('#registerPassword').value;
       const confirm = $('#registerConfirm').value;
+      const discountCode = $('#registerDiscountCode')?.value?.trim() || null;
 
       if(password !== confirm){
         setStatus($('#authStatus'), 'passwords do not match', 'error');
         return;
       }
 
-      await authenticateUser(email, password, true);
+      await authenticateUser(email, password, true, discountCode);
     });
   }
 

@@ -1,0 +1,123 @@
+Hi Netlify Agent,
+
+I need your help fixing a Railway deployment issue. The booking system backend has been deployed but the routes aren't loading.
+
+**Project Directory:** `/Users/damianseguin/Downloads/WIMD-Railway-Deploy-Project`
+
+**Task Brief:** Read `NETLIFY_AGENT_RAILWAY_DEBUG.md` in the project root for full details.
+
+---
+
+## Quick Summary
+
+**Problem:** `/booking/*` routes return 404 (should be 401/422)
+**Railway Service:** https://what-is-my-delta-site-production.up.railway.app
+**Likely Cause:** Import error in booking.py preventing router from loading
+
+---
+
+## Files You'll Need Access To
+
+### Core Booking Files:
+```
+api/booking.py                          # Main booking router (NEEDS FIX)
+api/google_calendar_service.py         # Google Calendar integration
+api/paypal_service.py                   # PayPal payment processing
+api/run_migrations.py                   # Auto-migration runner
+api/index.py                            # Main FastAPI app (lines 106-113: router registration)
+```
+
+### Database Migrations:
+```
+data/migrations/001_add_booking_tables.sql   # Booking schema
+data/migrations/002_seed_booking_data.sql    # Seed data (WIMD25 promo)
+```
+
+### Documentation:
+```
+NETLIFY_AGENT_RAILWAY_DEBUG.md          # Full technical brief
+Planning/BOOKING_SESSION_BACKUP_2025-10-25.md  # Complete session history
+BOOKING_SYSTEM_READY.md                 # Deployment guide
+BOOKING_ENV_SETUP.md                    # Environment variables reference
+requirements.txt                        # Python dependencies
+```
+
+### Configuration:
+```
+.env                                    # Local env vars (DO NOT USE IN PROD)
+Railway Dashboard Variables:
+  - GOOGLE_SERVICE_ACCOUNT_KEY
+  - COACH_GOOGLE_CALENDAR_ID
+  - COACH_EMAIL
+  - PAYPAL_CLIENT_ID
+  - PAYPAL_CLIENT_SECRET
+  - PAYPAL_MODE
+  - DATABASE_URL
+```
+
+---
+
+## Directory Structure
+
+```
+/Users/damianseguin/Downloads/WIMD-Railway-Deploy-Project/
+├── api/
+│   ├── index.py                    # Main app (router registration here)
+│   ├── booking.py                  # Booking routes (NOT LOADING)
+│   ├── google_calendar_service.py
+│   ├── paypal_service.py
+│   ├── run_migrations.py
+│   ├── storage.py                  # Database functions
+│   └── ... (other API files)
+├── data/
+│   └── migrations/
+│       ├── 001_add_booking_tables.sql
+│       └── 002_seed_booking_data.sql
+├── Planning/
+│   ├── BOOKING_SESSION_BACKUP_2025-10-25.md
+│   └── NETLIFY_AGENT_PROTOCOL.md
+├── NETLIFY_AGENT_RAILWAY_DEBUG.md  # READ THIS FIRST
+├── BOOKING_SYSTEM_READY.md
+├── BOOKING_ENV_SETUP.md
+└── requirements.txt
+```
+
+---
+
+## What I Need You To Do
+
+1. **Diagnose:**
+   - Check Railway deployment logs for import errors
+   - Verify if `api/booking.py` has import issues
+   - Check if migrations ran (look for `schema_migrations` table)
+   - Find root cause of router not loading
+
+2. **Fix:**
+   - Resolve import error or dependency issue
+   - Ensure router registers successfully
+   - Verify migrations create booking tables
+
+3. **Verify:**
+   - `/booking/promo/WIMD25` returns 401 (not 404)
+   - Booking routes appear in `/openapi.json`
+   - No import errors in Railway logs
+
+4. **Report:**
+   - What was the root cause?
+   - What fix did you apply?
+   - Confirmation that routes now work
+
+---
+
+## Access Notes
+
+- **Railway Service:** `what-is-my-delta-site-production.up.railway.app`
+- **Latest Commit:** `fa95c45` (added error logging for booking router)
+- **Last Deploy:** 2025-10-26T14:37:25Z
+- **All environment variables:** Already set in Railway dashboard
+
+---
+
+**Start by reading `NETLIFY_AGENT_RAILWAY_DEBUG.md` for complete technical context.**
+
+Thanks!

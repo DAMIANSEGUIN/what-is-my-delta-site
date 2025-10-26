@@ -1,0 +1,12 @@
+# Rollback Plan - 20251024-173710
+
+## To rollback git state:
+git reset --hard baseline-20251024-173710
+
+## To rollback to safety branch:
+git checkout safety-checkpoint-20251024-173710
+
+## Current state:
+- Branch: main
+- Commit: fc4edab22410066bab4650b4e403633a203a2d92
+- HEAD: fc4edab REFACTOR: Rename specs to match naming convention (UPPERCASE_DATE format)

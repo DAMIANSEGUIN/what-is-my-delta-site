@@ -178,6 +178,7 @@ class WimdRequest(BaseModel):
 class UserRegister(BaseModel):
     email: str = Field(..., min_length=1)
     password: str = Field(..., min_length=6)
+    discount_code: Optional[str] = None
 
 class UserLogin(BaseModel):
     email: str = Field(..., min_length=1)
@@ -188,6 +189,16 @@ class UserResponse(BaseModel):
     email: str
     created_at: str
     last_login: Optional[str] = None
+    subscription_tier: Optional[str] = None
+    subscription_status: Optional[str] = None
+
+class DiscountCodeValidate(BaseModel):
+    code: str = Field(..., min_length=1, max_length=50)
+
+class DiscountCodeResponse(BaseModel):
+    valid: bool
+    message: str
+    grants_tier: Optional[str] = None
 
 
 class WimdResponse(BaseModel):
@@ -1013,24 +1024,112 @@ def resume_feedback(
     }
 
 
+# Discount Code Endpoints
+@app.post("/auth/validate-code", response_model=DiscountCodeResponse)
+async def validate_discount_code(payload: DiscountCodeValidate):
+    """Validate a discount code"""
+    code = payload.code.strip().upper()
+
+    with get_conn() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT code, grants_tier, max_uses, current_uses, active, expires_at
+            FROM discount_codes
+            WHERE UPPER(code) = %s
+        """, (code,))
+        result = cursor.fetchone()
+
+    if not result:
+        return DiscountCodeResponse(valid=False, message="Invalid discount code")
+
+    code_value, grants_tier, max_uses, current_uses, active, expires_at = result
+
+    # Check if active
+    if not active:
+        return DiscountCodeResponse(valid=False, message="This code is no longer active")
+
+    # Check expiration
+    from datetime import datetime
+    if expires_at and datetime.now() > expires_at:
+        return DiscountCodeResponse(valid=False, message="This code has expired")
+
+    # Check usage limit
+    if max_uses is not None and current_uses >= max_uses:
+        return DiscountCodeResponse(valid=False, message="This code has reached its usage limit")
+
+    return DiscountCodeResponse(
+        valid=True,
+        message=f"Code valid - grants {grants_tier} access",
+        grants_tier=grants_tier
+    )
+
+
 # User Authentication Endpoints
 @app.post("/auth/register", response_model=UserResponse)
 async def register_user(payload: UserRegister):
-    """Register a new user"""
+    """Register a new user with optional discount code"""
     # Check if user already exists
     existing_user = get_user_by_email(payload.email)
     if existing_user:
         raise HTTPException(status_code=400, detail="User already exists")
-    
-    # Create new user
-    user_id = create_user(payload.email, payload.password)
+
+    subscription_tier = 'free'
+    subscription_status = 'active'
+    discount_code_used = None
+
+    # If discount code provided, validate and consume it
+    if payload.discount_code:
+        code = payload.discount_code.strip().upper()
+
+        with get_conn() as conn:
+            cursor = conn.cursor()
+
+            # Validate code
+            cursor.execute("""
+                SELECT code, grants_tier, max_uses, current_uses, active, expires_at
+                FROM discount_codes
+                WHERE UPPER(code) = %s
+            """, (code,))
+            code_result = cursor.fetchone()
+
+            if not code_result:
+                raise HTTPException(status_code=400, detail="Invalid discount code")
+
+            code_value, grants_tier, max_uses, current_uses, active, expires_at = code_result
+
+            if not active:
+                raise HTTPException(status_code=400, detail="Code is no longer active")
+
+            from datetime import datetime
+            if expires_at and datetime.now() > expires_at:
+                raise HTTPException(status_code=400, detail="Code has expired")
+
+            if max_uses is not None and current_uses >= max_uses:
+                raise HTTPException(status_code=400, detail="Code usage limit reached")
+
+            # Grant tier from code
+            subscription_tier = grants_tier
+            discount_code_used = code_value
+
+            # Increment usage
+            cursor.execute("""
+                UPDATE discount_codes
+                SET current_uses = current_uses + 1
+                WHERE code = %s
+            """, (code_value,))
+            conn.commit()
+
+    # Create new user with subscription info
+    user_id = create_user(payload.email, payload.password, subscription_tier, subscription_status, discount_code_used)
     user = get_user_by_id(user_id)
-    
+
     return UserResponse(
         user_id=user["user_id"],
         email=user["email"],
         created_at=user["created_at"],
-        last_login=user["last_login"]
+        last_login=user["last_login"],
+        subscription_tier=user.get("subscription_tier"),
+        subscription_status=user.get("subscription_status")
     )
 
 
