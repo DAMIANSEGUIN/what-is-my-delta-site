@@ -7,9 +7,20 @@ Supports USD and CAD currencies with billing agreement for automatic penalty cha
 import os
 import logging
 import requests
-from typing import Optional, Dict, Literal
+from typing import Optional, Dict
 from datetime import datetime
 import base64
+import sys
+
+# Python 3.7 compatibility - Literal was added in 3.8
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    try:
+        from typing_extensions import Literal
+    except ImportError:
+        # Fallback for Python 3.7 without typing_extensions
+        Literal = str  # type: ignore
 
 logger = logging.getLogger(__name__)
 

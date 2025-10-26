@@ -16,3 +16,4 @@ beautifulsoup4
 psycopg2-binary
 google-api-python-client
 google-auth
+typing-extensions>=4.0.0
