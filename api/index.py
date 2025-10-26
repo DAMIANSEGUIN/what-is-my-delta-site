@@ -104,13 +104,19 @@ app = FastAPI()
 logger = logging.getLogger(__name__)
 
 # Register booking routes
+BOOKING_ROUTER_ERROR = None
 try:
     from api.booking import router as booking_router
     app.include_router(booking_router)
     logger.info("✅ Booking routes registered successfully")
 except Exception as e:
+    BOOKING_ROUTER_ERROR = str(e)
     logger.error(f"❌ Failed to register booking routes: {e}")
     logger.exception("Full booking router import error:")
+    # Also print to stdout for Railway logs
+    print(f"❌ BOOKING ROUTER IMPORT FAILED: {e}")
+    import traceback
+    traceback.print_exc()
 
 # Run database migrations on startup
 from api.run_migrations import run_migrations
@@ -668,6 +674,15 @@ def health_prompts():
             "error": str(e),
             "timestamp": datetime.utcnow().isoformat() + "Z"
         }
+
+@app.get("/health/booking")
+def health_booking():
+    """Health check for booking router"""
+    return {
+        "booking_router_loaded": BOOKING_ROUTER_ERROR is None,
+        "error": BOOKING_ROUTER_ERROR,
+        "timestamp": datetime.utcnow().isoformat() + "Z"
+    }
 
 @app.get("/health/comprehensive")
 def health_comprehensive():
