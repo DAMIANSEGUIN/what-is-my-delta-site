@@ -63,6 +63,7 @@ Scout (Claude Code) pushes updates here automatically.
 - `mosaic_ui/CLAUDE.md` - Design constraints
 
 **Redesign Architecture (YOUR WORK):**
+- `mosaic_ui/docs/redesign/UI_Redesign_Master_Plan_v1.0.md` - **MASTER IMPLEMENTATION PLAN** (start here)
 - `mosaic_ui/docs/redesign/REDESIGN_ADAPTIVE_FRAMEWORK.md` - Adaptive Growth Framework
 - `mosaic_ui/docs/redesign/HOLO_README.md` - Holographic minimal doc approach
 - `mosaic_ui/docs/redesign/README_Mosaic_Redesign.md` - Original redesign brief
