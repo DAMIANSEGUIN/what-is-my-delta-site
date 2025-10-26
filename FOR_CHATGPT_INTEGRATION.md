@@ -62,6 +62,11 @@ Scout (Claude Code) pushes updates here automatically.
 - `mosaic_ui/debug.html` - Debug view
 - `mosaic_ui/CLAUDE.md` - Design constraints
 
+**Redesign Architecture (YOUR WORK):**
+- `mosaic_ui/docs/redesign/REDESIGN_ADAPTIVE_FRAMEWORK.md` - Adaptive Growth Framework
+- `mosaic_ui/docs/redesign/HOLO_README.md` - Holographic minimal doc approach
+- `mosaic_ui/docs/redesign/README_Mosaic_Redesign.md` - Original redesign brief
+
 **Specifications:**
 - `mosaic_ui/docs/specs/MOSAIC_*.md` - All feature specs
 - `MOSAIC_APPOINTMENT_BOOKING_SPEC_2025-10-24.md`
