@@ -102,6 +102,10 @@ from .job_sources import (
 
 app = FastAPI()
 logger = logging.getLogger(__name__)
+
+# Register booking routes
+from api.booking import router as booking_router
+app.include_router(booking_router)
 HEALTH_DEBUG_ENABLED = os.getenv("HEALTH_DEBUG", "").lower() in {"1", "true", "yes", "on"}
 SERVICE_READY = threading.Event()
 
