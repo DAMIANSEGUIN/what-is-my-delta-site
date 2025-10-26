@@ -6,18 +6,40 @@ Handles appointment creation, cancellation, rescheduling, and availability check
 import logging
 from datetime import datetime, timedelta, time
 from typing import Optional, List, Dict
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Depends, Request, Header
 from pydantic import BaseModel, EmailStr, Field
 import uuid
 
 from api.storage import get_conn
 from api.google_calendar_service import get_calendar_service
 from api.paypal_service import get_paypal_service
-from api.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/booking", tags=["booking"])
+
+
+# ============================================================================
+# Authentication Dependency
+# ============================================================================
+
+async def get_current_user(user_id: str = Header(..., alias="X-User-ID")):
+    """
+    Simple auth dependency - expects X-User-ID header
+    TODO: Replace with proper JWT auth once auth system is fully integrated
+    """
+    with get_conn() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, email FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+
+        return {
+            'user_id': user[0],
+            'email': user[1]
+        }
 
 
 # ============================================================================
