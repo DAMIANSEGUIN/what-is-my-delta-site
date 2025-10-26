@@ -104,8 +104,13 @@ app = FastAPI()
 logger = logging.getLogger(__name__)
 
 # Register booking routes
-from api.booking import router as booking_router
-app.include_router(booking_router)
+try:
+    from api.booking import router as booking_router
+    app.include_router(booking_router)
+    logger.info("✅ Booking routes registered successfully")
+except Exception as e:
+    logger.error(f"❌ Failed to register booking routes: {e}")
+    logger.exception("Full booking router import error:")
 
 # Run database migrations on startup
 from api.run_migrations import run_migrations
