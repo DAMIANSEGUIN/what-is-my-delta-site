@@ -5,6 +5,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<link rel="stylesheet" href="css/tokens.css"/>
+<link rel="stylesheet" href="css/styles.css"/>
 <style>
   :root{--fg:#000;--muted:#666;--line:#e8e8e8;--hair:#111;--max:980px}
   *{box-sizing:border-box}
@@ -121,6 +123,21 @@
     <a id="showGuide" href="#" title="Show user guide">guide</a>
     <button id="logoutBtn" class="quiet" style="padding:4px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.08em" hidden>logout</button>
   </nav>
+
+  <!-- CHANNEL CHOOSER (Mosaic Master Plan - Beta UI toggle) -->
+  <div id="channelChooser" style="position:fixed;top:20px;right:20px;background:#fff;border:1px solid var(--color-border);padding:8px 12px;font-size:9px;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,0.06);z-index:999" hidden>
+    <label style="display:block;color:var(--color-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;font-weight:500">ux mode</label>
+    <div style="display:flex;gap:12px">
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer">
+        <input type="radio" name="ux-channel" value="standard" checked style="cursor:pointer">
+        <span>standard</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer">
+        <input type="radio" name="ux-channel" value="beta" style="cursor:pointer">
+        <span>beta</span>
+      </label>
+    </div>
+  </div>
 
   <header class="hero" id="top">
     <div class="title">WHAT IS MY DELTA</div>
@@ -1640,6 +1657,158 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
     chat.style.position = 'fixed';
     makeWindowDraggable(chat);
   }
+
+  // ============================================
+  // ADAPTIVE UX STATE MACHINE (Mosaic Master Plan)
+  // ============================================
+  const UxState = {
+    current: 'calm',
+    telemetry: { backtrack: 0, errors: 0, idle: 0, taskStart: Date.now() },
+    lastTransition: Date.now(),
+
+    // Guard: 20s dwell time between state transitions
+    canTransition() {
+      return (Date.now() - this.lastTransition) >= 20000;
+    },
+
+    // Set state and update DOM
+    setState(newState, reason) {
+      if (!this.canTransition()) {
+        console.log(`[UX_STATE] Blocked transition to ${newState} (dwell time < 20s)`);
+        return;
+      }
+      console.log(`[UX_STATE] ${this.current} → ${newState} (${reason})`);
+      this.current = newState;
+      this.lastTransition = Date.now();
+      document.body.setAttribute('data-state', newState);
+    },
+
+    // Detect struggle: backtrack ≥3 OR errors ≥2 OR idle ≥45s
+    checkStruggle() {
+      if (this.telemetry.backtrack >= 3 || this.telemetry.errors >= 2 || this.telemetry.idle >= 45000) {
+        this.setState('recovery', 'struggle detected');
+      }
+    },
+
+    // Detect stable focus: task duration ≥90s, no errors
+    checkFocus() {
+      const duration = Date.now() - this.telemetry.taskStart;
+      if (duration >= 90000 && this.telemetry.errors === 0 && this.current === 'calm') {
+        this.setState('focus', 'stable work detected');
+      }
+    },
+
+    // Telemetry tracking
+    recordBacktrack() {
+      this.telemetry.backtrack++;
+      console.log(`[UX_TELEMETRY] Backtrack count: ${this.telemetry.backtrack}`);
+      this.checkStruggle();
+    },
+    recordError() {
+      this.telemetry.errors++;
+      console.log(`[UX_TELEMETRY] Error count: ${this.telemetry.errors}`);
+      this.checkStruggle();
+    },
+    recordIdle(ms) {
+      this.telemetry.idle = ms;
+      console.log(`[UX_TELEMETRY] Idle time: ${ms}ms`);
+      this.checkStruggle();
+    },
+    resetTelemetry() {
+      this.telemetry = { backtrack: 0, errors: 0, idle: 0, taskStart: Date.now() };
+      console.log('[UX_TELEMETRY] Reset');
+    }
+  };
+
+  // Initialize state on page load
+  document.body.setAttribute('data-state', 'calm');
+  console.log('[UX_STATE] Initialized to calm');
+
+  // ============================================
+  // CHANNEL CHOOSER (Standard | Beta)
+  // ============================================
+  const channelChooserEl = $('#channelChooser');
+  const channelRadios = document.querySelectorAll('input[name="ux-channel"]');
+
+  // Determine channel: URL param > localStorage > default (standard)
+  const urlParams = new URLSearchParams(window.location.search);
+  const savedChannel = urlParams.get('channel') || localStorage.getItem('ux_channel') || 'standard';
+
+  // Set initial channel state
+  channelRadios.forEach(radio => {
+    if (radio.value === savedChannel) radio.checked = true;
+  });
+  console.log(`[CHANNEL] Initialized to ${savedChannel}`);
+
+  // Show channel chooser only for authenticated users
+  if (isAuthenticated && channelChooserEl) {
+    channelChooserEl.hidden = false;
+  }
+
+  // Handle channel change
+  channelRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const newChannel = e.target.value;
+      localStorage.setItem('ux_channel', newChannel);
+      console.log(`[CHANNEL] Switched to ${newChannel}`);
+
+      // Show notification
+      const status = $('#authStatus') || document.createElement('div');
+      status.textContent = `Switched to ${newChannel} mode`;
+      status.style.position = 'fixed';
+      status.style.bottom = '20px';
+      status.style.left = '50%';
+      status.style.transform = 'translateX(-50%)';
+      status.style.background = 'var(--color-surface)';
+      status.style.border = '1px solid var(--color-border)';
+      status.style.padding = '8px 12px';
+      status.style.borderRadius = '4px';
+      status.style.fontSize = '11px';
+      status.style.zIndex = '9999';
+      document.body.appendChild(status);
+      setTimeout(() => status.remove(), 2000);
+
+      // Future: Apply beta-specific features here
+      if (newChannel === 'beta') {
+        console.log('[CHANNEL] Beta features would activate here');
+      }
+    });
+  });
+
+  // Hook into existing error handlers
+  const originalCallJson = window.callJson;
+  if (originalCallJson) {
+    window.callJson = async function(...args) {
+      try {
+        const result = await originalCallJson(...args);
+        return result;
+      } catch (error) {
+        UxState.recordError();
+        throw error;
+      }
+    };
+  }
+
+  // Check for focus state every 30 seconds
+  setInterval(() => {
+    UxState.checkFocus();
+  }, 30000);
+
+  // Track idle time
+  let idleTimer;
+  const resetIdleTimer = () => {
+    clearTimeout(idleTimer);
+    UxState.telemetry.idle = 0;
+    idleTimer = setTimeout(() => {
+      const idleTime = 45000; // 45s
+      UxState.recordIdle(idleTime);
+    }, 45000);
+  };
+  ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(event => {
+    document.addEventListener(event, resetIdleTimer);
+  });
+  resetIdleTimer();
+
 })();
 </script>
 </body>

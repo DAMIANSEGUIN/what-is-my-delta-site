@@ -1,0 +1,100 @@
+:root{
+  /* Palette — Scandi × Japanese × Islamic */
+  --color-bg: #f8f7f3;        /* washi-offwhite */
+  --color-surface: #ffffff;
+  --color-ink: #1f2937;       /* slate-800 */
+  --color-muted: #6b7280;     /* slate-500 */
+  --color-border: #e5e7eb;    /* gray-200 */
+  --color-accent: #e03616;    /* vermilion */
+  --color-accent-2: #264073;  /* indigo */
+  --color-accent-3: #0f766e;  /* jade */
+  --color-gold: #c19a3f;      /* geometric motif */
+  --color-success: #0f766e;
+  --color-warning: #c19a3f;
+  --color-danger: #b91c1c;
+
+  /* Typography */
+  --font-sans: ui-sans-serif, -apple-system, Segoe UI, Roboto, Noto Sans, "Noto Sans JP", "Noto Naskh Arabic", "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Type scale */
+  --text-xs: 0.80rem;
+  --text-sm: 0.925rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+
+  /* Spacing (4-based) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* Radius */
+  --radius-s: 10px;
+  --radius-m: 16px;
+  --radius-l: 24px;
+
+  /* Shadows */
+  --shadow-s: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-m: 0 8px 24px rgba(0,0,0,0.06);
+
+  /* State */
+  --focus-ring: 2px dotted var(--color-gold);
+  --kbd-bg: #f3f4f6;
+  --kbd-border: #d1d5db;
+
+  /* Adaptive UX tokens (Mosaic Master Plan) */
+  --mx-font-base: 12px;
+  --mx-line-height: 1.75;
+  --mx-duration: 240ms;
+  --mx-ease: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  --mx-accent: var(--color-accent);
+}
+
+/* Adaptive Growth States (calm → focus → recovery → explore) */
+body[data-state="calm"] {
+  --mx-font-base: 12px;
+  --mx-duration: 240ms;
+  --mx-line-height: 1.75;
+  --mx-accent: var(--color-accent);
+}
+
+body[data-state="focus"] {
+  --mx-font-base: 13px;
+  --mx-duration: 220ms;
+  --mx-accent: var(--color-accent-2); /* indigo for focus */
+}
+
+body[data-state="recovery"] {
+  --mx-duration: 280ms;
+  --mx-line-height: 1.85;
+  --color-surface: #fafafa; /* lighter bg for breathing room */
+}
+
+body[data-state="explore"] {
+  --mx-accent: var(--color-accent-3); /* jade for exploration */
+}
+
+/* Respect user motion preference (a11y) */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --mx-duration: 80ms !important;
+  }
+}
+
+/* Dark mode seed (optional) */
+@media (prefers-color-scheme: dark){
+  :root{
+    --color-bg:#0b0d11;
+    --color-surface:#0f1218;
+    --color-ink:#e5e7eb;
+    --color-muted:#9ca3af;
+    --color-border:#1f2937;
+  }
+}
