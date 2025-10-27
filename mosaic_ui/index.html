@@ -124,20 +124,6 @@
     <button id="logoutBtn" class="quiet" style="padding:4px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.08em" hidden>logout</button>
   </nav>
 
-  <!-- CHANNEL CHOOSER (Mosaic Master Plan - Beta UI toggle) -->
-  <div id="channelChooser" style="position:fixed;top:20px;right:20px;background:#fff;border:1px solid var(--color-border);padding:8px 12px;font-size:9px;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,0.06);z-index:999" hidden>
-    <label style="display:block;color:var(--color-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;font-weight:500">ux mode</label>
-    <div style="display:flex;gap:12px">
-      <label style="display:flex;align-items:center;gap:4px;cursor:pointer">
-        <input type="radio" name="ux-channel" value="standard" checked style="cursor:pointer">
-        <span>standard</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:4px;cursor:pointer">
-        <input type="radio" name="ux-channel" value="beta" style="cursor:pointer">
-        <span>beta</span>
-      </label>
-    </div>
-  </div>
 
   <header class="hero" id="top">
     <div class="title">WHAT IS MY DELTA</div>
@@ -218,27 +204,20 @@
   <!-- WELCOME & ONBOARDING -->
   <section id="welcome" style="margin:60px 0;padding:40px 0;border:1px solid var(--line);border-radius:4px;background:linear-gradient(145deg, #ffffff 0%, #fafafa 100%)" hidden>
     <div style="max-width:var(--max);margin:0 auto;text-align:center">
-      <h1 style="font:600 18px/1.2 Helvetica,Arial;margin:0 0 16px;text-transform:uppercase;letter-spacing:.08em">welcome to your career transition</h1>
-      <p style="margin:0 0 24px;color:var(--muted);font-size:12px;line-height:1.5;max-width:64ch;margin:0 auto 24px">this is a problem-solving approach to career transition. we'll work through three phases to bridge your skills and passions to meaningful work in the present job market.</p>
-      
-      <div style="display:flex;gap:12px;justify-content:center;margin:24px 0">
-        <button id="startFastTrack" class="quiet" style="padding:10px 20px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">fast track</button>
-        <button id="startDiscovery" class="quiet" style="padding:10px 20px;font-size:11px;text-transform:uppercase;letter-spacing:.08em">explore freely</button>
+      <h1 style="font:600 18px/1.2 Helvetica,Arial;margin:0 0 16px;text-transform:uppercase;letter-spacing:.08em">welcome</h1>
+      <p style="margin:0 0 24px;color:var(--muted);font-size:12px;line-height:1.5;max-width:56ch;margin:0 auto 24px">career transition platform for evidence-based problem-solving</p>
+
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:center;margin:32px 0">
+        <button id="startPS101" class="quiet" style="padding:12px 24px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair);min-width:280px">start problem-solving flow</button>
+        <button id="startChat" class="quiet" style="padding:10px 20px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;min-width:280px">open chat coach</button>
       </div>
-      
-      <details style="margin-top:20px;text-align:left;max-width:500px;margin:20px auto 0">
-        <summary style="font-size:10px;color:var(--muted);cursor:pointer;text-transform:uppercase;letter-spacing:.08em">how it works</summary>
-        <div style="margin-top:12px;font-size:10px;color:var(--muted);line-height:1.4">
-          <p><strong>Fast Track:</strong> Guided sequence through analysis → opportunities → application</p>
-          <p><strong>Explore:</strong> Chat with coach, upload files, discover at your own pace</p>
-          <p><strong>Auto-save:</strong> Your progress is saved automatically as you go</p>
-          <br>
-          <p><strong>Three Phases:</strong></p>
-          <p>1. <strong>Explore:</strong> Chat with AI coach to understand your skills, passions, and career goals</p>
-          <p>2. <strong>Find:</strong> Discover job opportunities that match your profile and values</p>
-          <p>3. <strong>Apply:</strong> Optimize your resume and application materials for specific roles</p>
-          <br>
-          <p><strong>Your Data:</strong> All conversations, uploads, and progress are saved securely</p>
+
+      <details style="margin-top:32px;text-align:left;max-width:500px;margin:32px auto 0">
+        <summary style="font-size:10px;color:var(--muted);cursor:pointer;text-transform:uppercase;letter-spacing:.08em">what is this?</summary>
+        <div style="margin-top:12px;font-size:10px;color:var(--muted);line-height:1.6">
+          <p style="margin-bottom:8px"><strong>Problem-Solving Flow (PS101):</strong> 10-step guided process to analyze your career challenge, discover opportunities, and create an action plan</p>
+          <p style="margin-bottom:8px"><strong>Chat Coach:</strong> Open-ended conversation to explore your situation, upload files, search jobs, or optimize your resume</p>
+          <p style="margin-bottom:8px"><strong>Auto-save:</strong> Everything is saved as you go</p>
         </div>
       </details>
     </div>
@@ -1246,28 +1225,27 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
     });
   }
 
-  const startFastTrack = $('#startFastTrack');
-  if(startFastTrack){
-    startFastTrack.addEventListener('click', async e=>{
+  // Welcome onboarding buttons
+  const startPS101Btn = $('#startPS101');
+  if(startPS101Btn){
+    startPS101Btn.addEventListener('click', async e=>{
       e.preventDefault();
+      $('#welcome').hidden = true;
       chat.style.display='block';
-      try{
-        const welcomeMsg = await startPS101();
-        addMsg(welcomeMsg, 'bot');
-      }catch(err){
-        addMsg('Unable to start PS101 guided sequence. Please try again.', 'bot');
-        console.error('PS101 start error:', err);
-      }
+      // TODO: Implement full PS101 10-step flow
+      addMsg('PS101 problem-solving flow coming soon. For now, let\'s start with understanding your career challenge. What brings you here today?', 'bot');
+      saveUserData({path: 'ps101_stub', started: new Date().toISOString()});
     });
   }
 
-  const startDiscovery = $('#startDiscovery');
-  if(startDiscovery){
-    startDiscovery.addEventListener('click', e=>{
+  const startChatBtn = $('#startChat');
+  if(startChatBtn){
+    startChatBtn.addEventListener('click', e=>{
       e.preventDefault();
-      saveUserData({path: 'discovery', started: new Date().toISOString()});
+      $('#welcome').hidden = true;
       chat.style.display='block';
-      addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
+      addMsg('Welcome! I\'m your career coach. Tell me about your career situation — what are you looking to achieve?', 'bot');
+      saveUserData({path: 'chat', started: new Date().toISOString()});
     });
   }
 
@@ -1658,156 +1636,6 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
     makeWindowDraggable(chat);
   }
 
-  // ============================================
-  // ADAPTIVE UX STATE MACHINE (Mosaic Master Plan)
-  // ============================================
-  const UxState = {
-    current: 'calm',
-    telemetry: { backtrack: 0, errors: 0, idle: 0, taskStart: Date.now() },
-    lastTransition: Date.now(),
-
-    // Guard: 20s dwell time between state transitions
-    canTransition() {
-      return (Date.now() - this.lastTransition) >= 20000;
-    },
-
-    // Set state and update DOM
-    setState(newState, reason) {
-      if (!this.canTransition()) {
-        console.log(`[UX_STATE] Blocked transition to ${newState} (dwell time < 20s)`);
-        return;
-      }
-      console.log(`[UX_STATE] ${this.current} → ${newState} (${reason})`);
-      this.current = newState;
-      this.lastTransition = Date.now();
-      document.body.setAttribute('data-state', newState);
-    },
-
-    // Detect struggle: backtrack ≥3 OR errors ≥2 OR idle ≥45s
-    checkStruggle() {
-      if (this.telemetry.backtrack >= 3 || this.telemetry.errors >= 2 || this.telemetry.idle >= 45000) {
-        this.setState('recovery', 'struggle detected');
-      }
-    },
-
-    // Detect stable focus: task duration ≥90s, no errors
-    checkFocus() {
-      const duration = Date.now() - this.telemetry.taskStart;
-      if (duration >= 90000 && this.telemetry.errors === 0 && this.current === 'calm') {
-        this.setState('focus', 'stable work detected');
-      }
-    },
-
-    // Telemetry tracking
-    recordBacktrack() {
-      this.telemetry.backtrack++;
-      console.log(`[UX_TELEMETRY] Backtrack count: ${this.telemetry.backtrack}`);
-      this.checkStruggle();
-    },
-    recordError() {
-      this.telemetry.errors++;
-      console.log(`[UX_TELEMETRY] Error count: ${this.telemetry.errors}`);
-      this.checkStruggle();
-    },
-    recordIdle(ms) {
-      this.telemetry.idle = ms;
-      console.log(`[UX_TELEMETRY] Idle time: ${ms}ms`);
-      this.checkStruggle();
-    },
-    resetTelemetry() {
-      this.telemetry = { backtrack: 0, errors: 0, idle: 0, taskStart: Date.now() };
-      console.log('[UX_TELEMETRY] Reset');
-    }
-  };
-
-  // Initialize state on page load
-  document.body.setAttribute('data-state', 'calm');
-  console.log('[UX_STATE] Initialized to calm');
-
-  // ============================================
-  // CHANNEL CHOOSER (Standard | Beta)
-  // ============================================
-  const channelChooserEl = $('#channelChooser');
-  const channelRadios = document.querySelectorAll('input[name="ux-channel"]');
-
-  // Determine channel: URL param > localStorage > default (standard)
-  const urlParams = new URLSearchParams(window.location.search);
-  const savedChannel = urlParams.get('channel') || localStorage.getItem('ux_channel') || 'standard';
-
-  // Set initial channel state
-  channelRadios.forEach(radio => {
-    if (radio.value === savedChannel) radio.checked = true;
-  });
-  console.log(`[CHANNEL] Initialized to ${savedChannel}`);
-
-  // Show channel chooser only for authenticated users
-  if (isAuthenticated && channelChooserEl) {
-    channelChooserEl.hidden = false;
-  }
-
-  // Handle channel change
-  channelRadios.forEach(radio => {
-    radio.addEventListener('change', (e) => {
-      const newChannel = e.target.value;
-      localStorage.setItem('ux_channel', newChannel);
-      console.log(`[CHANNEL] Switched to ${newChannel}`);
-
-      // Show notification
-      const status = $('#authStatus') || document.createElement('div');
-      status.textContent = `Switched to ${newChannel} mode`;
-      status.style.position = 'fixed';
-      status.style.bottom = '20px';
-      status.style.left = '50%';
-      status.style.transform = 'translateX(-50%)';
-      status.style.background = 'var(--color-surface)';
-      status.style.border = '1px solid var(--color-border)';
-      status.style.padding = '8px 12px';
-      status.style.borderRadius = '4px';
-      status.style.fontSize = '11px';
-      status.style.zIndex = '9999';
-      document.body.appendChild(status);
-      setTimeout(() => status.remove(), 2000);
-
-      // Future: Apply beta-specific features here
-      if (newChannel === 'beta') {
-        console.log('[CHANNEL] Beta features would activate here');
-      }
-    });
-  });
-
-  // Hook into existing error handlers
-  const originalCallJson = window.callJson;
-  if (originalCallJson) {
-    window.callJson = async function(...args) {
-      try {
-        const result = await originalCallJson(...args);
-        return result;
-      } catch (error) {
-        UxState.recordError();
-        throw error;
-      }
-    };
-  }
-
-  // Check for focus state every 30 seconds
-  setInterval(() => {
-    UxState.checkFocus();
-  }, 30000);
-
-  // Track idle time
-  let idleTimer;
-  const resetIdleTimer = () => {
-    clearTimeout(idleTimer);
-    UxState.telemetry.idle = 0;
-    idleTimer = setTimeout(() => {
-      const idleTime = 45000; // 45s
-      UxState.recordIdle(idleTime);
-    }, 45000);
-  };
-  ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(event => {
-    document.addEventListener(event, resetIdleTimer);
-  });
-  resetIdleTimer();
 
 })();
 </script>

@@ -49,43 +49,6 @@
   --kbd-bg: #f3f4f6;
   --kbd-border: #d1d5db;
 
-  /* Adaptive UX tokens (Mosaic Master Plan) */
-  --mx-font-base: 12px;
-  --mx-line-height: 1.75;
-  --mx-duration: 240ms;
-  --mx-ease: cubic-bezier(0.45, 0.05, 0.55, 0.95);
-  --mx-accent: var(--color-accent);
-}
-
-/* Adaptive Growth States (calm → focus → recovery → explore) */
-body[data-state="calm"] {
-  --mx-font-base: 12px;
-  --mx-duration: 240ms;
-  --mx-line-height: 1.75;
-  --mx-accent: var(--color-accent);
-}
-
-body[data-state="focus"] {
-  --mx-font-base: 13px;
-  --mx-duration: 220ms;
-  --mx-accent: var(--color-accent-2); /* indigo for focus */
-}
-
-body[data-state="recovery"] {
-  --mx-duration: 280ms;
-  --mx-line-height: 1.85;
-  --color-surface: #fafafa; /* lighter bg for breathing room */
-}
-
-body[data-state="explore"] {
-  --mx-accent: var(--color-accent-3); /* jade for exploration */
-}
-
-/* Respect user motion preference (a11y) */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --mx-duration: 80ms !important;
-  }
 }
 
 /* Dark mode seed (optional) */
