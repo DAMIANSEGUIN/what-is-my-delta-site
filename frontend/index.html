@@ -145,6 +145,135 @@
   .method-step{margin:20px 0;padding:16px;border-left:3px solid var(--line);padding-left:20px}
   .method-step strong{display:block;margin-bottom:8px;color:var(--fg)}
   .method-step p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
+  
+  /* PS101 Styles */
+  .ps101-welcome{max-width:640px;margin:80px auto;padding:40px 20px;text-align:center}
+  .ps101-welcome.hidden{display:none}
+  .ps101-container.hidden{display:none}
+  .ps101-completion.hidden{display:none}
+  .previous-answers.hidden{display:none}
+  .welcome-resume.hidden{display:none}
+  .welcome-title{font-size:28px;font-weight:600;margin:0 0 8px;color:var(--fg)}
+  .welcome-subtitle{font-size:14px;font-weight:400;color:var(--muted);margin:0 0 32px;letter-spacing:.05em;text-transform:uppercase}
+  .welcome-description{margin-bottom:32px;text-align:left}
+  .welcome-description p{font-size:14px;line-height:1.6;color:var(--fg);margin-bottom:16px}
+  .welcome-features{list-style:none;padding:0;margin:0}
+  .welcome-features li{font-size:13px;line-height:2;color:var(--muted)}
+  .welcome-actions{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+  .welcome-btn-primary{font-weight:500;background:linear-gradient(145deg,#fff 0%,#f8f8f8 100%);border-color:var(--hair)}
+  .welcome-btn-secondary{background:transparent;border-color:var(--line)}
+  .welcome-resume{margin-top:32px;padding-top:24px;border-top:1px solid var(--line)}
+  .resume-text{font-size:12px;color:var(--muted);margin-bottom:12px}
+  
+  .ps101-container{max-width:var(--max);margin:0 auto;padding:40px 20px}
+  .ps101-progress{max-width:var(--max);margin:0 auto 40px;padding:20px}
+  .progress-header{text-align:center;margin-bottom:16px}
+  .step-label{font-size:14px;font-weight:500;color:var(--fg);letter-spacing:.02em}
+  .progress-dots{display:flex;justify-content:center;gap:12px;align-items:center;flex-wrap:wrap}
+  .progress-dots .dot{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);cursor:pointer;transition:all 0.2s ease}
+  .progress-dots .dot:hover{border-color:var(--hair);transform:translateY(-1px)}
+  .progress-dots .dot.completed{background:linear-gradient(145deg,#f5f5f5 0%,#eee 100%);color:var(--fg);border-color:var(--hair)}
+  .progress-dots .dot.active{background:linear-gradient(145deg,#fff 0%,#f8f8f8 100%);box-shadow:0 3px 8px rgba(0,0,0,0.12);color:var(--fg);font-weight:600;border-color:var(--hair)}
+  .progress-dots .dot:disabled{cursor:not-allowed;opacity:0.5}
+  
+  /* Experiment Components Styles */
+  .experiment-components{margin:32px 0;padding:24px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(145deg,#fff 0%,#fafafa 100%)}
+  .experiment-components.hidden{display:none}
+  .component-title{font-size:16px;font-weight:600;margin-bottom:20px;color:var(--fg)}
+  .experiment-form{display:flex;flex-direction:column;gap:16px}
+  .form-group{display:flex;flex-direction:column;gap:6px}
+  .form-group label{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .form-group textarea,.form-group input[type="text"],.form-group input[type="date"],.form-group select{width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:3px;font-size:13px;font-family:inherit;background:#fff;transition:border-color 0.2s ease}
+  .form-group textarea:focus,.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--hair);box-shadow:0 0 0 2px rgba(0,0,0,0.04)}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .btn-add{padding:8px 16px;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;border-radius:3px;font-size:12px;transition:all 0.2s ease;margin-top:8px}
+  .btn-add:hover{background:var(--line);border-color:var(--hair)}
+  
+  /* Obstacle Mapping */
+  .obstacle-item,.action-item{margin-bottom:16px;padding:12px;border:1px solid var(--line);border-radius:4px;background:#fff}
+  .obstacle-header,.action-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .obstacle-type{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;text-transform:uppercase;font-weight:600;background:var(--line);color:var(--muted)}
+  .obstacle-type.external{background:#e3f2fd;color:#1976d2}
+  .obstacle-type.internal{background:#fff3e0;color:#f57c00}
+  .obstacle-strategy{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+  .action-checkbox{display:flex;align-items:center;gap:8px}
+  .action-checkbox input[type="checkbox"]{width:18px;height:18px;cursor:pointer}
+  .action-due{font-size:11px;color:var(--muted);margin-top:4px}
+  .btn-remove{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0;line-height:1;opacity:0.6;transition:opacity 0.2s ease}
+  .btn-remove:hover{opacity:1}
+  
+  /* Reflection */
+  .confidence-slider-container{display:flex;align-items:center;gap:12px}
+  .confidence-slider-container input[type="range"]{flex:1}
+  #confidence-value{font-weight:600;min-width:30px;text-align:center}
+  
+  /* Add Form Containers */
+  .add-form-container{margin-top:16px;padding:16px;background:var(--bg-secondary);border:1px solid var(--line);border-radius:4px}
+  .add-form-container.hidden{display:none}
+  .form-error{font-size:12px;color:#d63638;margin-top:4px;display:block}
+  .form-error.hidden{display:none}
+  
+  .previous-answers{margin-bottom:32px;border:1px solid var(--line);border-radius:4px;background:linear-gradient(145deg,#fafafa 0%,#f5f5f5 100%);padding:16px}
+  .previous-answers summary{cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+  .previous-answers summary:hover .summary-text{color:var(--fg)}
+  .summary-text{font-size:13px;font-weight:500;color:var(--muted);transition:color 0.2s ease}
+  .summary-hint{font-size:11px;color:var(--muted)}
+  .answer-list{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+  .answer-card{background:#fff;border:1px solid var(--line);border-radius:4px;padding:12px;transition:box-shadow 0.2s ease}
+  .answer-card:hover{box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+  .answer-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .answer-step{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--fg)}
+  .answer-edit{font-size:11px;padding:4px 8px;border:1px solid var(--line);background:transparent;cursor:pointer;border-radius:2px;transition:all 0.2s ease}
+  .answer-edit:hover{background:var(--line)}
+  .answer-content{font-size:12px;line-height:1.5;color:var(--muted);white-space:pre-wrap}
+  
+  .ps101-question{margin-bottom:32px}
+  .question-text{font-size:18px;font-weight:400;line-height:1.5;color:var(--fg);margin:0 0 16px}
+  .coaching-hint{margin-top:12px;padding:12px;background:linear-gradient(145deg,#fafafa 0%,#f5f5f5 100%);border:1px solid var(--line);border-radius:4px}
+  .coaching-hint summary{font-size:12px;cursor:pointer;user-select:none;color:var(--muted)}
+  .coaching-hint summary:hover{color:var(--fg)}
+  .coaching-hint p{margin:8px 0 0;font-size:12px;line-height:1.5;color:var(--muted)}
+  
+  .ps101-input{margin-bottom:24px}
+  .step-textarea{width:100%;min-height:120px;padding:12px;border:1px solid var(--line);border-radius:4px;font:inherit;font-size:13px;line-height:1.6;resize:vertical;transition:all 0.2s ease}
+  .step-textarea:focus{outline:none;border-color:var(--hair);box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+  .char-count{margin-top:8px;font-size:11px;color:var(--muted);text-align:right}
+  
+  .ps101-nav{display:flex;justify-content:space-between;margin-top:32px;gap:16px}
+  .nav-btn{min-width:120px;padding:10px 20px;font-size:13px}
+  .nav-back{background:transparent;border-color:var(--line)}
+  .nav-next{background:linear-gradient(145deg,#fff 0%,#f8f8f8 100%);border-color:var(--hair);font-weight:500}
+  .nav-btn:disabled{opacity:0.5;cursor:not-allowed}
+  
+  .autosave-indicator{margin-top:16px;text-align:center;font-size:11px;color:var(--muted);opacity:0;transition:opacity 0.3s ease}
+  .autosave-indicator.visible{opacity:1}
+  
+  .ps101-completion{max-width:var(--max);margin:40px auto;padding:40px 20px}
+  .ps101-completion.hidden{display:none}
+  .completion-header{text-align:center;margin-bottom:32px}
+  .completion-title{font-size:22px;font-weight:600;color:var(--fg);margin:0 0 16px}
+  .completion-progress{font-size:16px;color:var(--fg);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .completion-label{font-size:12px;color:var(--muted)}
+  .completion-message{text-align:center;margin-bottom:32px}
+  .completion-message p{font-size:14px;color:var(--muted)}
+  .commitment-highlight{background:linear-gradient(145deg,#fafafa 0%,#f5f5f5 100%);border:1px solid var(--line);border-radius:4px;padding:20px;margin-bottom:32px}
+  .commitment-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--fg);margin:0 0 12px}
+  .commitment-text{font-size:14px;line-height:1.6;color:var(--fg);margin-bottom:8px;white-space:pre-wrap}
+  .commitment-deadline{font-size:12px;color:var(--muted);font-weight:500}
+  .completion-summary{margin-bottom:32px;border:1px solid var(--line);border-radius:4px;padding:16px}
+  .completion-summary summary{cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);user-select:none}
+  
+  @media (max-width:768px){
+    .ps101-welcome{margin:40px auto;padding:24px 16px}
+    .welcome-title{font-size:24px}
+    .ps101-container{padding:24px 16px}
+    .question-text{font-size:16px}
+    .step-textarea{min-height:100px}
+    .ps101-nav{flex-direction:column-reverse}
+    .nav-btn{width:100%}
+    .progress-dots{gap:8px}
+    .progress-dots .dot{width:28px;height:28px;font-size:10px}
+  }
 </style>
 
 <div class="wrap">
@@ -284,6 +413,307 @@
       </div>
     </div>
   </section>
+
+  <div class="rule"></div>
+
+  <!-- PS101 Welcome Screen -->
+  <div class="ps101-welcome hidden" id="ps101-welcome">
+    <div class="welcome-content">
+      <h1 class="welcome-title">Welcome to PS101</h1>
+      <p class="welcome-subtitle">Problem Solving 101</p>
+
+      <div class="welcome-description">
+        <p>A 7-step framework to get clarity on your career challenge and create an action plan.</p>
+
+        <ul class="welcome-features">
+          <li>⏱ Takes 15-30 minutes</li>
+          <li>💾 Progress auto-saves</li>
+          <li>✏️ Edit previous answers anytime</li>
+        </ul>
+      </div>
+
+      <div class="welcome-actions">
+        <button class="quiet welcome-btn-primary" id="start-ps101">
+          Start PS101 Flow
+        </button>
+
+        <button class="quiet welcome-btn-secondary" id="learn-more-ps101">
+          Learn More
+        </button>
+      </div>
+
+      <div class="welcome-resume hidden" id="welcome-resume">
+        <p class="resume-text">Already started? Your progress is saved.</p>
+        <button class="quiet" id="continue-ps101">
+          Continue Where I Left Off
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PS101 Flow Container -->
+  <section id="ps101-flow" class="ps101-container hidden" aria-label="PS101 Coaching Flow">
+    <!-- Progress indicator -->
+    <div class="ps101-progress" role="navigation" aria-label="Progress">
+      <div class="progress-header">
+        <span class="step-label" id="step-label">Step 1 of 10: Problem Identification and Delta Analysis</span>
+      </div>
+      <div class="progress-dots">
+        <button class="dot active" aria-label="Step 1: Problem Identification and Delta Analysis (current)" aria-current="step" data-step="1">1</button>
+        <button class="dot" aria-label="Step 2: Current Situation Analysis" data-step="2">2</button>
+        <button class="dot" aria-label="Step 3: Root Cause Exploration" data-step="3">3</button>
+        <button class="dot" aria-label="Step 4: Self-Efficacy Assessment" data-step="4">4</button>
+        <button class="dot" aria-label="Step 5: Solution Brainstorming" data-step="5">5</button>
+        <button class="dot" aria-label="Step 6: Experimental Design" data-step="6">6</button>
+        <button class="dot" aria-label="Step 7: Obstacle Identification" data-step="7">7</button>
+        <button class="dot" aria-label="Step 8: Action Planning" data-step="8">8</button>
+        <button class="dot" aria-label="Step 9: Reflection and Iteration" data-step="9">9</button>
+        <button class="dot" aria-label="Step 10: Building Mastery and Self-Efficacy" data-step="10">10</button>
+      </div>
+    </div>
+
+    <!-- Previous answers (expandable) -->
+    <details class="previous-answers hidden" id="previous-answers">
+      <summary>
+        <span class="summary-text">▼ Previous Answers (0 steps completed)</span>
+        <span class="summary-hint">Click to review or edit</span>
+      </summary>
+      <div class="answer-list"></div>
+    </details>
+
+    <!-- Current step question -->
+    <div class="ps101-question" id="ps101-question">
+      <h2 class="question-text" id="question-text">
+        <!-- Dynamic: Current step question -->
+      </h2>
+
+      <!-- Optional coaching hint -->
+      <details class="coaching-hint" id="coaching-hint">
+        <summary>💡 Coaching Hint</summary>
+        <p id="hint-text">
+          <!-- Dynamic: Step-specific guidance -->
+        </p>
+      </details>
+    </div>
+
+    <!-- User input area -->
+    <div class="ps101-input" id="ps101-input">
+      <textarea
+        id="step-answer"
+        class="step-textarea"
+        placeholder="Type your answer here..."
+        aria-label="Your answer"
+        rows="6"
+      ></textarea>
+      <div class="char-count" id="char-count" aria-live="polite">
+        <span id="char-current">0</span> / <span id="char-max">500</span>
+      </div>
+    </div>
+
+    <!-- Experiment Components (Steps 6-9) -->
+    <div class="experiment-components hidden" id="experiment-components">
+      <!-- Step 6: Experiment Canvas -->
+      <div class="experiment-canvas hidden" id="experiment-canvas">
+        <h3 class="component-title">Experiment Design</h3>
+        <div class="experiment-form">
+          <div class="form-group">
+            <label for="exp-hypothesis">Hypothesis</label>
+            <textarea id="exp-hypothesis" rows="3" placeholder="What are you testing?"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="exp-success-metric">Success Metric</label>
+            <input type="text" id="exp-success-metric" placeholder="What measurable outcome indicates success?">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="exp-start-date">Start Date</label>
+              <input type="date" id="exp-start-date">
+            </div>
+            <div class="form-group">
+              <label for="exp-review-date">Review Date</label>
+              <input type="date" id="exp-review-date">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="exp-resources">Resources/Support Needed</label>
+            <textarea id="exp-resources" rows="2" placeholder="What do you need to run this experiment?"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 7: Obstacle Mapping -->
+      <div class="obstacle-mapping hidden" id="obstacle-mapping">
+        <h3 class="component-title">Obstacle Identification</h3>
+        <div id="obstacles-list"></div>
+        <button class="btn-add" id="add-obstacle-btn">+ Add Obstacle</button>
+        <!-- Add Obstacle Form (hidden by default) -->
+        <div id="add-obstacle-form" class="hidden add-form-container">
+          <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--fg);">Add Obstacle</h4>
+          <div class="form-group">
+            <label for="obstacle-label">What obstacle do you anticipate? *</label>
+            <input
+              type="text"
+              id="obstacle-label"
+              placeholder="e.g., Limited time availability"
+              aria-required="true"
+              aria-describedby="obstacle-label-error"
+            />
+            <span id="obstacle-label-error" class="form-error hidden" role="alert"></span>
+          </div>
+          <div class="form-group">
+            <label style="margin-bottom: 8px;">Obstacle Type</label>
+            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: normal; text-transform: none; letter-spacing: normal;">
+              <input type="radio" name="obstacle-type" value="external" checked />
+              External (e.g., time, resources, other people)
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; text-transform: none; letter-spacing: normal;">
+              <input type="radio" name="obstacle-type" value="internal" />
+              Internal (e.g., self-doubt, fear, lack of knowledge)
+            </label>
+          </div>
+          <div class="form-group">
+            <label for="obstacle-strategy">Strategy to overcome this obstacle *</label>
+            <textarea
+              id="obstacle-strategy"
+              rows="3"
+              placeholder="How will you mitigate this?"
+              aria-required="true"
+              aria-describedby="obstacle-strategy-error"
+            ></textarea>
+            <span id="obstacle-strategy-error" class="form-error hidden" role="alert"></span>
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <button id="save-obstacle-btn" class="quiet" style="flex: 1;">Add Obstacle</button>
+            <button id="cancel-obstacle-btn" class="quiet" style="flex: 1;">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 8: Action Plan -->
+      <div class="action-plan hidden" id="action-plan">
+        <h3 class="component-title">Action Plan</h3>
+        <div id="actions-list"></div>
+        <button class="btn-add" id="add-action-btn">+ Add Action Item</button>
+        <!-- Add Action Form (hidden by default) -->
+        <div id="add-action-form" class="hidden add-form-container">
+          <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--fg);">Add Action Item</h4>
+          <div class="form-group">
+            <label for="action-label">What action will you take? *</label>
+            <input
+              type="text"
+              id="action-label"
+              placeholder="e.g., Schedule 30-min focus block daily"
+              aria-required="true"
+              aria-describedby="action-label-error"
+            />
+            <span id="action-label-error" class="form-error hidden" role="alert"></span>
+          </div>
+          <div class="form-group">
+            <label for="action-due">By when?</label>
+            <input
+              type="text"
+              id="action-due"
+              placeholder="e.g., 2025-11-15 or 'Next Friday'"
+            />
+          </div>
+          <div class="form-group">
+            <label for="action-accountability">Who can help hold you accountable? (optional)</label>
+            <input
+              type="text"
+              id="action-accountability"
+              placeholder="e.g., My mentor, Team lead"
+            />
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <button id="save-action-btn" class="quiet" style="flex: 1;">Add Action</button>
+            <button id="cancel-action-btn" class="quiet" style="flex: 1;">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 9: Reflection Log -->
+      <div class="reflection-log hidden" id="reflection-log">
+        <h3 class="component-title">Reflection & Learning</h3>
+        <div class="form-group">
+          <label for="reflection-outcome">Outcomes</label>
+          <textarea id="reflection-outcome" rows="4" placeholder="What were the results of your experiment?"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="reflection-learning">Learning Summary</label>
+          <textarea id="reflection-learning" rows="4" placeholder="What did you learn?"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="reflection-confidence">Confidence After (1-10)</label>
+          <input type="range" id="reflection-confidence" min="1" max="10" value="5">
+          <span id="confidence-value">5</span>
+        </div>
+        <div class="form-group">
+          <label for="reflection-next-move">Next Move</label>
+          <select id="reflection-next-move">
+            <option value="Continue">Continue</option>
+            <option value="Pivot">Pivot</option>
+            <option value="Archive">Archive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="ps101-nav">
+      <button class="nav-btn nav-back quiet" id="ps101-back" aria-label="Go back to previous step">
+        ← Back
+      </button>
+
+      <button class="nav-btn nav-next quiet" id="ps101-next" aria-label="Continue to next step">
+        Next →
+      </button>
+    </div>
+
+    <!-- Auto-save indicator -->
+    <div class="autosave-indicator" id="autosave-indicator" aria-live="polite">
+      <span class="autosave-text">Saved</span>
+    </div>
+  </section>
+
+  <!-- PS101 Completion Screen -->
+  <div class="ps101-completion hidden" id="ps101-completion">
+    <div class="completion-header">
+      <h2 class="completion-title">PS101 Complete — Your Action Plan</h2>
+      <div class="completion-progress">
+        ● ● ● ● ● ● ● ● ● ●
+        <span class="completion-label">All 10 steps completed</span>
+      </div>
+    </div>
+
+    <div class="completion-message">
+      <p>Well done! You've created a clear action plan.</p>
+    </div>
+
+    <!-- Highlighted commitment -->
+    <div class="commitment-highlight">
+      <h3 class="commitment-label">Your Next Commitment (Step 7):</h3>
+      <div class="commitment-text" id="commitment-text">
+        <!-- Dynamic: User's Step 7 answer -->
+      </div>
+      <div class="commitment-deadline" id="commitment-deadline">
+        <!-- Dynamic: Deadline if provided -->
+      </div>
+    </div>
+
+    <!-- Expandable full summary -->
+    <details class="completion-summary" open>
+      <summary>▼ View All Answers</summary>
+      <div class="answer-list" id="completion-answers">
+        <!-- Dynamic: All 7 steps with answers -->
+      </div>
+    </details>
+
+    <!-- Actions -->
+    <div class="welcome-actions" style="margin-top:32px">
+      <button class="quiet" id="download-summary">Download Summary</button>
+      <button class="quiet" id="start-over">Start Over</button>
+    </div>
+  </div>
 
   <div class="rule"></div>
 
@@ -1221,7 +1651,27 @@
 
   $('#linkFast').addEventListener('click', e => {
     e.preventDefault();
-    smoothTo('#ps101');
+    // Show PS101 welcome screen or continue existing flow
+    const welcomeScreen = document.getElementById('ps101-welcome');
+    const flow = document.getElementById('ps101-flow');
+    
+    // Wait for PS101 to initialize
+    setTimeout(() => {
+      if (window.PS101State && window.PS101State.steps && Object.keys(window.PS101State.steps).length > 0 && !window.PS101State.completed) {
+        // User has progress - show current step
+        if (window.renderCurrentStep) {
+          window.renderCurrentStep();
+          if (flow) flow.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else if (window.renderWelcomeScreen) {
+        // New user - show welcome screen
+        window.renderWelcomeScreen();
+        if (welcomeScreen) welcomeScreen.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        // Fallback: scroll to PS101 module
+        smoothTo('#ps101');
+      }
+    }, 100);
   });
 
   $('#linkDiscover').addEventListener('click', e => {
@@ -1458,5 +1908,1521 @@
       voiceBtn.style.display = 'none';
     }
   });
+
+  // PS101 Implementation
+  (function() {
+    'use strict';
+
+    // PS101 Framework Definition (10-step canonical)
+    const PS101_STEPS = [
+      {
+        step: 1,
+        title: "Problem Identification and Delta Analysis",
+        prompts: [
+          "What specific challenge are you currently facing in your personal or professional life?",
+          "Why is it a problem?",
+          "Reduce this to a simple problem statement",
+          "If you were to wake up tomorrow and this problem was solved, what would be different? (Miracle Question)",
+          "What is the 'delta' or gap between your current situation and your desired state?",
+          "How would solving this problem align with your long-term goals or values?"
+        ],
+        minChars: 50,
+        maxChars: 1000
+      },
+      {
+        step: 2,
+        title: "Current Situation Analysis",
+        prompts: [
+          "Describe your current situation in detail. What factors are contributing to the problem?",
+          "What attempts have you made so far to address this issue? What were the outcomes?",
+          "Are there any patterns or recurring themes you've noticed related to this problem?",
+          "How is this problem affecting different areas of your life (e.g., career, relationships, personal growth)?"
+        ],
+        minChars: 30,
+        maxChars: 1000
+      },
+      {
+        step: 3,
+        title: "Root Cause Exploration",
+        prompts: [
+          "What do you believe are the underlying causes of this problem?",
+          "Are there any assumptions you're making about the problem or its causes?",
+          "How might your own beliefs, habits, or past experiences be contributing to the situation?",
+          "If you were to view this problem from an outsider's perspective, what insights might you gain?"
+        ],
+        minChars: 30,
+        maxChars: 1000
+      },
+      {
+        step: 4,
+        title: "Self-Efficacy Assessment",
+        prompts: [
+          "On a scale of 1-10, how confident do you feel in your ability to solve this problem? Why?",
+          "What past experiences or skills can you draw upon to address this challenge?",
+          "How might your perception of your own capabilities be influencing your approach to this problem?",
+          "What small wins or successes have you had in the past that you can build upon?"
+        ],
+        minChars: 30,
+        maxChars: 1000
+      },
+      {
+        step: 5,
+        title: "Solution Brainstorming",
+        prompts: [
+          "List at least five potential solutions to your problem, no matter how unconventional they may seem.",
+          "For each solution, what are the potential benefits and drawbacks?",
+          "Which solution feels most aligned with your values and long-term goals?",
+          "How might you combine elements from different solutions to create a more comprehensive approach?"
+        ],
+        minChars: 100,
+        maxChars: 1000
+      },
+      {
+        step: 6,
+        title: "Experimental Design",
+        prompts: [
+          "Based on your chosen solution(s), what small, low-risk experiment could you conduct to test its effectiveness?",
+          "What specific, measurable outcome would indicate that your experiment was successful?",
+          "What resources or support might you need to carry out this experiment?",
+          "How long will you run this experiment before evaluating its results?"
+        ],
+        minChars: 30,
+        maxChars: 1000
+      },
+      {
+        step: 7,
+        title: "Obstacle Identification",
+        prompts: [
+          "What external factors (e.g., time, resources, other people) might hinder your progress?",
+          "What internal obstacles (e.g., self-doubt, fear, lack of knowledge) do you anticipate facing?",
+          "For each obstacle identified, brainstorm at least one strategy to overcome or mitigate it.",
+          "How can you reframe these obstacles as opportunities for growth or learning?"
+        ],
+        minChars: 30,
+        maxChars: 1000
+      },
+      {
+        step: 8,
+        title: "Action Planning",
+        prompts: [
+          "What specific steps will you take to implement your chosen experiment?",
+          "How will you measure and track your progress throughout the experiment?",
+          "What milestones can you set to celebrate small wins along the way?",
+          "Who can you enlist to provide support or accountability during this process?"
+        ],
+        minChars: 30,
+        maxChars: 1000
+      },
+      {
+        step: 9,
+        title: "Reflection and Iteration",
+        prompts: [
+          "After conducting your experiment, what were the results? What did you learn?",
+          "How has this experience affected your confidence in problem-solving?",
+          "Based on what you've learned, what adjustments would you make to your approach?",
+          "What new experiments or actions will you take based on these insights?"
+        ],
+        minChars: 30,
+        maxChars: 1000
+      },
+      {
+        step: 10,
+        title: "Building Mastery and Self-Efficacy",
+        prompts: [
+          "Reflecting on this problem-solving process, what new skills or knowledge have you gained?",
+          "How can you apply what you've learned to future challenges or goals?",
+          "What strategies will you use to maintain momentum and continue building your problem-solving abilities?",
+          "How has this experience changed your perception of your own capabilities?"
+        ],
+        minChars: 30,
+        maxChars: 1000
+      }
+    ];
+
+    // State Object (v2 - multi-prompt + experiments)
+    const PS101State = {
+      currentStep: 1,
+      currentPromptIndex: 0,
+      steps: {}, // { "1": { prompts: [{ response: "...", completedAt: "..." }] } }
+      experiments: [], // Array of experiment objects
+      startedAt: null,
+      lastUpdated: null,
+      completed: false,
+      completionScores: {},
+
+      // Initialize state
+      init() {
+        // Try v2 first, then fall back to v1 for migration
+        const savedState = localStorage.getItem('ps101_v2_state');
+        if (savedState) {
+          try {
+            const parsed = JSON.parse(savedState);
+            Object.assign(this, parsed);
+          } catch (e) {
+            console.error('Failed to parse saved PS101 v2 state:', e);
+          }
+        } else {
+          // Migrate from v1 if exists
+          const v1State = localStorage.getItem('ps101_state');
+          if (v1State) {
+            try {
+              const parsed = JSON.parse(v1State);
+              // Migrate old structure to new
+              if (parsed.answers) {
+                this.steps = {};
+                Object.keys(parsed.answers).forEach(stepNum => {
+                  this.steps[stepNum] = {
+                    prompts: [{ response: parsed.answers[stepNum], completedAt: parsed.lastUpdated || new Date().toISOString() }]
+                  };
+                });
+              }
+              this.currentStep = parsed.currentStep || 1;
+              this.startedAt = parsed.startedAt;
+              this.completed = parsed.completed || false;
+              this.save(); // Save in new format
+              localStorage.removeItem('ps101_state'); // Clean up old
+            } catch (e) {
+              console.error('Failed to migrate PS101 v1 state:', e);
+            }
+          }
+        }
+
+        if (!this.startedAt) {
+          this.startedAt = new Date().toISOString();
+        }
+
+        // Initialize steps structure if empty
+        if (!this.steps || Object.keys(this.steps).length === 0) {
+          this.steps = {};
+        }
+
+        // Initialize experiments if empty
+        if (!this.experiments || !Array.isArray(this.experiments)) {
+          this.experiments = [];
+        }
+      },
+
+      // Save state
+      save() {
+        this.lastUpdated = new Date().toISOString();
+        localStorage.setItem('ps101_v2_state', JSON.stringify(this));
+      },
+
+      // Get current step data
+      getCurrentStep() {
+        return PS101_STEPS.find(s => s.step === this.currentStep);
+      },
+
+      // Get current prompt data
+      getCurrentPrompt() {
+        const step = this.getCurrentStep();
+        if (!step || !step.prompts) return null;
+        return step.prompts[this.currentPromptIndex] || step.prompts[0];
+      },
+
+      // Get answer for step/prompt
+      getAnswer(stepNumber, promptIndex = 0) {
+        if (this.steps[stepNumber] && this.steps[stepNumber].prompts && this.steps[stepNumber].prompts[promptIndex]) {
+          return this.steps[stepNumber].prompts[promptIndex].response || '';
+        }
+        return '';
+      },
+
+      // Set answer for step/prompt
+      setAnswer(stepNumber, promptIndex, answer) {
+        if (!this.steps[stepNumber]) {
+          this.steps[stepNumber] = { prompts: [] };
+        }
+        if (!this.steps[stepNumber].prompts) {
+          this.steps[stepNumber].prompts = [];
+        }
+        // Ensure array is large enough
+        while (this.steps[stepNumber].prompts.length <= promptIndex) {
+          this.steps[stepNumber].prompts.push({ response: '', completedAt: null });
+        }
+        this.steps[stepNumber].prompts[promptIndex] = {
+          response: answer,
+          completedAt: answer ? new Date().toISOString() : null
+        };
+        this.save();
+      },
+
+      // Get all answers for a step (for display)
+      getStepAnswers(stepNumber) {
+        if (this.steps[stepNumber] && this.steps[stepNumber].prompts) {
+          return this.steps[stepNumber].prompts.map(p => p.response || '');
+        }
+        return [];
+      },
+
+      // Check if step is complete (all prompts answered with min chars)
+      isStepComplete(stepNumber) {
+        const step = PS101_STEPS.find(s => s.step === stepNumber);
+        if (!step) return false;
+        const answers = this.getStepAnswers(stepNumber);
+        if (answers.length !== step.prompts.length) return false;
+        return answers.every((answer, idx) => answer.length >= step.minChars);
+      },
+
+      // Navigate to step
+      goToStep(stepNumber, promptIndex = 0) {
+        if (stepNumber >= 1 && stepNumber <= PS101_STEPS.length) {
+          this.currentStep = stepNumber;
+          this.currentPromptIndex = promptIndex;
+          this.save();
+          renderCurrentStep();
+        }
+      },
+
+      // Next prompt within step, or next step if all prompts done
+      nextPrompt() {
+        const step = this.getCurrentStep();
+        if (!step || !step.prompts) return;
+
+        const totalPrompts = step.prompts.length;
+        if (this.currentPromptIndex + 1 < totalPrompts) {
+          // Move to next prompt in same step
+          this.currentPromptIndex++;
+          this.save();
+          renderCurrentStep();
+        } else {
+          // All prompts done, move to next step
+          this.nextStep();
+        }
+      },
+
+      // Previous prompt within step, or previous step
+      prevPrompt() {
+        if (this.currentPromptIndex > 0) {
+          // Move to previous prompt in same step
+          this.currentPromptIndex--;
+          this.save();
+          renderCurrentStep();
+        } else {
+          // Move to previous step
+          this.prevStep();
+        }
+      },
+
+      // Next step (only called when all prompts in current step are complete)
+      nextStep() {
+        if (this.currentStep < PS101_STEPS.length) {
+          this.currentStep++;
+          this.currentPromptIndex = 0; // Reset to first prompt of new step
+          this.save();
+          renderCurrentStep();
+        } else {
+          this.completed = true;
+          this.save();
+          renderCompletionScreen();
+        }
+      },
+
+      // Previous step
+      prevStep() {
+        if (this.currentStep > 1) {
+          this.currentStep--;
+          const step = this.getCurrentStep();
+          // Set to last prompt of previous step, or 0 if no prompts
+          this.currentPromptIndex = step && step.prompts ? Math.max(0, step.prompts.length - 1) : 0;
+          this.save();
+          renderCurrentStep();
+        }
+      },
+
+      // Reset
+      reset() {
+        this.currentStep = 1;
+        this.currentPromptIndex = 0;
+        this.steps = {};
+        this.experiments = [];
+        this.startedAt = new Date().toISOString();
+        this.lastUpdated = null;
+        this.completed = false;
+        this.completionScores = {};
+        this.save();
+        renderWelcomeScreen();
+      },
+
+      // Experiment Management Methods
+      createExperiment(title = null) {
+        const expId = `exp-${Date.now()}`;
+        const experiment = {
+          id: expId,
+          title: title || `Experiment ${this.experiments.length + 1}`,
+          hypothesis: '',
+          successMetric: '',
+          duration: { start: '', review: '' },
+          resources: '',
+          obstacles: [],
+          actions: [],
+          reflection: null,
+          status: 'draft',
+          createdAt: new Date().toISOString()
+        };
+        this.experiments.push(experiment);
+        this.save();
+        return experiment;
+      },
+
+      getActiveExperiment() {
+        return this.experiments.find(e => e.status === 'active') || this.experiments[this.experiments.length - 1];
+      },
+
+      updateExperiment(expId, updates) {
+        const exp = this.experiments.find(e => e.id === expId);
+        if (exp) {
+          Object.assign(exp, updates);
+          exp.lastUpdated = new Date().toISOString();
+          this.save();
+          return exp;
+        }
+        return null;
+      },
+
+      addObstacle(expId, obstacle) {
+        const exp = this.getActiveExperiment() || this.experiments.find(e => e.id === expId);
+        if (exp) {
+          if (!exp.obstacles) exp.obstacles = [];
+          exp.obstacles.push({
+            id: `obs-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            type: obstacle.type || 'external',
+            label: obstacle.label || '',
+            strategy: obstacle.strategy || '',
+            createdAt: new Date().toISOString()
+          });
+          this.save();
+          return exp;
+        }
+        return null;
+      },
+
+      addAction(expId, action) {
+        const exp = this.getActiveExperiment() || this.experiments.find(e => e.id === expId);
+        if (exp) {
+          if (!exp.actions) exp.actions = [];
+          exp.actions.push({
+            id: `act-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            label: action.label || '',
+            due: action.due || '',
+            done: false,
+            accountability: action.accountability || '',
+            createdAt: new Date().toISOString()
+          });
+          this.save();
+          return exp;
+        }
+        return null;
+      },
+
+      updateReflection(expId, reflection) {
+        const exp = this.getActiveExperiment() || this.experiments.find(e => e.id === expId);
+        if (exp) {
+          // Get confidence from Step 4 if available
+          const step4Answers = this.getStepAnswers(4);
+          const confidenceBefore = step4Answers[0] ? parseInt(step4Answers[0].match(/\d+/)?.[0] || '5') : null;
+
+          exp.reflection = {
+            outcome: reflection.outcome || '',
+            learning: reflection.learning || '',
+            confidence: {
+              before: confidenceBefore || reflection.confidence?.before || null,
+              after: reflection.confidence?.after || null
+            },
+            nextMove: reflection.nextMove || 'Continue',
+            completedAt: new Date().toISOString()
+          };
+          exp.status = 'reviewed';
+          this.save();
+          return exp;
+        }
+        return null;
+      }
+    };
+
+    // Initialize
+    PS101State.init();
+
+    // Expose to global scope
+    window.PS101State = PS101State;
+    window.PS101_STEPS = PS101_STEPS;
+    window.renderWelcomeScreen = renderWelcomeScreen;
+    window.renderCurrentStep = renderCurrentStep;
+
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Update progress indicator
+    function updateProgressIndicator(currentStep) {
+      const dots = document.querySelectorAll('.progress-dots .dot');
+      dots.forEach((dot, index) => {
+        const stepNumber = index + 1;
+        dot.classList.remove('completed', 'active');
+        if (stepNumber < currentStep) {
+          dot.classList.add('completed');
+          dot.disabled = false;
+        } else if (stepNumber === currentStep) {
+          dot.classList.add('active');
+          dot.setAttribute('aria-current', 'step');
+          dot.disabled = false;
+        } else {
+          dot.disabled = true;
+        }
+      });
+
+      const stepLabel = document.getElementById('step-label');
+      const step = PS101_STEPS[currentStep - 1];
+      if (stepLabel) {
+        stepLabel.textContent = `Step ${currentStep} of 10: ${step.title}`;
+      }
+    }
+
+    // Update character count
+    function updateCharCount(current, max) {
+      const currentEl = document.getElementById('char-current');
+      const maxEl = document.getElementById('char-max');
+      const charCount = document.getElementById('char-count');
+      
+      if (currentEl) currentEl.textContent = current;
+      if (maxEl) maxEl.textContent = max;
+      
+      if (charCount) {
+        if (current > max * 0.9) {
+          charCount.style.color = '#d63638';
+        } else {
+          charCount.style.color = 'var(--muted)';
+        }
+      }
+    }
+
+    // Update navigation buttons
+    function updateNavButtons(currentStep, promptIndex, totalPrompts) {
+      const backBtn = document.getElementById('ps101-back');
+      const nextBtn = document.getElementById('ps101-next');
+
+      if (backBtn) {
+        // Disable back only if at first prompt of first step
+        backBtn.disabled = (currentStep === 1 && promptIndex === 0);
+        backBtn.textContent = '← Back';
+      }
+
+      if (nextBtn) {
+        const isLastStep = currentStep === 10;
+        const isLastPrompt = promptIndex === totalPrompts - 1;
+        const isStepComplete = PS101State.isStepComplete(currentStep);
+
+        // Button text based on position
+        if (isLastStep && isLastPrompt) {
+          nextBtn.textContent = 'Complete PS101 →';
+        } else if (!isLastPrompt) {
+          nextBtn.textContent = 'Next Prompt →';
+        } else {
+          nextBtn.textContent = 'Next Step →';
+        }
+
+        // Enable/disable based on validation
+        const currentAnswer = PS101State.getAnswer(currentStep, promptIndex);
+        const step = PS101_STEPS.find(s => s.step === currentStep);
+        let isValid = currentAnswer.length >= (step ? step.minChars : 30);
+        
+        // Additional validation for experiment steps (when on last prompt)
+        if (isLastPrompt && [6, 7, 8, 9].includes(currentStep)) {
+          const activeExp = PS101State.getActiveExperiment();
+          if (currentStep === 6 && activeExp) {
+            // Step 6: need hypothesis, success metric, and duration
+            isValid = isValid && activeExp.hypothesis && activeExp.successMetric && 
+                     (activeExp.duration?.start || activeExp.duration?.review);
+          } else if (currentStep === 7 && activeExp) {
+            // Step 7: need at least one obstacle with strategy
+            isValid = isValid && activeExp.obstacles && activeExp.obstacles.length > 0 &&
+                     activeExp.obstacles.some(o => o.label && o.strategy);
+          } else if (currentStep === 8 && activeExp) {
+            // Step 8: need at least 3 actions
+            isValid = isValid && activeExp.actions && activeExp.actions.length >= 3;
+          } else if (currentStep === 9 && activeExp) {
+            // Step 9: need reflection outcome and learning
+            isValid = isValid && activeExp.reflection && 
+                     activeExp.reflection.outcome && activeExp.reflection.learning &&
+                     activeExp.reflection.confidence?.after;
+          }
+        }
+        
+        nextBtn.disabled = !isValid;
+      }
+    }
+
+    // Render previous answers
+    function renderPreviousAnswers(currentStep) {
+      const previousSteps = currentStep - 1;
+      const previousAnswersEl = document.getElementById('previous-answers');
+      
+      if (!previousAnswersEl) return;
+
+      if (previousSteps === 0) {
+        previousAnswersEl.classList.add('hidden');
+        return;
+      }
+
+      previousAnswersEl.classList.remove('hidden');
+      const summaryText = previousAnswersEl.querySelector('.summary-text');
+      if (summaryText) {
+        summaryText.textContent = `▼ Previous Answers (${previousSteps} step${previousSteps > 1 ? 's' : ''} completed)`;
+      }
+
+      const answerList = previousAnswersEl.querySelector('.answer-list');
+      if (!answerList) return;
+      
+      answerList.innerHTML = '';
+
+      for (let i = 1; i < currentStep; i++) {
+        const step = PS101_STEPS.find(s => s.step === i);
+        if (!step) continue;
+
+        const stepAnswers = PS101State.getStepAnswers(i);
+        const hasAnswers = stepAnswers.some(a => a && a.trim().length > 0);
+
+        if (!hasAnswers) continue;
+
+        const card = document.createElement('div');
+        card.className = 'answer-card';
+        card.dataset.step = i;
+
+        // Show summary of all prompts if multiple, or single answer
+        let answerSummary = '';
+        if (step.prompts.length > 1) {
+          answerSummary = stepAnswers
+            .map((ans, idx) => ans && ans.trim() ? `<div class="prompt-summary"><strong>Prompt ${idx + 1}:</strong> ${escapeHtml(ans.substring(0, 200))}${ans.length > 200 ? '...' : ''}</div>` : '')
+            .filter(s => s)
+            .join('');
+        } else {
+          answerSummary = escapeHtml(stepAnswers[0] || '');
+        }
+
+        card.innerHTML = `
+          <div class="answer-header">
+            <span class="answer-step">Step ${i}: ${step.title}</span>
+            <button class="answer-edit" data-step="${i}" aria-label="Edit Step ${i}">Edit</button>
+          </div>
+          <div class="answer-content">${answerSummary || 'No answers yet'}</div>
+        `;
+
+        answerList.appendChild(card);
+      }
+
+      // Add click handlers for edit buttons
+      document.querySelectorAll('.answer-edit').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const stepNumber = parseInt(e.target.dataset.step);
+          PS101State.goToStep(stepNumber);
+        });
+      });
+    }
+
+    // Render current step
+    function renderCurrentStep() {
+      const state = PS101State;
+      const step = state.getCurrentStep();
+
+      if (!step || !step.prompts) {
+        console.error('Invalid step or prompts:', state.currentStep);
+        return;
+      }
+
+      // Hide welcome/completion, show main flow
+      const welcome = document.getElementById('ps101-welcome');
+      const completion = document.getElementById('ps101-completion');
+      const flow = document.getElementById('ps101-flow');
+      
+      if (welcome) welcome.classList.add('hidden');
+      if (completion) completion.classList.add('hidden');
+      if (flow) flow.classList.remove('hidden');
+
+      // Update progress indicator
+      updateProgressIndicator(state.currentStep);
+
+      // Get current prompt
+      const promptIndex = state.currentPromptIndex || 0;
+      const currentPrompt = step.prompts[promptIndex] || step.prompts[0];
+      const totalPrompts = step.prompts.length;
+
+      // Update question text with prompt progress
+      const questionText = document.getElementById('question-text');
+      if (questionText) {
+        const promptProgress = totalPrompts > 1 ? ` (Prompt ${promptIndex + 1} of ${totalPrompts})` : '';
+        questionText.textContent = currentPrompt + promptProgress;
+        questionText.setAttribute('aria-label', `Step ${state.currentStep}${promptProgress}: ${currentPrompt}`);
+      }
+
+      // Update hint (optional, hide if no hint available)
+      const hintText = document.getElementById('hint-text');
+      const coachingHint = document.getElementById('coaching-hint');
+      if (hintText) {
+        // We don't have hints in the new structure, but could add contextual ones later
+        hintText.textContent = 'Take your time to reflect on this question.';
+      }
+      if (coachingHint) {
+        coachingHint.style.display = 'block'; // Keep visible for now
+      }
+
+      // Update textarea
+      const textarea = document.getElementById('step-answer');
+      if (textarea) {
+        const answer = state.getAnswer(state.currentStep, promptIndex);
+        textarea.value = answer;
+        textarea.placeholder = `Type your response to: ${currentPrompt.substring(0, 50)}...`;
+        textarea.setAttribute('maxlength', step.maxChars);
+        updateCharCount(answer.length, step.maxChars);
+        textarea.focus();
+      }
+
+      // Show/hide experiment components for Steps 6-9
+      const expComponents = document.getElementById('experiment-components');
+      const ps101Input = document.getElementById('ps101-input');
+      
+      if ([6, 7, 8, 9].includes(state.currentStep) && promptIndex === totalPrompts - 1) {
+        // Show experiment component for this step, hide regular input
+        if (expComponents) {
+          expComponents.classList.remove('hidden');
+          // Ensure active experiment exists
+          let activeExp = PS101State.getActiveExperiment();
+          if (!activeExp && state.currentStep === 6) {
+            activeExp = PS101State.createExperiment();
+          }
+          
+          // Show relevant component
+          if (state.currentStep === 6) {
+            renderExperimentCanvas(activeExp);
+          } else if (state.currentStep === 7) {
+            renderObstacleMapping(activeExp);
+          } else if (state.currentStep === 8) {
+            renderActionPlan(activeExp);
+          } else if (state.currentStep === 9) {
+            renderReflectionLog(activeExp);
+          }
+        }
+        if (ps101Input) ps101Input.classList.add('hidden');
+      } else {
+        // Hide experiment components, show regular input
+        if (expComponents) expComponents.classList.add('hidden');
+        if (ps101Input) ps101Input.classList.remove('hidden');
+      }
+
+      // Update navigation buttons
+      updateNavButtons(state.currentStep, promptIndex, totalPrompts);
+
+      // Update previous answers
+      renderPreviousAnswers(state.currentStep);
+    }
+
+    // Experiment Component Rendering Functions
+    function renderExperimentCanvas(experiment) {
+      if (!experiment) return;
+      
+      const canvas = document.getElementById('experiment-canvas');
+      const obstacleMapping = document.getElementById('obstacle-mapping');
+      const actionPlan = document.getElementById('action-plan');
+      const reflectionLog = document.getElementById('reflection-log');
+      
+      // Show canvas, hide others
+      if (canvas) canvas.classList.remove('hidden');
+      if (obstacleMapping) obstacleMapping.classList.add('hidden');
+      if (actionPlan) actionPlan.classList.add('hidden');
+      if (reflectionLog) reflectionLog.classList.add('hidden');
+      
+      // Populate fields
+      const hypothesis = document.getElementById('exp-hypothesis');
+      const successMetric = document.getElementById('exp-success-metric');
+      const startDate = document.getElementById('exp-start-date');
+      const reviewDate = document.getElementById('exp-review-date');
+      const resources = document.getElementById('exp-resources');
+      
+      if (hypothesis) hypothesis.value = experiment.hypothesis || '';
+      if (successMetric) successMetric.value = experiment.successMetric || '';
+      if (startDate) startDate.value = experiment.duration?.start || '';
+      if (reviewDate) reviewDate.value = experiment.duration?.review || '';
+      if (resources) resources.value = experiment.resources || '';
+    }
+
+    function renderObstacleMapping(experiment) {
+      if (!experiment) return;
+      
+      const canvas = document.getElementById('experiment-canvas');
+      const obstacleMapping = document.getElementById('obstacle-mapping');
+      const actionPlan = document.getElementById('action-plan');
+      const reflectionLog = document.getElementById('reflection-log');
+      
+      // Show obstacle mapping, hide others
+      if (canvas) canvas.classList.add('hidden');
+      if (obstacleMapping) obstacleMapping.classList.remove('hidden');
+      if (actionPlan) actionPlan.classList.add('hidden');
+      if (reflectionLog) reflectionLog.classList.add('hidden');
+      
+      // Render obstacles list
+      const obstaclesList = document.getElementById('obstacles-list');
+      if (!obstaclesList) return;
+      
+      obstaclesList.innerHTML = '';
+      const obstacles = experiment.obstacles || [];
+      
+      obstacles.forEach((obs, idx) => {
+        const item = document.createElement('div');
+        item.className = 'obstacle-item';
+        item.innerHTML = `
+          <div class="obstacle-header">
+            <span class="obstacle-type ${obs.type}">${obs.type}</span>
+            <button class="btn-remove" data-obstacle-id="${obs.id}" aria-label="Remove obstacle">×</button>
+          </div>
+          <div><strong>${escapeHtml(obs.label)}</strong></div>
+          <div class="obstacle-strategy">Strategy: ${escapeHtml(obs.strategy)}</div>
+        `;
+        obstaclesList.appendChild(item);
+      });
+      
+      // Attach remove handlers
+      obstaclesList.querySelectorAll('.btn-remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const obsId = e.target.dataset.obstacleId;
+          if (experiment.obstacles) {
+            experiment.obstacles = experiment.obstacles.filter(o => o.id !== obsId);
+            PS101State.updateExperiment(experiment.id, { obstacles: experiment.obstacles });
+            renderObstacleMapping(experiment);
+          }
+        });
+      });
+    }
+
+    function renderActionPlan(experiment) {
+      if (!experiment) return;
+      
+      const canvas = document.getElementById('experiment-canvas');
+      const obstacleMapping = document.getElementById('obstacle-mapping');
+      const actionPlan = document.getElementById('action-plan');
+      const reflectionLog = document.getElementById('reflection-log');
+      
+      // Show action plan, hide others
+      if (canvas) canvas.classList.add('hidden');
+      if (obstacleMapping) obstacleMapping.classList.add('hidden');
+      if (actionPlan) actionPlan.classList.remove('hidden');
+      if (reflectionLog) reflectionLog.classList.add('hidden');
+      
+      // Render actions list
+      const actionsList = document.getElementById('actions-list');
+      if (!actionsList) return;
+      
+      actionsList.innerHTML = '';
+      const actions = experiment.actions || [];
+      
+      actions.forEach((action, idx) => {
+        const item = document.createElement('div');
+        item.className = 'action-item';
+        item.innerHTML = `
+          <div class="action-header">
+            <div class="action-checkbox">
+              <input type="checkbox" id="action-${action.id}" ${action.done ? 'checked' : ''} data-action-id="${action.id}">
+              <label for="action-${action.id}"><strong>${escapeHtml(action.label)}</strong></label>
+            </div>
+            <button class="btn-remove" data-action-id="${action.id}" aria-label="Remove action">×</button>
+          </div>
+          ${action.due ? `<div class="action-due">Due: ${escapeHtml(action.due)}</div>` : ''}
+          ${action.accountability ? `<div class="action-due">Accountability: ${escapeHtml(action.accountability)}</div>` : ''}
+        `;
+        actionsList.appendChild(item);
+        
+        // Attach checkbox handler
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (checkbox) {
+          checkbox.addEventListener('change', (e) => {
+            const actionId = e.target.dataset.actionId;
+            const action = experiment.actions.find(a => a.id === actionId);
+            if (action) {
+              action.done = e.target.checked;
+              PS101State.updateExperiment(experiment.id, { actions: experiment.actions });
+            }
+          });
+        }
+      });
+      
+      // Attach remove handlers
+      actionsList.querySelectorAll('.btn-remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const actionId = e.target.dataset.actionId;
+          if (experiment.actions) {
+            experiment.actions = experiment.actions.filter(a => a.id !== actionId);
+            PS101State.updateExperiment(experiment.id, { actions: experiment.actions });
+            renderActionPlan(experiment);
+          }
+        });
+      });
+    }
+
+    function renderReflectionLog(experiment) {
+      if (!experiment) return;
+      
+      const canvas = document.getElementById('experiment-canvas');
+      const obstacleMapping = document.getElementById('obstacle-mapping');
+      const actionPlan = document.getElementById('action-plan');
+      const reflectionLog = document.getElementById('reflection-log');
+      
+      // Show reflection log, hide others
+      if (canvas) canvas.classList.add('hidden');
+      if (obstacleMapping) obstacleMapping.classList.add('hidden');
+      if (actionPlan) actionPlan.classList.add('hidden');
+      if (reflectionLog) reflectionLog.classList.remove('hidden');
+      
+      // Populate fields
+      const outcome = document.getElementById('reflection-outcome');
+      const learning = document.getElementById('reflection-learning');
+      const confidence = document.getElementById('reflection-confidence');
+      const confidenceValue = document.getElementById('confidence-value');
+      const nextMove = document.getElementById('reflection-next-move');
+      
+      const reflection = experiment.reflection || {};
+      
+      if (outcome) outcome.value = reflection.outcome || '';
+      if (learning) learning.value = reflection.learning || '';
+      if (confidence) {
+        confidence.value = reflection.confidence?.after || 5;
+        if (confidenceValue) {
+          confidenceValue.textContent = reflection.confidence?.after || 5;
+        }
+      }
+      if (nextMove) nextMove.value = reflection.nextMove || 'Continue';
+      
+      // Update confidence display when slider changes
+      if (confidence && confidenceValue) {
+        confidence.addEventListener('input', (e) => {
+          confidenceValue.textContent = e.target.value;
+        });
+      }
+    }
+
+    // Render welcome screen
+    function renderWelcomeScreen() {
+      const state = PS101State;
+      const welcome = document.getElementById('ps101-welcome');
+      const flow = document.getElementById('ps101-flow');
+      const completion = document.getElementById('ps101-completion');
+
+      if (welcome) welcome.classList.remove('hidden');
+      if (flow) flow.classList.add('hidden');
+      if (completion) completion.classList.add('hidden');
+
+      // Check if user has progress
+      const hasProgress = state.steps && Object.keys(state.steps).length > 0;
+      const resumeSection = document.getElementById('welcome-resume');
+      
+      if (resumeSection) {
+        if (hasProgress && !state.completed) {
+          resumeSection.classList.remove('hidden');
+        } else {
+          resumeSection.classList.add('hidden');
+        }
+      }
+    }
+
+    // Render completion screen
+    function renderCompletionScreen() {
+      const state = PS101State;
+      const completion = document.getElementById('ps101-completion');
+      const flow = document.getElementById('ps101-flow');
+      const welcome = document.getElementById('ps101-welcome');
+
+      if (completion) completion.classList.remove('hidden');
+      if (flow) flow.classList.add('hidden');
+      if (welcome) welcome.classList.add('hidden');
+
+      // Render commitment highlight
+      const commitmentText = document.getElementById('commitment-text');
+      if (commitmentText) {
+        commitmentText.textContent = state.getAnswer(7);
+      }
+
+      // Render all answers
+      const completionAnswers = document.getElementById('completion-answers');
+      if (completionAnswers) {
+        completionAnswers.innerHTML = '';
+        PS101_STEPS.forEach(step => {
+          const answer = state.getAnswer(step.number);
+          const card = document.createElement('div');
+          card.className = 'answer-card';
+          card.innerHTML = `
+            <div class="answer-header">
+              <span class="answer-step">Step ${step.number}: ${step.title}</span>
+            </div>
+            <div class="answer-content">${escapeHtml(answer)}</div>
+          `;
+          completionAnswers.appendChild(card);
+        });
+      }
+    }
+
+    // Validate current step
+    function validateCurrentStep() {
+      const state = PS101State;
+      const step = state.getCurrentStep();
+      const textarea = document.getElementById('step-answer');
+      if (!textarea || !step) return false;
+      
+      const answer = textarea.value.trim();
+      const promptIndex = state.currentPromptIndex || 0;
+
+      // Check minimum length
+      if (answer.length < step.minChars) {
+        alert(`Please provide at least ${step.minChars} characters for this prompt.`);
+        textarea.focus();
+        return false;
+      }
+
+      // Check maximum length
+      if (answer.length > step.maxChars) {
+        alert(`Please keep your answer under ${step.maxChars} characters.`);
+        textarea.focus();
+        return false;
+      }
+
+      // Step-specific validation (only for first prompt of step 1)
+      if (step.step === 1 && promptIndex === 0) {
+        // Step 1, prompt 1 - need at least 2 sentences
+        const sentences = answer.split(/[.!?]+/).filter(s => s.trim().length > 0);
+        if (sentences.length < 2) {
+          alert('Please provide at least 2 sentences describing your situation.');
+          return false;
+        }
+      }
+
+      // Step 5, prompt 1 - need at least 5 solutions
+      if (step.step === 5 && promptIndex === 0) {
+        const hasNumbers = /[1-5]/.test(answer);
+        const hasBullets = /[•\-\*]/.test(answer);
+        if (!hasNumbers && !hasBullets && answer.length < 100) {
+          alert('Please list at least 5 potential solutions to your problem.');
+          return false;
+        }
+      }
+
+      // Step 8, prompt 1 - should mention specific steps
+      if (step.step === 8 && promptIndex === 0) {
+        const hasNumbers = /[1-3]/.test(answer);
+        const hasBullets = /[•\-\*]/.test(answer);
+        if (!hasNumbers && !hasBullets && answer.length < 50) {
+          const confirmed = confirm('Your action plan doesn\'t seem to list specific steps. Continue anyway?');
+          if (!confirmed) return false;
+        }
+      }
+
+      return true;
+    }
+
+    // Auto-save functionality
+    let autosaveTimeout;
+    function autosaveAnswer(stepNumber, promptIndex, answerText) {
+      clearTimeout(autosaveTimeout);
+      autosaveTimeout = setTimeout(() => {
+        PS101State.setAnswer(stepNumber, promptIndex, answerText);
+        showAutosaveIndicator('Saved');
+      }, 1000);
+    }
+
+    function showAutosaveIndicator(message) {
+      const indicator = document.getElementById('autosave-indicator');
+      if (!indicator) return;
+      
+      const text = indicator.querySelector('.autosave-text');
+      if (text) {
+        text.textContent = message;
+        indicator.classList.add('visible');
+        setTimeout(() => {
+          indicator.classList.remove('visible');
+        }, 2000);
+      }
+    }
+
+    // Download summary
+    function downloadSummary() {
+      const state = PS101State;
+      const summary = {
+        version: '1.0',
+        timestamp: new Date().toISOString(),
+        ps101: {
+          completed_at: state.lastUpdated,
+          answers: state.answers
+        }
+      };
+      
+      try {
+        const blob = new Blob([JSON.stringify(summary, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'ps101-summary.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+      } catch (error) {
+        console.error('Download failed:', error);
+        alert('Save failed - please try again');
+      }
+    }
+
+    // Event listeners setup
+    document.addEventListener('DOMContentLoaded', () => {
+      // Welcome screen buttons
+      const startBtn = document.getElementById('start-ps101');
+      if (startBtn) {
+        startBtn.addEventListener('click', () => {
+          PS101State.currentStep = 1;
+          PS101State.save();
+          renderCurrentStep();
+        });
+      }
+
+      const continueBtn = document.getElementById('continue-ps101');
+      if (continueBtn) {
+        continueBtn.addEventListener('click', () => {
+          renderCurrentStep();
+        });
+      }
+
+      const learnMoreBtn = document.getElementById('learn-more-ps101');
+      if (learnMoreBtn) {
+        learnMoreBtn.addEventListener('click', () => {
+          scrollToSection('about');
+        });
+      }
+
+      // Navigation buttons
+      const backBtn = document.getElementById('ps101-back');
+      if (backBtn) {
+        backBtn.addEventListener('click', () => {
+          PS101State.prevPrompt();
+        });
+      }
+
+      const nextBtn = document.getElementById('ps101-next');
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          const isValid = validateCurrentStep();
+          if (isValid) {
+            const textarea = document.getElementById('step-answer');
+            if (textarea) {
+              PS101State.setAnswer(PS101State.currentStep, PS101State.currentPromptIndex, textarea.value);
+              PS101State.nextPrompt();
+            }
+          }
+        });
+      }
+
+      // Progress dots (click to jump to step)
+      document.querySelectorAll('.progress-dots .dot').forEach(dot => {
+        dot.addEventListener('click', (e) => {
+          if (!e.target.disabled) {
+            const stepNumber = parseInt(e.target.dataset.step);
+            PS101State.goToStep(stepNumber);
+          }
+        });
+      });
+
+      // Textarea input (auto-save + char count)
+      const textarea = document.getElementById('step-answer');
+      if (textarea) {
+        textarea.addEventListener('input', (e) => {
+          const step = PS101State.getCurrentStep();
+          if (step) {
+            updateCharCount(e.target.value.length, step.maxChars);
+            PS101State.setAnswer(PS101State.currentStep, PS101State.currentPromptIndex, e.target.value);
+            // Trigger validation update for button state
+            const promptIndex = PS101State.currentPromptIndex || 0;
+            const totalPrompts = step.prompts ? step.prompts.length : 1;
+            updateNavButtons(PS101State.currentStep, promptIndex, totalPrompts);
+          }
+        });
+      }<｜tool▁call▁end｜><｜tool▁call▁begin｜>
+grep
+
+      // Completion screen buttons
+      const downloadBtn = document.getElementById('download-summary');
+      if (downloadBtn) {
+        downloadBtn.addEventListener('click', downloadSummary);
+      }
+
+      const startOverBtn = document.getElementById('start-over');
+      if (startOverBtn) {
+        startOverBtn.addEventListener('click', () => {
+          if (confirm('Are you sure you want to start over? This will clear all your answers.')) {
+            PS101State.reset();
+          }
+        });
+      }
+
+      // Experiment component event listeners
+      // Experiment Canvas (Step 6) - auto-save on change
+      const expHypothesis = document.getElementById('exp-hypothesis');
+      const expSuccessMetric = document.getElementById('exp-success-metric');
+      const expStartDate = document.getElementById('exp-start-date');
+      const expReviewDate = document.getElementById('exp-review-date');
+      const expResources = document.getElementById('exp-resources');
+      
+      function saveExperimentCanvas() {
+        const activeExp = PS101State.getActiveExperiment();
+        if (!activeExp) return;
+        
+        PS101State.updateExperiment(activeExp.id, {
+          hypothesis: expHypothesis?.value || '',
+          successMetric: expSuccessMetric?.value || '',
+          duration: {
+            start: expStartDate?.value || '',
+            review: expReviewDate?.value || ''
+          },
+          resources: expResources?.value || '',
+          status: 'draft'
+        });
+        showAutosaveIndicator('Experiment saved');
+      }
+      
+      if (expHypothesis) expHypothesis.addEventListener('input', () => saveExperimentCanvas());
+      if (expSuccessMetric) expSuccessMetric.addEventListener('input', () => saveExperimentCanvas());
+      if (expStartDate) expStartDate.addEventListener('change', () => saveExperimentCanvas());
+      if (expReviewDate) expReviewDate.addEventListener('change', () => saveExperimentCanvas());
+      if (expResources) expResources.addEventListener('input', () => saveExperimentCanvas());
+      
+      // Add Obstacle button (Step 7)
+      // Implementation: Replaces browser prompt()/confirm() dialogs with inline form per Decision #003
+      const addObstacleBtn = document.getElementById('add-obstacle-btn');
+      const addObstacleForm = document.getElementById('add-obstacle-form');
+      const saveObstacleBtn = document.getElementById('save-obstacle-btn');
+      const cancelObstacleBtn = document.getElementById('cancel-obstacle-btn');
+      const obstacleLabelInput = document.getElementById('obstacle-label');
+      const obstacleStrategyInput = document.getElementById('obstacle-strategy');
+      const obstacleLabelError = document.getElementById('obstacle-label-error');
+      const obstacleStrategyError = document.getElementById('obstacle-strategy-error');
+      
+      if (addObstacleBtn && addObstacleForm) {
+        // Show form when Add button clicked
+        // Form appears inline below button, button hides, first field auto-focuses
+        addObstacleBtn.addEventListener('click', () => {
+          addObstacleForm.classList.remove('hidden');
+          addObstacleBtn.style.display = 'none';
+          // Clear any previous errors from last form use
+          obstacleLabelError.classList.add('hidden');
+          obstacleStrategyError.classList.add('hidden');
+          // Focus first input with slight delay to ensure form is visible
+          setTimeout(() => obstacleLabelInput?.focus(), 50);
+        });
+        
+        // Cancel button: Hides form, restores button, clears all input state
+        if (cancelObstacleBtn) {
+          cancelObstacleBtn.addEventListener('click', () => {
+            addObstacleForm.classList.add('hidden');
+            addObstacleBtn.style.display = 'block';
+            // Clear all input values to reset form state
+            if (obstacleLabelInput) obstacleLabelInput.value = '';
+            if (obstacleStrategyInput) obstacleStrategyInput.value = '';
+            // Reset radio button to default (external)
+            const externalRadio = document.querySelector('input[name="obstacle-type"][value="external"]');
+            if (externalRadio) externalRadio.checked = true;
+            // Clear any validation error messages
+            obstacleLabelError.classList.add('hidden');
+            obstacleStrategyError.classList.add('hidden');
+          });
+          
+          // ESC key handler: Cancel form when Escape pressed (keyboard accessibility)
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !addObstacleForm.classList.contains('hidden')) {
+              cancelObstacleBtn.click();
+            }
+          });
+        }
+        
+        // Save button: Validates inputs, shows inline errors, saves to state if valid
+        if (saveObstacleBtn) {
+          saveObstacleBtn.addEventListener('click', () => {
+            const label = obstacleLabelInput?.value.trim() || '';
+            const strategy = obstacleStrategyInput?.value.trim() || '';
+            const typeRadio = document.querySelector('input[name="obstacle-type"]:checked');
+            const type = typeRadio?.value || 'external';
+            
+            // Validation: Both label and strategy are required
+            // Inline error messages appear below fields (no alert() dialogs)
+            let isValid = true;
+            
+            if (!label) {
+              obstacleLabelError.textContent = 'Please describe the obstacle.';
+              obstacleLabelError.classList.remove('hidden');
+              isValid = false;
+              obstacleLabelInput?.focus(); // Focus first invalid field
+            } else {
+              obstacleLabelError.classList.add('hidden');
+            }
+            
+            if (!strategy) {
+              obstacleStrategyError.textContent = 'Please add a strategy to overcome this obstacle.';
+              obstacleStrategyError.classList.remove('hidden');
+              isValid = false;
+              // Only focus strategy field if label was valid (to avoid jumping)
+              if (label) obstacleStrategyInput?.focus();
+            } else {
+              obstacleStrategyError.classList.add('hidden');
+            }
+            
+            // Stop if validation failed
+            if (!isValid) return;
+            
+            // Save obstacle to state via PS101State method (per Decision #003)
+            const activeExp = PS101State.getActiveExperiment();
+            if (activeExp) {
+              PS101State.addObstacle(activeExp.id, {
+                type: type,
+                label: label,
+                strategy: strategy
+              });
+              
+              // Reset form state: clear inputs, reset defaults, hide form, show button
+              obstacleLabelInput.value = '';
+              obstacleStrategyInput.value = '';
+              const externalRadioReset = document.querySelector('input[name="obstacle-type"][value="external"]');
+              if (externalRadioReset) externalRadioReset.checked = true;
+              addObstacleForm.classList.add('hidden');
+              addObstacleBtn.style.display = 'block';
+              
+              // Re-render obstacle list to show new item
+              renderObstacleMapping(activeExp);
+            }
+          });
+          
+          // Enter key submission: Allow form submission when Enter pressed in any field
+          // Form fields will trigger save when Enter is pressed (default form behavior)
+          if (obstacleLabelInput) {
+            obstacleLabelInput.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveObstacleBtn.click();
+              }
+            });
+          }
+          if (obstacleStrategyInput) {
+            obstacleStrategyInput.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+                e.preventDefault();
+                saveObstacleBtn.click();
+              }
+            });
+          }
+        }
+        
+        // Real-time error clearing: Hide error messages as user types (better UX)
+        if (obstacleLabelInput) {
+          obstacleLabelInput.addEventListener('input', () => {
+            if (obstacleLabelInput.value.trim()) {
+              obstacleLabelError.classList.add('hidden');
+            }
+          });
+        }
+        if (obstacleStrategyInput) {
+          obstacleStrategyInput.addEventListener('input', () => {
+            if (obstacleStrategyInput.value.trim()) {
+              obstacleStrategyError.classList.add('hidden');
+            }
+          });
+        }
+      }
+      
+      // Add Action button (Step 8)
+      // Implementation: Replaces browser prompt() dialogs with inline form per Decision #003
+      const addActionBtn = document.getElementById('add-action-btn');
+      const addActionForm = document.getElementById('add-action-form');
+      const saveActionBtn = document.getElementById('save-action-btn');
+      const cancelActionBtn = document.getElementById('cancel-action-btn');
+      const actionLabelInput = document.getElementById('action-label');
+      const actionDueInput = document.getElementById('action-due');
+      const actionAccountabilityInput = document.getElementById('action-accountability');
+      const actionLabelError = document.getElementById('action-label-error');
+      
+      if (addActionBtn && addActionForm) {
+        // Show form when Add button clicked
+        // Form appears inline below button, button hides, first field auto-focuses
+        addActionBtn.addEventListener('click', () => {
+          addActionForm.classList.remove('hidden');
+          addActionBtn.style.display = 'none';
+          // Clear any previous errors from last form use
+          actionLabelError.classList.add('hidden');
+          // Focus first input with slight delay to ensure form is visible
+          setTimeout(() => actionLabelInput?.focus(), 50);
+        });
+        
+        // Cancel button: Hides form, restores button, clears all input state
+        if (cancelActionBtn) {
+          cancelActionBtn.addEventListener('click', () => {
+            addActionForm.classList.add('hidden');
+            addActionBtn.style.display = 'block';
+            // Clear all input values to reset form state
+            if (actionLabelInput) actionLabelInput.value = '';
+            if (actionDueInput) actionDueInput.value = '';
+            if (actionAccountabilityInput) actionAccountabilityInput.value = '';
+            // Clear any validation error messages
+            actionLabelError.classList.add('hidden');
+          });
+          
+          // ESC key handler: Cancel form when Escape pressed (keyboard accessibility)
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !addActionForm.classList.contains('hidden')) {
+              cancelActionBtn.click();
+            }
+          });
+        }
+        
+        // Save button: Validates inputs, shows inline errors, saves to state if valid
+        if (saveActionBtn) {
+          saveActionBtn.addEventListener('click', () => {
+            const label = actionLabelInput?.value.trim() || '';
+            const due = actionDueInput?.value.trim() || '';
+            const accountability = actionAccountabilityInput?.value.trim() || '';
+            
+            // Validation: Label is required (due and accountability are optional)
+            // Inline error message appears below field (no alert() dialogs)
+            if (!label) {
+              actionLabelError.textContent = 'Please describe the action you will take.';
+              actionLabelError.classList.remove('hidden');
+              actionLabelInput?.focus(); // Focus invalid field
+              return;
+            } else {
+              actionLabelError.classList.add('hidden');
+            }
+            
+            // Save action to state via PS101State method (per Decision #003)
+            const activeExp = PS101State.getActiveExperiment();
+            if (activeExp) {
+              PS101State.addAction(activeExp.id, {
+                label: label,
+                due: due,
+                accountability: accountability
+              });
+              
+              // Reset form state: clear inputs, hide form, show button
+              actionLabelInput.value = '';
+              actionDueInput.value = '';
+              actionAccountabilityInput.value = '';
+              addActionForm.classList.add('hidden');
+              addActionBtn.style.display = 'block';
+              
+              // Re-render action list to show new item
+              renderActionPlan(activeExp);
+            }
+          });
+          
+          // Enter key submission: Allow form submission when Enter pressed in any field
+          if (actionLabelInput) {
+            actionLabelInput.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveActionBtn.click();
+              }
+            });
+          }
+          if (actionDueInput) {
+            actionDueInput.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveActionBtn.click();
+              }
+            });
+          }
+          if (actionAccountabilityInput) {
+            actionAccountabilityInput.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveActionBtn.click();
+              }
+            });
+          }
+        }
+        
+        // Real-time error clearing: Hide error messages as user types (better UX)
+        if (actionLabelInput) {
+          actionLabelInput.addEventListener('input', () => {
+            if (actionLabelInput.value.trim()) {
+              actionLabelError.classList.add('hidden');
+            }
+          });
+        }
+      }
+      
+      // Reflection fields (Step 9) - auto-save
+      const reflectionOutcome = document.getElementById('reflection-outcome');
+      const reflectionLearning = document.getElementById('reflection-learning');
+      const reflectionConfidence = document.getElementById('reflection-confidence');
+      const reflectionNextMove = document.getElementById('reflection-next-move');
+      
+      function saveReflection() {
+        const activeExp = PS101State.getActiveExperiment();
+        if (!activeExp) return;
+        
+        PS101State.updateReflection(activeExp.id, {
+          outcome: reflectionOutcome?.value || '',
+          learning: reflectionLearning?.value || '',
+          confidence: {
+            after: parseInt(reflectionConfidence?.value || '5')
+          },
+          nextMove: reflectionNextMove?.value || 'Continue'
+        });
+        showAutosaveIndicator('Reflection saved');
+      }
+      
+      if (reflectionOutcome) reflectionOutcome.addEventListener('input', () => saveReflection());
+      if (reflectionLearning) reflectionLearning.addEventListener('input', () => saveReflection());
+      if (reflectionConfidence) reflectionConfidence.addEventListener('change', () => saveReflection());
+      if (reflectionNextMove) reflectionNextMove.addEventListener('change', () => saveReflection());
+
+      // Initial render - only show screens if user has progress or completed
+      // Don't auto-show welcome screen on page load - wait for user to click "start with questions"
+      if (PS101State.completed) {
+        renderCompletionScreen();
+      } else if (PS101State.steps && Object.keys(PS101State.steps).length > 0) {
+        // User has progress - show current step
+        renderCurrentStep();
+      }
+      // Otherwise, keep welcome screen hidden until user clicks link
+    });
+
+    // Add link to PS101 module to start flow
+    const ps101Module = document.getElementById('ps101');
+    if (ps101Module) {
+      const moduleLink = ps101Module.querySelector('a');
+      if (moduleLink) {
+        moduleLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          // Check if user has progress
+          if (PS101State.steps && Object.keys(PS101State.steps).length > 0 && !PS101State.completed) {
+            renderCurrentStep();
+            document.getElementById('ps101-flow')?.scrollIntoView({ behavior: 'smooth' });
+          } else {
+            renderWelcomeScreen();
+            document.getElementById('ps101-welcome')?.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      }
+      
+      // Also link the "start here" action in the module
+      const startHereLink = ps101Module.querySelector('[data-prompt]');
+      if (startHereLink) {
+        startHereLink.addEventListener('click', (e) => {
+          // Don't prevent default - let it also trigger chat
+          // But also show PS101 flow if user wants
+          setTimeout(() => {
+            if (PS101State.steps && Object.keys(PS101State.steps).length > 0 && !PS101State.completed) {
+              renderCurrentStep();
+              document.getElementById('ps101-flow')?.scrollIntoView({ behavior: 'smooth' });
+            } else {
+              renderWelcomeScreen();
+              document.getElementById('ps101-welcome')?.scrollIntoView({ behavior: 'smooth' });
+            }
+          }, 500);
+        });
+      }
+    }
+  })();
 
 </script>

@@ -1,0 +1,1648 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>What Is My Delta — Clean Interface</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="stylesheet" href="css/tokens.css"/>
+<link rel="stylesheet" href="css/styles.css"/>
+<style>
+  :root{--fg:#000;--muted:#666;--line:#e8e8e8;--hair:#111;--max:980px}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);color:var(--fg)}
+  body{font:12px/1.75 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  a{color:inherit;text-decoration:none}
+  a:hover,a:focus{text-decoration:underline}
+  .wrap{max-width:var(--max);margin:0 auto;padding:28px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);background:linear-gradient(145deg, #ffffff 0%, #fafafa 100%);border-radius:4px}
+
+  .nav{display:flex;gap:24px;margin-bottom:60px}
+  .hero{margin:120px 0 40px}
+  .title{font:500 15px/1.4 Helvetica,Arial;letter-spacing:.02em}
+  .sub{color:var(--muted);max-width:64ch}
+  .actions{margin:24px 0 0;display:flex;gap:16px;align-items:center}
+  .quiet{border:1px solid var(--line);padding:6px 10px;background:#fff}
+
+  .chat{position:fixed;right:20px;bottom:20px;width:320px;max-width:90vw;background:#fff;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.06);display:none}
+  .chat header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line)}
+  .chat header .x{border:1px solid var(--line);padding:2px 6px;background:#fff}
+  .chat main{padding:10px 12px;height:220px;overflow:auto}
+  .msg{margin:6px 0}
+  .chat footer{padding:8px 10px;border-top:1px solid var(--line);display:flex;gap:6px}
+  .chat input{flex:1;border:1px solid var(--line);padding:6px 8px}
+
+  .modal{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+  .modal .panel{background:#fff;border:1px solid var(--line);padding:20px;min-width:280px;max-width:92vw}
+  .modal .close{margin-top:16px;border:1px solid var(--line);background:#fff;padding:6px 10px}
+  .drop{border:1px dashed #ccc;padding:24px;text-align:center}
+
+  .status{font-size:11px;color:var(--muted);margin-top:8px}
+  .status.error{color:#b00020}
+  .status.ok{color:#2d7a2d}
+  
+  /* Enhanced depth and detail */
+  .flow-circle {
+    background: linear-gradient(145deg, #ffffff 0%, #f8f8f8 100%);
+    box-shadow: 
+      0 3px 6px rgba(0,0,0,0.08),
+      0 1px 3px rgba(0,0,0,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.9);
+    transition: all 0.2s ease;
+  }
+  
+  .flow-circle:hover {
+    background: linear-gradient(145deg, #ffffff 0%, #f0f0f0 100%);
+    box-shadow: 
+      0 4px 12px rgba(0,0,0,0.12),
+      0 2px 6px rgba(0,0,0,0.06),
+      inset 0 1px 0 rgba(255,255,255,0.95);
+    transform: translateY(-2px);
+  }
+  
+  .flow-circle.active {
+    background: linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%);
+    box-shadow: 
+      0 5px 15px rgba(0,0,0,0.15),
+      0 3px 8px rgba(0,0,0,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.98);
+  }
+  
+  .quiet {
+    background: linear-gradient(145deg, #ffffff 0%, #f8f8f8 100%);
+    box-shadow: 
+      0 2px 4px rgba(0,0,0,0.06),
+      inset 0 1px 0 rgba(255,255,255,0.8);
+    transition: all 0.15s ease;
+  }
+  
+  .quiet:hover {
+    background: linear-gradient(145deg, #ffffff 0%, #f0f0f0 100%);
+    box-shadow: 
+      0 3px 8px rgba(0,0,0,0.10),
+      inset 0 1px 0 rgba(255,255,255,0.9);
+    transform: translateY(-1px);
+  }
+  
+  .quiet:active {
+    transform: translateY(0);
+    background: linear-gradient(145deg, #f8f8f8 0%, #eeeeee 100%);
+    box-shadow: 
+      0 1px 3px rgba(0,0,0,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  
+  .section-card {
+    background: linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
+    box-shadow: 
+      0 2px 6px rgba(0,0,0,0.06),
+      0 1px 3px rgba(0,0,0,0.03);
+    transition: all 0.2s ease;
+  }
+  
+  .section-card:hover {
+    background: linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%);
+    box-shadow: 
+      0 4px 12px rgba(0,0,0,0.10),
+      0 2px 6px rgba(0,0,0,0.06);
+  }
+  .job-card{border:1px solid var(--line);padding:12px;margin:12px 0;cursor:pointer;transition:border-color .2s ease}
+  .job-card.selected{border-color:var(--hair)}
+  .job-card.applied{border-style:dashed}
+  .job-actions{display:flex;gap:8px;margin-top:10px}
+  .pill{display:inline-block;border:1px solid var(--line);padding:2px 6px;margin:2px 4px 0 0;font-size:10px;color:var(--muted)}
+  .muted{color:var(--muted);font-size:11px}
+  .resume-output{border:1px solid var(--line);padding:12px;background:#fafafa;margin-top:12px;white-space:pre-wrap}
+  .loading{opacity:.6;pointer-events:none}
+  @media (max-width:860px){.nav{flex-direction:column;gap:12px}}
+</style>
+
+<div class="wrap">
+  <nav class="nav">
+    <a id="openUpload" href="#" title="Upload a resume, image, or audio">upload</a>
+    <a id="openChat" href="#" title="Open coaching chat">chat</a>
+    <a id="showGuide" href="#" title="Show user guide">guide</a>
+    <button id="logoutBtn" class="quiet" style="padding:4px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.08em" hidden>logout</button>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="title">WHAT IS MY DELTA</div>
+    <p class="sub">career transition platform. discover your path. find your fit. take action.</p>
+  </header>
+
+  <!-- LOGIN/REGISTER MODAL -->
+  <div id="authModal" class="modal" style="display:block">
+    <div class="panel" style="max-width:400px">
+      <h2 style="font:600 14px/1.2 Helvetica,Arial;margin:0 0 20px;text-transform:uppercase;letter-spacing:.08em;text-align:center">welcome to your career transition</h2>
+      
+      <!-- LOGIN FORM -->
+      <form id="loginForm" style="margin-bottom:20px">
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">email</label>
+          <input type="email" id="loginEmail" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">password</label>
+          <input type="password" id="loginPassword" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
+        </div>
+        <div style="margin-bottom:16px;text-align:right">
+          <a href="#" id="forgotPassword" style="font-size:9px;color:var(--muted);text-decoration:underline">forgot password?</a>
+        </div>
+        <button type="submit" class="quiet" style="width:100%;padding:10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">sign in</button>
+      </form>
+      
+      <!-- REGISTER FORM -->
+      <form id="registerForm" style="margin-bottom:20px" hidden>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">email</label>
+          <input type="email" id="registerEmail" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">password</label>
+          <input type="password" id="registerPassword" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">confirm password</label>
+          <input type="password" id="registerConfirm" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">discount code <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+          <input type="text" id="registerDiscountCode" style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px;text-transform:uppercase" placeholder="BETA2025">
+        </div>
+        <button type="submit" class="quiet" style="width:100%;padding:10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">create account</button>
+      </form>
+      
+      <div style="text-align:center;margin-top:16px">
+        <button id="toggleAuth" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">need an account?</button>
+      </div>
+      
+      <div id="authStatus" class="status" style="margin-top:12px;text-align:center"></div>
+    </div>
+  </div>
+
+  <!-- PASSWORD RESET MODAL -->
+  <div id="resetModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1001">
+    <div style="background:#fff;padding:32px;border-radius:4px;max-width:400px;width:90%;box-shadow:0 8px 30px rgba(0,0,0,.12)">
+      <h2 style="font:600 14px/1.2 Helvetica,Arial;margin:0 0 20px;text-transform:uppercase;letter-spacing:.08em;text-align:center">reset password</h2>
+
+      <form id="resetForm" style="margin-bottom:20px">
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">email</label>
+          <input type="email" id="resetEmail" required style="width:100%;padding:8px;border:1px solid var(--line);font-size:12px">
+        </div>
+        <button type="submit" class="quiet" style="width:100%;padding:10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">send reset link</button>
+      </form>
+
+      <div style="text-align:center;margin-top:16px">
+        <button id="closeReset" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">cancel</button>
+      </div>
+
+      <div id="resetStatus" class="status" style="margin-top:12px;text-align:center"></div>
+    </div>
+  </div>
+
+  <!-- WELCOME & ONBOARDING -->
+  <section id="welcome" style="margin:60px 0;padding:40px 0;border:1px solid var(--line);border-radius:4px;background:linear-gradient(145deg, #ffffff 0%, #fafafa 100%)" hidden>
+    <div style="max-width:var(--max);margin:0 auto;text-align:center">
+      <h1 style="font:600 18px/1.2 Helvetica,Arial;margin:0 0 16px;text-transform:uppercase;letter-spacing:.08em">welcome to your career transition</h1>
+      <p style="margin:0 0 24px;color:var(--muted);font-size:12px;line-height:1.5;max-width:64ch;margin:0 auto 24px">this is a problem-solving approach to career transition. we'll work through three phases to bridge your skills and passions to meaningful work in the present job market.</p>
+      
+      <div style="display:flex;gap:12px;justify-content:center;margin:24px 0">
+        <button id="startFastTrack" class="quiet" style="padding:10px 20px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">fast track</button>
+        <button id="startDiscovery" class="quiet" style="padding:10px 20px;font-size:11px;text-transform:uppercase;letter-spacing:.08em">explore freely</button>
+      </div>
+      
+      <details style="margin-top:20px;text-align:left;max-width:500px;margin:20px auto 0">
+        <summary style="font-size:10px;color:var(--muted);cursor:pointer;text-transform:uppercase;letter-spacing:.08em">how it works</summary>
+        <div style="margin-top:12px;font-size:10px;color:var(--muted);line-height:1.4">
+          <p><strong>Fast Track:</strong> Guided sequence through analysis → opportunities → application</p>
+          <p><strong>Explore:</strong> Chat with coach, upload files, discover at your own pace</p>
+          <p><strong>Auto-save:</strong> Your progress is saved automatically as you go</p>
+          <br>
+          <p><strong>Three Phases:</strong></p>
+          <p>1. <strong>Explore:</strong> Chat with AI coach to understand your skills, passions, and career goals</p>
+          <p>2. <strong>Find:</strong> Discover job opportunities that match your profile and values</p>
+          <p>3. <strong>Apply:</strong> Optimize your resume and application materials for specific roles</p>
+          <br>
+          <p><strong>Your Data:</strong> All conversations, uploads, and progress are saved securely</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- JOURNEY FLOW -->
+  <section style="margin:80px 0;padding:40px 0">
+    <div style="max-width:var(--max);margin:0 auto">
+      <h2 style="font:600 12px/1 Helvetica,Arial;margin:0 0 40px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">your career transition</h2>
+      
+      <!-- ORGANIC FLOW -->
+      <div style="display:flex;justify-content:center;align-items:center;margin:60px 0;position:relative">
+            <!-- EXPLORE -->
+            <div style="position:absolute;left:0;top:0;text-align:center">
+              <button id="exploreCircle" class="flow-circle" style="width:50px;height:50px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font:600 14px/1 Helvetica,Arial;background:#fff;cursor:pointer;padding:0" title="Start career exploration">E</button>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">explore</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.3;max-width:100px">skills, passions, and career goals</p>
+        </div>
+
+            <!-- FIND -->
+            <div style="position:absolute;right:0;top:0;text-align:center">
+              <button id="findCircle" class="flow-circle" style="width:50px;height:50px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font:600 14px/1 Helvetica,Arial;background:#fff;cursor:pointer;padding:0" title="Find job opportunities">F</button>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">find</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.3;max-width:100px">opportunities that align with you</p>
+        </div>
+
+            <!-- APPLY -->
+            <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center">
+              <button id="applyCircle" class="flow-circle active" style="width:60px;height:60px;border:2px solid var(--hair);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font:600 16px/1 Helvetica,Arial;background:#fff;cursor:pointer;padding:0" title="Optimize resume for roles">A</button>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">apply</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.3;max-width:100px">optimize for specific roles</p>
+        </div>
+        
+            <!-- CONNECTING LINES -->
+            <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 300 200">
+              <defs>
+                <linearGradient id="lineGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:var(--line);stop-opacity:0.2" />
+                  <stop offset="50%" style="stop-color:var(--line);stop-opacity:0.4" />
+                  <stop offset="100%" style="stop-color:var(--line);stop-opacity:0.2" />
+                </linearGradient>
+              </defs>
+              <path d="M50,25 Q150,100 250,25" stroke="url(#lineGrad1)" stroke-width="1.5" fill="none"/>
+              <path d="M50,25 Q150,150 150,100" stroke="url(#lineGrad1)" stroke-width="1.5" fill="none"/>
+              <path d="M250,25 Q150,150 150,100" stroke="url(#lineGrad1)" stroke-width="1.5" fill="none"/>
+            </svg>
+      </div>
+      
+      <!-- START ACTIONS -->
+      <div style="text-align:center;margin-top:80px">
+        <p style="margin:0 0 20px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">begin anywhere</p>
+        <div style="display:flex;gap:8px;justify-content:center;align-items:center">
+          <button id="startDiscoveryFlow" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;background:var(--hair);color:#fff;border:1px solid var(--hair)">explore</button>
+          <button id="openUploadFlow" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">upload</button>
+          <button id="findOpportunities" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">find jobs</button>
+          <a href="https://calendar.app.google/EAnDSz2CcTtH849x6" target="_blank" rel="noopener noreferrer" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;display:inline-block" title="Book a 1-on-1 coaching session">book session</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USER PROGRESS & SESSION INFO -->
+  <section id="userProgress" style="margin:40px 0;padding:20px;border:1px solid var(--line);border-radius:4px;background:linear-gradient(145deg, #fafafa 0%, #f5f5f5 100%)" hidden>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="font:600 11px/1 Helvetica,Arial;margin:0;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">your progress</h3>
+      <button id="clearSession" class="quiet" style="padding:4px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">clear session</button>
+    </div>
+    <div id="progressInfo" style="font-size:10px;color:var(--muted);line-height:1.4">
+      <div>Session: <span id="sessionDisplay">not started</span></div>
+      <div>Path: <span id="pathDisplay">-</span></div>
+      <div>Last activity: <span id="lastActivityDisplay">-</span></div>
+    </div>
+    
+    <!-- Self-Efficacy Metrics Toggle -->
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--line)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h4 style="font:600 10px/1 Helvetica,Arial;margin:0;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">self-efficacy metrics</h4>
+        <button id="toggleMetrics" class="quiet" style="padding:4px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">show new metrics</button>
+      </div>
+      
+      <!-- Legacy Metrics (Default Visible) -->
+      <div id="legacyMetrics" style="font-size:10px;color:var(--muted);line-height:1.4">
+        <div>Legacy metrics display (existing functionality)</div>
+      </div>
+      
+      <!-- New Self-Efficacy Metrics (Hidden by Default) -->
+      <div id="newMetrics" style="display:none;font-size:10px;color:var(--muted);line-height:1.4">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:8px">
+          <!-- Experiment Completion -->
+          <div class="metric-card" style="padding:12px;border:1px solid var(--line);border-radius:4px;background:#fff">
+            <div style="font-weight:600;margin-bottom:4px">Experiment Completion</div>
+            <div id="completionRate" style="font-size:14px;font-weight:600;color:var(--hair)">-</div>
+            <div style="font-size:9px;color:var(--muted)">completed/total experiments</div>
+          </div>
+          
+          <!-- Learning Velocity -->
+          <div class="metric-card" style="padding:12px;border:1px solid var(--line);border-radius:4px;background:#fff">
+            <div style="font-weight:600;margin-bottom:4px">Learning Velocity</div>
+            <div id="learningVelocity" style="font-size:14px;font-weight:600;color:var(--hair)">-</div>
+            <div style="font-size:9px;color:var(--muted)">events per day</div>
+          </div>
+          
+          <!-- Confidence Score -->
+          <div class="metric-card" style="padding:12px;border:1px solid var(--line);border-radius:4px;background:#fff">
+            <div style="font-weight:600;margin-bottom:4px">Confidence Score</div>
+            <div id="confidenceScore" style="font-size:14px;font-weight:600;color:var(--hair)">-</div>
+            <div style="font-size:9px;color:var(--muted)">average confidence level</div>
+          </div>
+          
+          <!-- Escalation Risk -->
+          <div class="metric-card" style="padding:12px;border:1px solid var(--line);border-radius:4px;background:#fff">
+            <div style="font-weight:600;margin-bottom:4px">Escalation Risk</div>
+            <div id="escalationRisk" style="font-size:14px;font-weight:600;color:var(--hair)">-</div>
+            <div style="font-size:9px;color:var(--muted)">risk level indicator</div>
+          </div>
+        </div>
+        
+        <!-- Escalation Alert -->
+        <div id="escalationAlert" style="display:none;margin-top:12px;padding:12px;border:1px solid #b00020;border-radius:4px;background:#ffeaea">
+          <div style="font-weight:600;color:#b00020;margin-bottom:4px">🚨 Coach Escalation Needed</div>
+          <div id="escalationMessage" style="font-size:10px;color:#b00020;line-height:1.4"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USER GUIDE & HELP -->
+  <section id="userGuide" style="margin:60px 0;padding:40px 0;border:1px solid var(--line);border-radius:4px;background:linear-gradient(145deg, #ffffff 0%, #fafafa 100%)" hidden>
+    <div style="max-width:var(--max);margin:0 auto">
+      <h2 style="font:600 12px/1 Helvetica,Arial;margin:0 0 20px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">user guide</h2>
+      
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:24px;margin:20px 0">
+        <div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">getting started</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.4">Start by chatting with the coach or uploading your resume. The system will guide you through career discovery.</p>
+        </div>
+        
+        <div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">chat with coach</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.4">Ask questions about your career, skills, or goals. The AI coach provides personalized guidance.</p>
+        </div>
+        
+        <div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">upload files</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.4">Upload your resume, documents, or audio files for deeper analysis and personalized insights.</p>
+        </div>
+        
+        <div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">find opportunities</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.4">Discover job opportunities that match your skills, values, and career goals.</p>
+        </div>
+        
+        <div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">optimize resume</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.4">Get personalized resume recommendations and optimize your materials for specific roles.</p>
+        </div>
+        
+        <div>
+          <h3 style="font:600 10px/1 Helvetica,Arial;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">your data</h3>
+          <p style="margin:0;font-size:9px;color:var(--muted);line-height:1.4">All your conversations, uploads, and progress are saved securely and can be exported anytime.</p>
+        </div>
+      </div>
+      
+      <div style="text-align:center;margin-top:24px">
+        <button id="hideGuide" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">hide guide</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATUS AND OUTPUTS -->
+  <div id="status" class="status" aria-live="polite"></div>
+  <div id="jobsStatus" class="status" aria-live="polite"></div>
+  <div id="jobsList" aria-live="polite"></div>
+  
+  <!-- RESUME CONTROLS -->
+  <section id="resumeControls" style="margin:40px 0;padding:20px;border:1px solid var(--line);border-radius:4px;background:linear-gradient(145deg, #fafafa 0%, #f5f5f5 100%)" hidden>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="font:600 11px/1 Helvetica,Arial;margin:0;text-transform:uppercase;letter-spacing:.08em;color:var(--hair)">resume tools</h3>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button id="resumeRewrite" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">rewrite</button>
+      <button id="resumeCustomize" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">customize</button>
+      <button id="resumeFeedback" class="quiet" style="padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.08em">feedback</button>
+    </div>
+  </section>
+  
+  <div id="resumeStatus" class="status" aria-live="polite"></div>
+  <pre id="resumeOutput" class="resume-output" hidden></pre>
+
+  <!-- FOOTER -->
+  <footer style="border-top:1px solid var(--line);margin-top:140px;padding:14px 0;color:#777;font-size:12px;display:flex;justify-content:space-between">
+    <div>© <span id="y"></span> Delta</div>
+    <div>privacy · terms · support</div>
+  </footer>
+</div>
+
+<!-- CHAT -->
+<aside class="chat" id="chat">
+  <header>
+    <div>coaching</div>
+    <button class="x" id="closeChat" title="Close">×</button>
+  </header>
+  <main id="chatLog" aria-live="polite"></main>
+  <footer>
+    <input id="chatInput" placeholder="type and enter…" aria-label="message">
+    <button class="btn" id="sendMsg">send</button>
+  </footer>
+</aside>
+
+<!-- UPLOAD MODAL -->
+<div class="modal" id="uploadModal">
+  <div class="panel">
+    <div class="drop">
+      <div style="margin-bottom:10px">upload a resume, image, or audio</div>
+      <input type="file" id="filePick" multiple>
+    </div>
+    <div id="uploadStatus" class="status" aria-live="polite"></div>
+    <button class="close" id="closeUpload">close</button>
+  </div>
+</div>
+
+<script>
+// Force cache clear - remove after deployment
+if(!sessionStorage.getItem('cache_cleared_v3')){
+  localStorage.clear();
+  sessionStorage.setItem('cache_cleared_v3', '1');
+  console.log('Cache cleared');
+}
+
+(function(){
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+  const SESSION_KEY = 'delta_session_id';
+  const AUTO = 'delta_auto_v2';
+  const SEEN = 'delta_seen_intro_v1';
+  const USER_DATA_KEY = 'delta_user_data';
+  const TRIAL_START_KEY = 'delta_trial_start';
+  const TRIAL_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+  let sessionId = localStorage.getItem(SESSION_KEY) || '';
+  let apiBase = '';
+  let configPromise = null;
+  let jobCache = [];
+  let selectedJobId = null;
+  let lastResumeDraft = '';
+  let userData = JSON.parse(localStorage.getItem(USER_DATA_KEY) || '{}');
+  let autoSaveInterval = null;
+  let isAuthenticated = false;
+  let currentUser = null;
+  let trialStartTime = localStorage.getItem(TRIAL_START_KEY);
+
+  if(sessionId) {
+    document.body.dataset.session = sessionId;
+  }
+
+  const chat = $('#chat');
+  const chatLog = $('#chatLog');
+  const chatInput = $('#chatInput');
+  const sendMsg = $('#sendMsg');
+  const modal = $('#uploadModal');
+  const filePick = $('#filePick');
+  const uploadStatus = $('#uploadStatus');
+  const jobsButton = $('#findOpportunities');
+  const jobsStatus = $('#jobsStatus');
+  const jobsList = $('#jobsList');
+  const resumeRewriteBtn = $('#resumeRewrite');
+  const resumeCustomizeBtn = $('#resumeCustomize');
+  const resumeFeedbackBtn = $('#resumeFeedback');
+  const resumeStatus = $('#resumeStatus');
+  const resumeOutput = $('#resumeOutput');
+  const jobsButtonLabel = jobsButton ? jobsButton.textContent.trim() : '';
+  const status = $('#status');
+
+  $('#y').textContent = new Date().getFullYear();
+
+  function setStatus(el, msg, kind='info'){
+    if(!el) return;
+    el.textContent = msg || '';
+    el.classList.remove('error','ok');
+    if(!msg) return;
+    if(kind === 'error') el.classList.add('error');
+    else if(kind === 'ok') el.classList.add('ok');
+  }
+
+  function setSession(id){
+    if(!id) return;
+    sessionId = id;
+    localStorage.setItem(SESSION_KEY, id);
+    document.body.dataset.session = id;
+    startAutoSave();
+  }
+
+  function saveUserData(data){
+    userData = {...userData, ...data};
+    localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
+  }
+
+  function startAutoSave(){
+    if(autoSaveInterval) clearInterval(autoSaveInterval);
+    autoSaveInterval = setInterval(() => {
+      if(sessionId && userData){
+        // Auto-save user progress every 30 seconds
+        saveUserData({
+          lastActivity: new Date().toISOString(),
+          sessionId: sessionId
+        });
+      }
+    }, 30000);
+  }
+
+  // Self-Efficacy Metrics Toggle
+  let showNewMetrics = false;
+  $('#toggleMetrics').addEventListener('click', () => {
+    showNewMetrics = !showNewMetrics;
+    const legacyMetrics = $('#legacyMetrics');
+    const newMetrics = $('#newMetrics');
+    const toggleButton = $('#toggleMetrics');
+    
+    if(showNewMetrics) {
+      legacyMetrics.style.display = 'none';
+      newMetrics.style.display = 'block';
+      toggleButton.textContent = 'show legacy metrics';
+      // Load new metrics data
+      loadSelfEfficacyMetrics();
+    } else {
+      legacyMetrics.style.display = 'block';
+      newMetrics.style.display = 'none';
+      toggleButton.textContent = 'show new metrics';
+    }
+  });
+
+  // Load Self-Efficacy Metrics
+  async function loadSelfEfficacyMetrics() {
+    if(!sessionId) return;
+    
+    try {
+      const response = await fetch(`${apiBase}/self-efficacy/metrics`, {
+        headers: { 'X-Session-ID': sessionId }
+      });
+      
+      if(response.ok) {
+        const data = await response.json();
+        updateMetricsDisplay(data);
+        
+        // Check for escalation
+        const escalationResponse = await fetch(`${apiBase}/self-efficacy/escalation`, {
+          headers: { 'X-Session-ID': sessionId }
+        });
+        
+        if(escalationResponse.ok) {
+          const escalationData = await escalationResponse.json();
+          updateEscalationDisplay(escalationData);
+        }
+      }
+    } catch(error) {
+      console.error('Error loading self-efficacy metrics:', error);
+    }
+  }
+
+  // Update Metrics Display
+  function updateMetricsDisplay(data) {
+    const completionRate = (data.experiment_completion_rate * 100).toFixed(1);
+    const learningVelocity = data.learning_velocity.toFixed(2);
+    const confidenceScore = (data.confidence_score * 100).toFixed(1);
+    const escalationRisk = (data.escalation_risk * 100).toFixed(1);
+    
+    $('#completionRate').textContent = `${data.completed_experiments}/${data.total_experiments} (${completionRate}%)`;
+    $('#learningVelocity').textContent = `${learningVelocity} events/day`;
+    $('#confidenceScore').textContent = `${confidenceScore}%`;
+    $('#escalationRisk').textContent = `${escalationRisk}%`;
+    
+    // Color coding based on values
+    const completionEl = $('#completionRate');
+    const velocityEl = $('#learningVelocity');
+    const confidenceEl = $('#confidenceScore');
+    const riskEl = $('#escalationRisk');
+    
+    // Completion rate colors
+    if(data.experiment_completion_rate >= 0.8) completionEl.style.color = '#2d7a2d';
+    else if(data.experiment_completion_rate >= 0.5) completionEl.style.color = '#b8860b';
+    else completionEl.style.color = '#b00020';
+    
+    // Learning velocity colors
+    if(data.learning_velocity >= 1.0) velocityEl.style.color = '#2d7a2d';
+    else if(data.learning_velocity >= 0.5) velocityEl.style.color = '#b8860b';
+    else velocityEl.style.color = '#b00020';
+    
+    // Confidence score colors
+    if(data.confidence_score >= 0.7) confidenceEl.style.color = '#2d7a2d';
+    else if(data.confidence_score >= 0.4) confidenceEl.style.color = '#b8860b';
+    else confidenceEl.style.color = '#b00020';
+    
+    // Escalation risk colors
+    if(data.escalation_risk >= 0.7) riskEl.style.color = '#b00020';
+    else if(data.escalation_risk >= 0.4) riskEl.style.color = '#b8860b';
+    else riskEl.style.color = '#2d7a2d';
+  }
+
+  // Update Escalation Display
+  function updateEscalationDisplay(data) {
+    const escalationAlert = $('#escalationAlert');
+    const escalationMessage = $('#escalationMessage');
+    
+    if(data.should_escalate) {
+      escalationAlert.style.display = 'block';
+      escalationMessage.textContent = data.reason;
+    } else {
+      escalationAlert.style.display = 'none';
+    }
+  }
+
+  function stopAutoSave(){
+    if(autoSaveInterval) {
+      clearInterval(autoSaveInterval);
+      autoSaveInterval = null;
+    }
+  }
+
+  async function authenticateUser(email, password, isRegister = false, discountCode = null){
+    try{
+      setStatus($('#authStatus'), 'authenticating...');
+
+      // Enhanced authentication with backend API
+      if(isRegister){
+        // Registration validation
+        if(password.length < 6){
+          throw new Error('Password must be at least 6 characters');
+        }
+        if(!email.includes('@')){
+          throw new Error('Please enter a valid email address');
+        }
+
+        // Register with backend (include discount code if provided)
+        const body = { email, password };
+        if(discountCode) body.discount_code = discountCode;
+
+        const response = await callJson('/auth/register', {
+          method: 'POST',
+          body
+        });
+
+        currentUser = {
+          id: response.user_id,
+          email: response.email,
+          createdAt: response.created_at,
+          lastLogin: response.last_login,
+          subscriptionTier: response.subscription_tier,
+          subscriptionStatus: response.subscription_status
+        };
+
+        const tierMessage = response.subscription_tier === 'beta' ? ' (beta access granted)' : '';
+        setStatus($('#authStatus'), `account created successfully!${tierMessage}`, 'ok');
+
+      } else {
+        // Login with backend
+        const response = await callJson('/auth/login', {
+          method: 'POST',
+          body: { email, password }
+        });
+        
+        currentUser = {
+          id: response.user_id,
+          email: response.email,
+          createdAt: response.created_at,
+          lastLogin: response.last_login
+        };
+        
+        setStatus($('#authStatus'), 'welcome back!', 'ok');
+      }
+      
+      // Success - set user data
+      isAuthenticated = true;
+      localStorage.removeItem(TRIAL_START_KEY); // Clear trial
+      trialStartTime = null;
+      saveUserData({
+        user: currentUser,
+        authenticated: true,
+        loginTime: new Date().toISOString()
+      });
+
+      // Hide auth modal, show welcome
+      $('#authModal').style.display = 'none';
+      $('#welcome').hidden = false;
+      $('#logoutBtn').hidden = false;
+      updateUserProgress();
+
+      // Start auto-save for authenticated user
+      startAutoSave();
+      
+    }catch(err){
+      setStatus($('#authStatus'), err.message, 'error');
+    }
+  }
+
+  function startTrial(){
+    if(!isAuthenticated && !trialStartTime){
+      trialStartTime = Date.now().toString();
+      localStorage.setItem(TRIAL_START_KEY, trialStartTime);
+      setTimeout(checkTrialExpired, TRIAL_DURATION);
+    }
+  }
+
+  function checkTrialExpired(){
+    if(isAuthenticated) return; // User signed up, no need to prompt
+
+    const elapsed = Date.now() - parseInt(trialStartTime);
+    if(elapsed >= TRIAL_DURATION){
+      showSignUpPrompt();
+    }
+  }
+
+  function showSignUpPrompt(){
+    const authModal = $('#authModal');
+    if(authModal){
+      authModal.style.display = 'block';
+      const authStatus = $('#authStatus');
+      if(authStatus){
+        setStatus(authStatus, 'trial period ended - sign up to continue', 'info');
+      }
+    }
+  }
+
+  function updateUserProgress(){
+    if(currentUser){
+      $('#sessionDisplay').textContent = currentUser.email;
+      $('#pathDisplay').textContent = userData.path || '-';
+      $('#lastActivityDisplay').textContent = userData.lastActivity ? new Date(userData.lastActivity).toLocaleString() : '-';
+      $('#userProgress').hidden = false;
+
+      // Update user stats
+      const userStats = {
+        totalSessions: userData.totalSessions || 1,
+        messagesSent: userData.messagesSent || 0,
+        filesUploaded: userData.filesUploaded || 0,
+        opportunitiesViewed: userData.opportunitiesViewed || 0,
+        resumesGenerated: userData.resumesGenerated || 0
+      };
+
+      // Save updated stats
+      saveUserData(userStats);
+    }
+  }
+
+  async function logout(){
+    console.log('[LOGOUT] Starting logout process...');
+
+    // Store old session ID before clearing
+    const oldSessionId = sessionId;
+    console.log('[LOGOUT] Session ID:', oldSessionId);
+
+    // Set logout flag in sessionStorage (survives the reload)
+    sessionStorage.setItem('LOGGING_OUT', '1');
+    console.log('[LOGOUT] Set LOGGING_OUT flag in sessionStorage');
+
+    // Clear ALL localStorage
+    localStorage.clear();
+    console.log('[LOGOUT] Cleared localStorage');
+
+    // Call backend logout endpoint (fire and forget)
+    try {
+      await callJson('/auth/logout', {
+        method: 'POST',
+        headers: oldSessionId ? { 'X-Session-ID': oldSessionId } : {}
+      });
+      console.log('[LOGOUT] Backend logout API called successfully');
+    } catch(err) {
+      console.error('[LOGOUT] Logout API error:', err);
+    }
+
+    // Reload page - logout flag will be checked on load
+    console.log('[LOGOUT] Reloading page...');
+    window.location.reload();
+  }
+
+  async function ensureConfig(){
+    if(apiBase) return apiBase;
+    if(configPromise) return configPromise;
+    const endpoints = [
+      `${window.location.origin}/config`,
+      'https://what-is-my-delta-site-production.up.railway.app/config',
+      'https://whatismydelta.com/config'
+    ];
+    configPromise = (async ()=>{
+      for(const url of endpoints){
+        try{
+          const res = await fetch(url, {mode:'cors'});
+          if(!res.ok) continue;
+          const data = await res.json();
+          apiBase = (data.apiBase || new URL(url).origin || '').replace(/\/$/,'');
+          if(!apiBase) apiBase = new URL(url).origin;
+          document.body.dataset.apiBase = apiBase;
+          return apiBase;
+        }catch(err){
+          // ignore endpoint failure
+        }
+      }
+      apiBase = 'https://what-is-my-delta-site-production.up.railway.app';
+      document.body.dataset.apiBase = apiBase;
+      return apiBase;
+    })();
+    return configPromise;
+  }
+
+  async function callJson(path, {method='GET', body, headers={}} = {}){
+    await ensureConfig();
+    const init = {method, headers:{...headers}};
+    if(body !== undefined){
+      if(body instanceof FormData){
+        init.body = body;
+      }else{
+        init.headers['Content-Type'] = 'application/json';
+        init.body = JSON.stringify(body);
+      }
+    }
+    if(sessionId){
+      init.headers['X-Session-ID'] = sessionId;
+    }
+    const res = await fetch(`${apiBase}${path}`, init);
+    let data = null;
+    try{ data = await res.json(); } catch(err){ data = null; }
+    if(!res.ok){
+      const message = (data && (data.detail || data.error)) || `request_failed (${res.status})`;
+      throw new Error(message);
+    }
+    if(data && data.session_id) setSession(data.session_id);
+    return data || {};
+  }
+
+  async function uploadToWimd(file){
+    await ensureConfig();
+    const headers = {};
+    if(sessionId) headers['X-Session-ID'] = sessionId;
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch(`${apiBase}/wimd/upload`, {method:'POST', headers, body: form});
+    let data = null;
+    try{ data = await res.json(); } catch(err){ data = null; }
+    if(!res.ok){
+      const message = (data && (data.detail || data.error)) || `upload_failed (${res.status})`;
+      throw new Error(message);
+    }
+    if(data && data.session_id) setSession(data.session_id);
+    return data;
+  }
+
+  function getJob(jobId){
+    // Phase 4+ compatibility: Support both job_id and id
+    return jobCache.find(item => (item.job_id === jobId || item.id === jobId));
+  }
+
+  function highlightSelected(){
+    $$('.job-card').forEach(card => {
+      card.classList.toggle('selected', card.dataset.jobId === selectedJobId);
+    });
+  }
+
+  function renderJobs(matches){
+    jobCache = Array.isArray(matches) ? matches : [];
+    jobsList.innerHTML = '';
+    selectedJobId = null;
+    if(!jobCache.length){
+      setStatus(jobsStatus, 'no opportunities yet — keep working the coach flow', 'info');
+      const resumeControls = $('#resumeControls');
+      if(resumeControls) resumeControls.hidden = true;
+      return;
+    }
+    jobCache.forEach(match=>{
+      // Phase 4+ compatibility: Support both old (job_id/role) and new (id/title) formats
+      const jobId = match.job_id || match.id;
+      const role = match.role || match.title;
+      const company = match.company;
+      const location = match.location || 'remote';
+
+      // Phase 4+ uses skills array, legacy uses skills_match
+      const skillsArr = Array.isArray(match.skills) ? match.skills : (Array.isArray(match.skills_match) ? match.skills_match : []);
+      const valuesArr = Array.isArray(match.values_match) ? match.values_match : [];
+
+      // Phase 4+ doesn't provide fit_score, show source instead
+      const fit = Math.round(match.fit_score || 0);
+      const source = match.source ? `source: ${match.source}` : (fit > 0 ? `fit score: ${fit}%` : '');
+
+      const card = document.createElement('div');
+      card.className = 'job-card';
+      card.dataset.jobId = jobId;
+      card.innerHTML = `
+        <div><strong>${role}</strong> — ${company}</div>
+        <div class="muted">${location}</div>
+        ${source ? `<div class="muted">${source}</div>` : ''}
+        ${skillsArr.length > 0 ? `
+          <div class="muted">skills</div>
+          <div>${skillsArr.map(s=>`<span class=\"pill\">${s}</span>`).join(' ')}</div>
+        ` : ''}
+        ${valuesArr.length > 0 ? `
+          <div class="muted">values</div>
+          <div>${valuesArr.map(s=>`<span class=\"pill\">${s}</span>`).join(' ')}</div>
+        ` : ''}
+        <div class="job-actions">
+          <button class="quiet job-select" type="button">focus</button>
+          <button class="quiet job-apply" type="button">apply</button>
+        </div>
+      `;
+      jobsList.appendChild(card);
+    });
+    setStatus(jobsStatus, `found ${jobCache.length} opportunities`, 'ok');
+    
+    // Show resume controls when jobs are available
+    const resumeControls = $('#resumeControls');
+    if(resumeControls) resumeControls.hidden = false;
+  }
+
+  function selectJob(jobId){
+    if(!jobId) return;
+    selectedJobId = jobId;
+    highlightSelected();
+    const job = getJob(jobId);
+    setStatus(jobsStatus, job ? `focused on ${job.role}` : `focused on ${jobId}`, 'ok');
+  }
+
+  function currentResumeSource(){
+    if(lastResumeDraft) return lastResumeDraft;
+    return '';
+  }
+
+  function setResumeOutput(text){
+    lastResumeDraft = text || '';
+    if(resumeOutput){
+      if(lastResumeDraft){
+        resumeOutput.textContent = lastResumeDraft;
+        resumeOutput.hidden = false;
+      }else{
+        resumeOutput.hidden = true;
+      }
+    }
+  }
+
+  async function askCoach(prompt){
+    const payload = {prompt};
+    if(sessionId) payload.session_id = sessionId;
+    saveUserData({lastMessage: prompt, timestamp: new Date().toISOString()});
+    const data = await callJson('/wimd', {method:'POST', body: payload});
+
+    // Save coach response and metrics
+    saveUserData({
+      lastCoachResponse: data.message,
+      metrics: data.metrics,
+      sessionId: data.session_id
+    });
+
+    // If this is the first meaningful interaction, show opportunities hint
+    if(data.metrics && !userData.hasSeenOpportunities){
+      setTimeout(() => {
+        setStatus(status, 'ready to explore opportunities?', 'ok');
+        saveUserData({hasSeenOpportunities: true});
+      }, 2000);
+    }
+
+    return data.message || 'noted.';
+  }
+
+  async function startPS101(){
+    const headers = {};
+    if(sessionId) headers['X-Session-ID'] = sessionId;
+    const data = await callJson('/wimd/start-ps101', {method:'POST', headers});
+
+    // Save session info
+    if(!sessionId && data.session_id){
+      sessionId = data.session_id;
+      saveUserData({sessionId: data.session_id});
+    }
+
+    saveUserData({
+      path: 'fastTrack',
+      ps101Active: true,
+      started: new Date().toISOString()
+    });
+
+    return data.message || 'Starting PS101 guided sequence...';
+  }
+
+  async function fetchOpportunities(){
+    // Phase 4+: Use new job search endpoint with RAG
+    const query = userData.careerGoal || userData.lastCoachResponse || 'software engineer';
+
+    try {
+      const data = await callJson(`/jobs/search?query=${encodeURIComponent(query)}&limit=10`);
+      renderJobs(data.jobs || []);
+
+      // Show feedback about sources used
+      if(data.sources_used && data.sources_used.length > 0){
+        setStatus(jobsStatus, `found ${data.total_results || 0} opportunities from ${data.sources_used.length} sources`, 'ok');
+      }
+    } catch(err) {
+      // Fallback to legacy endpoint if Phase 4+ not enabled
+      if(sessionId){
+        const data = await callJson('/ob/opportunities');
+        renderJobs(data.opportunities || []);
+      } else {
+        throw new Error('start with the coach to unlock matches');
+      }
+    }
+  }
+
+  async function applyForJob(jobId, notes=''){
+    const data = await callJson('/ob/apply', {
+      method:'POST',
+      body: {job_id: jobId, notes},
+    });
+    const job = getJob(jobId);
+    if(job){
+      job.extras = job.extras || {};
+      job.extras.status = 'applied';
+    }
+    const card = jobsList.querySelector(`.job-card[data-job-id="${jobId}"]`);
+    if(card){
+      card.classList.add('applied');
+    }
+    return data;
+  }
+
+  async function rewriteResume(jobId, source){
+    const body = {};
+    if(sessionId) body.session_id = sessionId;
+    if(jobId) body.job_id = jobId;
+    if(source) body.source_resume = source;
+    const data = await callJson('/resume/rewrite', {method:'POST', body});
+    setResumeOutput(data.resume || '');
+    return data;
+  }
+
+  async function customizeResume(jobId, source, job){
+    if(!jobId) throw new Error('select an opportunity first');
+    if(!source) throw new Error('add resume content first');
+    const body = {
+      job_id: jobId,
+      resume: source,
+      highlight_skills: Array.isArray(job?.skills_match) ? job.skills_match : [],
+    };
+    if(sessionId) body.session_id = sessionId;
+    const data = await callJson('/resume/customize', {method:'POST', body});
+    setResumeOutput(data.resume || '');
+    return data;
+  }
+
+  async function resumeFeedback(source){
+    if(!source) throw new Error('need a resume draft first');
+    const body = {resume: source};
+    if(sessionId) body.session_id = sessionId;
+    const data = await callJson('/resume/feedback', {method:'POST', body});
+    return data;
+  }
+
+  ensureConfig().then(()=>{
+    if(sessionId){
+      callJson('/wimd/metrics').catch(()=>{});
+    }
+  }).catch(()=>{});
+
+  // Authentication event handlers
+  const loginForm = $('#loginForm');
+  if(loginForm){
+    loginForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = $('#loginEmail').value;
+      const password = $('#loginPassword').value;
+      await authenticateUser(email, password, false);
+    });
+  }
+
+  const registerForm = $('#registerForm');
+  if(registerForm){
+    registerForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = $('#registerEmail').value;
+      const password = $('#registerPassword').value;
+      const confirm = $('#registerConfirm').value;
+      const discountCode = $('#registerDiscountCode')?.value?.trim() || null;
+
+      if(password !== confirm){
+        setStatus($('#authStatus'), 'passwords do not match', 'error');
+        return;
+      }
+
+      await authenticateUser(email, password, true, discountCode);
+    });
+  }
+
+  const toggleAuth = $('#toggleAuth');
+  if(toggleAuth){
+    toggleAuth.addEventListener('click', e => {
+      e.preventDefault();
+      const loginForm = $('#loginForm');
+      const registerForm = $('#registerForm');
+      const isLogin = !loginForm.hidden;
+
+      if(isLogin){
+        loginForm.hidden = true;
+        registerForm.hidden = false;
+        toggleAuth.textContent = 'already have an account?';
+      } else {
+        loginForm.hidden = false;
+        registerForm.hidden = true;
+        toggleAuth.textContent = 'need an account?';
+      }
+    });
+  }
+
+  const clearSession = $('#clearSession');
+  if(clearSession){
+    clearSession.addEventListener('click', e => {
+      e.preventDefault();
+      logout();
+    });
+  }
+
+  const logoutBtn = $('#logoutBtn');
+  if(logoutBtn){
+    logoutBtn.addEventListener('click', e => {
+      e.preventDefault();
+      logout();
+    });
+  }
+
+  // Password reset
+  const forgotPassword = $('#forgotPassword');
+  const resetModal = $('#resetModal');
+  const resetForm = $('#resetForm');
+  const closeReset = $('#closeReset');
+
+  if(forgotPassword){
+    forgotPassword.addEventListener('click', e => {
+      e.preventDefault();
+      resetModal.style.display = 'flex';
+    });
+  }
+
+  if(closeReset){
+    closeReset.addEventListener('click', () => {
+      resetModal.style.display = 'none';
+      $('#resetStatus').textContent = '';
+      $('#resetEmail').value = '';
+    });
+  }
+
+  if(resetForm){
+    resetForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = $('#resetEmail').value;
+      const resetStatus = $('#resetStatus');
+
+      setStatus(resetStatus, 'sending reset link...');
+
+      try {
+        const response = await fetch(`${apiBase}/auth/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if(response.ok){
+          setStatus(resetStatus, 'password reset link sent to your email', 'ok');
+          setTimeout(() => {
+            resetModal.style.display = 'none';
+            $('#resetStatus').textContent = '';
+            $('#resetEmail').value = '';
+          }, 3000);
+        } else {
+          setStatus(resetStatus, data.detail || 'reset failed', 'error');
+        }
+      } catch(error){
+        setStatus(resetStatus, 'network error - try again', 'error');
+      }
+    });
+  }
+
+  const showGuide = $('#showGuide');
+  if(showGuide){
+    showGuide.addEventListener('click', e => {
+      e.preventDefault();
+      $('#userGuide').hidden = false;
+    });
+  }
+
+  const hideGuide = $('#hideGuide');
+  if(hideGuide){
+    hideGuide.addEventListener('click', e => {
+      e.preventDefault();
+      $('#userGuide').hidden = true;
+    });
+  }
+
+  const openChat = $('#openChat');
+  if(openChat){
+    openChat.addEventListener('click', e=>{
+      e.preventDefault();
+      if(chat) chat.style.display='block';
+    });
+  }
+
+  const closeChat = $('#closeChat');
+  if(closeChat){
+    closeChat.addEventListener('click', ()=>{
+      if(chat) chat.style.display='none';
+    });
+  }
+
+  const startFastTrack = $('#startFastTrack');
+  if(startFastTrack){
+    startFastTrack.addEventListener('click', async e=>{
+      e.preventDefault();
+      chat.style.display='block';
+      try{
+        const welcomeMsg = await startPS101();
+        addMsg(welcomeMsg, 'bot');
+      }catch(err){
+        addMsg('Unable to start PS101 guided sequence. Please try again.', 'bot');
+        console.error('PS101 start error:', err);
+      }
+    });
+  }
+
+  const startDiscovery = $('#startDiscovery');
+  if(startDiscovery){
+    startDiscovery.addEventListener('click', e=>{
+      e.preventDefault();
+      saveUserData({path: 'discovery', started: new Date().toISOString()});
+      chat.style.display='block';
+      addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
+    });
+  }
+
+  const startDiscoveryFlow = $('#startDiscoveryFlow');
+  console.log('startDiscoveryFlow element:', startDiscoveryFlow);
+  if(startDiscoveryFlow){
+    startDiscoveryFlow.addEventListener('click', e=>{
+      console.log('EXPLORE button clicked!');
+      e.preventDefault();
+      saveUserData({path: 'discovery', started: new Date().toISOString()});
+      console.log('chat element:', chat, 'display:', chat ? chat.style.display : 'no chat');
+      if(chat) chat.style.display='block';
+      addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
+    });
+    console.log('startDiscoveryFlow event listener attached');
+  } else {
+    console.log('ERROR: startDiscoveryFlow element not found!');
+  }
+
+  // Circular flow buttons
+  const exploreCircle = $('#exploreCircle');
+  if(exploreCircle){
+    exploreCircle.addEventListener('click', e => {
+      e.preventDefault();
+      saveUserData({path: 'discovery', started: new Date().toISOString()});
+      if(chat) chat.style.display='block';
+      addMsg('hi — let\'s start your career discovery. what are you looking to explore in your career transition?', 'bot');
+    });
+  }
+
+  const findCircle = $('#findCircle');
+  if(findCircle){
+    findCircle.addEventListener('click', async e => {
+      e.preventDefault();
+      setStatus(jobsStatus, 'finding opportunities...');
+      try {
+        await fetchOpportunities();
+      } catch(err) {
+        setStatus(jobsStatus, err.message, 'error');
+      }
+    });
+  }
+
+  const applyCircle = $('#applyCircle');
+  if(applyCircle){
+    applyCircle.addEventListener('click', e => {
+      e.preventDefault();
+
+      // Check if jobs are loaded first
+      if(!jobCache || jobCache.length === 0){
+        setStatus(resumeStatus, 'find jobs first before using resume tools', 'error');
+        return;
+      }
+
+      // Show and scroll to resume tools section
+      const resumeSection = $('#resumeControls');
+      if(resumeSection){
+        resumeSection.hidden = false;
+        resumeSection.scrollIntoView({behavior: 'smooth', block: 'start'});
+
+        // Highlight the section briefly
+        resumeSection.style.border = '2px solid #2d7a2d';
+        setTimeout(() => {
+          resumeSection.style.border = '1px solid var(--line)';
+        }, 2000);
+
+        // Guide the user
+        if(selectedJobId){
+          setStatus(resumeStatus, `ready to customize resume for selected job`, 'ok');
+        } else {
+          setStatus(resumeStatus, 'select a job below, then use rewrite/customize/feedback buttons', 'info');
+        }
+      }
+    });
+  }
+
+  // Add missing event handlers for the new interface
+  if(jobsButton){
+    jobsButton.addEventListener('click', async e => {
+      e.preventDefault();
+      setStatus(jobsStatus, 'finding opportunities...');
+      try {
+        await fetchOpportunities();
+      } catch(err) {
+        setStatus(jobsStatus, err.message, 'error');
+      }
+    });
+  }
+
+  if(resumeRewriteBtn){
+    resumeRewriteBtn.addEventListener('click', async e => {
+      e.preventDefault();
+      setStatus(resumeStatus, 'rewriting resume...');
+      try {
+        const data = await rewriteResume(selectedJobId, '');
+        setStatus(resumeStatus, `resume rewritten`, 'ok');
+      } catch(err) {
+        setStatus(resumeStatus, err.message, 'error');
+      }
+    });
+  }
+
+  function addMsg(txt, who='you'){
+    if(!chatLog) return;
+    const div = document.createElement('div');
+    div.className = 'msg';
+    div.textContent = (who==='you'?'> ':'') + txt;
+    chatLog.appendChild(div);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  async function send(){
+    if(!chatInput) return;
+    const v = (chatInput.value || '').trim();
+    if(!v) return;
+    addMsg(v, 'you');
+    chatInput.value = '';
+    try{
+      const r = await askCoach(v);
+      addMsg(r, 'bot');
+    }catch(err){
+      addMsg(err.message || '…connection issue', 'bot');
+    }
+  }
+
+  if(chatInput){
+    chatInput.addEventListener('keydown', e=>{
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        send();
+      }
+    });
+  }
+  if(sendMsg){
+    sendMsg.addEventListener('click', send);
+  }
+
+  $('#openUpload').addEventListener('click', e=>{
+    e.preventDefault();
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  });
+
+  // Handle flow section upload button
+  $('#openUploadFlow').addEventListener('click', e=>{
+    e.preventDefault();
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  });
+  $('#closeUpload').addEventListener('click', ()=>{
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    setStatus(uploadStatus, '');
+  });
+
+  if(filePick){
+    filePick.addEventListener('change', async e=>{
+      const file = (e.target.files || [])[0];
+      if(!file) return;
+      try{
+        setStatus(uploadStatus, `uploading ${file.name}…`);
+        await uploadToWimd(file);
+        setStatus(uploadStatus, `${file.name} uploaded`, 'ok');
+      }catch(err){
+        setStatus(uploadStatus, err.message, 'error');
+      }finally{
+        e.target.value = '';
+      }
+    });
+  }
+
+  if(jobsButton){
+    jobsButton.addEventListener('click', async e=>{
+      e.preventDefault();
+      jobsButton.classList.add('loading');
+      jobsButton.textContent = 'finding…';
+      setStatus(jobsStatus, '');
+      try{
+        await fetchOpportunities();
+      }catch(err){
+        setStatus(jobsStatus, err.message, 'error');
+      }finally{
+        jobsButton.classList.remove('loading');
+        jobsButton.textContent = jobsButtonLabel || 'find opportunities';
+      }
+    });
+  }
+
+  if(jobsList){
+    jobsList.addEventListener('click', async e=>{
+      const card = e.target.closest('.job-card');
+      if(!card) return;
+      const jobId = card.dataset.jobId;
+      if(e.target.classList.contains('job-select')){
+        selectJob(jobId);
+        return;
+      }
+      if(e.target.classList.contains('job-apply')){
+        e.preventDefault();
+        card.classList.add('loading');
+        try{
+          const data = await applyForJob(jobId);
+          selectJob(jobId);
+          setStatus(jobsStatus, `applied to ${data.job?.role || jobId}`, 'ok');
+        }catch(err){
+          setStatus(jobsStatus, err.message, 'error');
+        }finally{
+          card.classList.remove('loading');
+        }
+      }
+    });
+  }
+
+  if(resumeRewriteBtn){
+    resumeRewriteBtn.addEventListener('click', async e=>{
+      e.preventDefault();
+      const source = currentResumeSource();
+      resumeRewriteBtn.classList.add('loading');
+      setStatus(resumeStatus, 'rewriting…');
+      try{
+        const data = await rewriteResume(selectedJobId, source);
+        setStatus(resumeStatus, `saved ${data.version_name}`, 'ok');
+      }catch(err){
+        setStatus(resumeStatus, err.message, 'error');
+      }finally{
+        resumeRewriteBtn.classList.remove('loading');
+      }
+    });
+  }
+
+  if(resumeCustomizeBtn){
+    resumeCustomizeBtn.addEventListener('click', async e=>{
+      e.preventDefault();
+      const job = getJob(selectedJobId);
+      const source = currentResumeSource();
+      resumeCustomizeBtn.classList.add('loading');
+      setStatus(resumeStatus, 'customizing…');
+      try{
+        const data = await customizeResume(selectedJobId, source, job);
+        setStatus(resumeStatus, `customized for ${data.version_name}`, 'ok');
+      }catch(err){
+        setStatus(resumeStatus, err.message, 'error');
+      }finally{
+        resumeCustomizeBtn.classList.remove('loading');
+      }
+    });
+  }
+
+  if(resumeFeedbackBtn){
+    resumeFeedbackBtn.addEventListener('click', async e=>{
+      e.preventDefault();
+      const source = currentResumeSource();
+      resumeFeedbackBtn.classList.add('loading');
+      setStatus(resumeStatus, 'scanning draft…');
+      try{
+        const data = await resumeFeedback(source);
+        const suggestions = data.suggestions || [];
+        setStatus(resumeStatus, suggestions.length ? suggestions.join(' • ') : 'no changes suggested', 'ok');
+      }catch(err){
+        setStatus(resumeStatus, err.message, 'error');
+      }finally{
+        resumeFeedbackBtn.classList.remove('loading');
+      }
+    });
+  }
+
+  // Check if we just logged out (flag set in sessionStorage)
+  const loggingOutFlag = sessionStorage.getItem('LOGGING_OUT');
+  console.log('[PAGE LOAD] Checking LOGGING_OUT flag:', loggingOutFlag);
+
+  if(loggingOutFlag){
+    console.log('[PAGE LOAD] LOGGING_OUT flag detected - executing clean state');
+
+    // Clear the flag
+    sessionStorage.removeItem('LOGGING_OUT');
+    console.log('[PAGE LOAD] Removed LOGGING_OUT flag');
+
+    // Force clean state - don't restore anything
+    isAuthenticated = false;
+    currentUser = null;
+    sessionId = '';
+    userData = {};
+    localStorage.clear();
+    console.log('[PAGE LOAD] Cleared all state variables and localStorage');
+
+    // Clear chat UI
+    const chatLog = $('#chatLog');
+    if(chatLog){
+      console.log('[PAGE LOAD] Clearing chat log, current content:', chatLog.innerHTML.substring(0, 100));
+      chatLog.innerHTML = '';
+      console.log('[PAGE LOAD] Chat log cleared');
+    } else {
+      console.log('[PAGE LOAD] WARNING: chatLog element not found!');
+    }
+
+    if(chat){
+      chat.style.display = 'none';
+      console.log('[PAGE LOAD] Hidden chat panel');
+    }
+
+    // Show auth modal
+    $('#authModal').style.display = 'block';
+    $('#welcome').hidden = true;
+    $('#userProgress').hidden = true;
+    $('#logoutBtn').hidden = true;
+    console.log('[PAGE LOAD] Reset UI to login state');
+
+    // Don't run any auto-login or welcome message logic
+    console.log('[PAGE LOAD] Logout cleanup complete - skipping normal auth restore');
+  } else {
+    console.log('[PAGE LOAD] Normal page load - no LOGGING_OUT flag');
+    // Normal page load - check for existing authentication
+    if(userData.authenticated && userData.user){
+      currentUser = userData.user;
+      isAuthenticated = true;
+      $('#authModal').style.display = 'none';
+      $('#welcome').hidden = false;
+      $('#logoutBtn').hidden = false;
+      updateUserProgress();
+
+      // Ensure chat functionality is enabled for authenticated users
+      if(chat && chatInput && sendMsg){
+        // Chat is ready - make sure event listeners are working
+        console.log('Chat initialized for authenticated user');
+      }
+    }
+
+    if(!localStorage.getItem(SEEN) && isAuthenticated){
+      chat.style.display = 'block';
+      addMsg('hi — let\'s work on your career transition. what would you like to explore?', 'bot');
+      localStorage.setItem(SEEN, '1');
+    }
+  }
+
+  // Start trial mode for unauthenticated users
+  if(!isAuthenticated){
+    startTrial();
+
+    // Check if trial already expired
+    if(trialStartTime){
+      const elapsed = Date.now() - parseInt(trialStartTime);
+      if(elapsed >= TRIAL_DURATION){
+        showSignUpPrompt();
+      } else {
+        // Set timeout for remaining time
+        setTimeout(checkTrialExpired, TRIAL_DURATION - elapsed);
+      }
+    }
+  }
+
+  // Draggable windows functionality (minimal, mobile-aware)
+  const makeWindowDraggable = (el) => {
+    if(!el || window.innerWidth < 768) return;
+    const header = el.querySelector('[data-drag-handle]') || el.querySelector('header');
+    if(!header) return;
+    let pos = {x: 0, y: 0, startX: 0, startY: 0};
+    header.style.cursor = 'move';
+    header.onmousedown = (e) => {
+      e.preventDefault();
+      pos.startX = e.clientX;
+      pos.startY = e.clientY;
+      document.onmousemove = drag;
+      document.onmouseup = stopDrag;
+    };
+    const drag = (e) => {
+      pos.x = pos.startX - e.clientX;
+      pos.y = pos.startY - e.clientY;
+      pos.startX = e.clientX;
+      pos.startY = e.clientY;
+      const newTop = (el.offsetTop - pos.y);
+      const newLeft = (el.offsetLeft - pos.x);
+      if(newTop >= 0 && newTop + el.offsetHeight <= window.innerHeight){
+        el.style.top = newTop + 'px';
+      }
+      if(newLeft >= 0 && newLeft + el.offsetWidth <= window.innerWidth){
+        el.style.left = newLeft + 'px';
+      }
+    };
+    const stopDrag = () => {
+      document.onmousemove = null;
+      document.onmouseup = null;
+    };
+  };
+
+  // Make chat draggable (if it exists and is fixed position)
+  if(chat && window.innerWidth >= 768){
+    chat.style.position = 'fixed';
+    makeWindowDraggable(chat);
+  }
+})();
+</script>
+</body>
+</html>
