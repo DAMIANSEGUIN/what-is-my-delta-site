@@ -1,6 +1,6 @@
 [build]
-  base = "mosaic_ui"
-  publish = "mosaic_ui"
+  base = "frontend"
+  publish = "frontend"
 
 [[redirects]]
   from = "/health"
