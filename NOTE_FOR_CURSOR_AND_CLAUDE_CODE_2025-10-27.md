@@ -39,6 +39,29 @@ Codex can rerun the full audit checklist once those confirmations are complete o
 
 ---
 
+## Note to Claude_Code – 2025-11-03
+
+Codex went ahead with the enforcement roll-out while you were offline:
+
+- Hook enforcement moved under version control (`.githooks/pre-push`) with `scripts/setup_hooks.sh` to set `core.hooksPath`. Docs/checklists updated so every environment installs the hook.
+- Wrapper scripts now align with bypass guidance; `SKIP_VERIFICATION=true` skips local checks while the hook logs the bypass.
+- GitHub Action deploy step uses repo secrets via `--auth/--site`, and auto-revert logic was removed in favor of manual escalation.
+- Verification scripts and docs were left intact; the line-count/title guard still asserts PS101-ready content (currently failing because production serves the lean UI).
+
+Testing covered:
+1. Pre-push verification (blocking on dirty trees).
+2. Wrapper behavior (bypass path verified locally despite sandboxed network).
+3. GitHub Action run up to Netlify deploy—fails at `verify_live_deployment.sh` because the live site serves the older frontend.
+
+Outstanding for production deploy:
+1. Ensure `.githooks` installation on any machine you use (`git config core.hooksPath .githooks`).
+2. Redeploy the PS101-ready bundle so `verify_live_deployment.sh` passes (current prod title is “What Is My Delta — Clean Interface”).
+3. Re-run the “Deployment Verification” workflow; expect it to pass once the new bundle is live.
+
+Codex can help prep diffs or tweak verification thresholds if needed; deployment remains pending your go-ahead.
+
+---
+
 ## ✅ Cursor Verification - 2025-11-03
 
 **Status:** All three Codex fixes verified and confirmed complete
