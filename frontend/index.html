@@ -114,6 +114,130 @@
   .resume-output{border:1px solid var(--line);padding:12px;background:#fafafa;margin-top:12px;white-space:pre-wrap}
   .loading{opacity:.6;pointer-events:none}
   @media (max-width:860px){.nav{flex-direction:column;gap:12px}}
+
+  /* PS101 Styles */
+  .ps101-welcome{max-width:640px;margin:80px auto;padding:40px 20px;text-align:center}
+  .ps101-welcome.hidden{display:none}
+  .ps101-container.hidden{display:none}
+  .ps101-completion.hidden{display:none}
+  .previous-answers.hidden{display:none}
+  .welcome-resume.hidden{display:none}
+  .welcome-title{font-size:28px;font-weight:600;margin:0 0 8px;color:var(--fg)}
+  .welcome-subtitle{font-size:14px;font-weight:400;color:var(--muted);margin:0 0 32px;letter-spacing:.05em;text-transform:uppercase}
+  .welcome-description{margin-bottom:32px;text-align:left}
+  .welcome-description p{font-size:14px;line-height:1.6;color:var(--fg);margin-bottom:16px}
+  .welcome-features{list-style:none;padding:0;margin:0}
+  .welcome-features li{font-size:13px;line-height:2;color:var(--muted)}
+  .welcome-actions{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+  .welcome-btn-primary{font-weight:500;background:linear-gradient(145deg,#fff 0%,#f8f8f8 100%);border-color:var(--hair)}
+  .welcome-btn-secondary{background:transparent;border-color:var(--line)}
+  .welcome-resume{margin-top:32px;padding-top:24px;border-top:1px solid var(--line)}
+  .resume-text{font-size:12px;color:var(--muted);margin-bottom:12px}
+
+  .ps101-container{max-width:var(--max);margin:0 auto;padding:40px 20px}
+  .ps101-progress{max-width:var(--max);margin:0 auto 40px;padding:20px}
+  .progress-header{text-align:center;margin-bottom:16px}
+  .step-label{font-size:14px;font-weight:500;color:var(--fg);letter-spacing:.02em}
+  .progress-dots{display:flex;justify-content:center;gap:12px;align-items:center;flex-wrap:wrap}
+  .progress-dots .dot{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);cursor:pointer;transition:all 0.2s ease}
+  .progress-dots .dot:hover{border-color:var(--hair);transform:translateY(-1px)}
+  .progress-dots .dot.completed{background:linear-gradient(145deg,#f5f5f5 0%,#eee 100%);color:var(--fg);border-color:var(--hair)}
+  .progress-dots .dot.active{background:linear-gradient(145deg,#fff 0%,#f8f8f8 100%);box-shadow:0 3px 8px rgba(0,0,0,0.12);color:var(--fg);font-weight:600;border-color:var(--hair)}
+  .progress-dots .dot:disabled{cursor:not-allowed;opacity:0.5}
+
+  /* Experiment Components Styles */
+  .experiment-components{margin:32px 0;padding:24px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(145deg,#fff 0%,#fafafa 100%)}
+  .experiment-components.hidden{display:none}
+  .component-title{font-size:16px;font-weight:600;margin-bottom:20px;color:var(--fg)}
+  .experiment-form{display:flex;flex-direction:column;gap:16px}
+  .form-group{display:flex;flex-direction:column;gap:6px}
+  .form-group label{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .form-group textarea,.form-group input[type="text"],.form-group input[type="date"],.form-group select{width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:3px;font-size:13px;font-family:inherit;background:#fff;transition:border-color 0.2s ease}
+  .form-group textarea:focus,.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--hair);box-shadow:0 0 0 2px rgba(0,0,0,0.04)}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .btn-add{padding:8px 16px;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;border-radius:3px;font-size:12px;transition:all 0.2s ease;margin-top:8px}
+  .btn-add:hover{background:var(--line);border-color:var(--hair)}
+
+  /* Obstacle Mapping */
+  .obstacle-item,.action-item{margin-bottom:16px;padding:12px;border:1px solid var(--line);border-radius:4px;background:#fff}
+  .obstacle-header,.action-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .obstacle-type{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;text-transform:uppercase;font-weight:600;background:var(--line);color:var(--muted)}
+  .obstacle-type.external{background:#e3f2fd;color:#1976d2}
+  .obstacle-type.internal{background:#fff3e0;color:#f57c00}
+  .obstacle-strategy{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+  .action-checkbox{display:flex;align-items:center;gap:8px}
+  .action-checkbox input[type="checkbox"]{width:18px;height:18px;cursor:pointer}
+  .action-due{font-size:11px;color:var(--muted);margin-top:4px}
+  .btn-remove{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0;line-height:1;opacity:0.6;transition:opacity 0.2s ease}
+  .btn-remove:hover{opacity:1}
+
+  /* Reflection */
+  .confidence-slider-container{display:flex;align-items:center;gap:12px}
+  .confidence-slider-container input[type="range"]{flex:1}
+  #confidence-value{font-weight:600;min-width:30px;text-align:center}
+
+  /* Add Form Containers */
+  .add-form-container{margin-top:16px;padding:16px;background:var(--bg-secondary);border:1px solid var(--line);border-radius:4px}
+  .add-form-container.hidden{display:none}
+  .form-error{font-size:12px;color:#d63638;margin-top:4px;display:block}
+  .form-error.hidden{display:none}
+
+  .previous-answers{margin-bottom:32px;border:1px solid var(--line);border-radius:4px;background:linear-gradient(145deg,#fafafa 0%,#f5f5f5 100%);padding:16px}
+  .previous-answers summary{cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+  .previous-answers summary:hover .summary-text{color:var(--fg)}
+  .summary-text{font-size:13px;font-weight:500;color:var(--muted);transition:color 0.2s ease}
+  .summary-hint{font-size:11px;color:var(--muted)}
+  .answer-list{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+  .answer-card{background:#fff;border:1px solid var(--line);border-radius:4px;padding:12px;transition:box-shadow 0.2s ease}
+  .answer-card:hover{box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+  .answer-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .answer-step{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--fg)}
+  .answer-edit{font-size:11px;padding:4px 8px;border:1px solid var(--line);background:transparent;cursor:pointer;border-radius:2px;transition:all 0.2s ease}
+  .answer-edit:hover{background:var(--line)}
+  .answer-content{font-size:12px;line-height:1.5;color:var(--muted);white-space:pre-wrap}
+
+  .ps101-question{margin-bottom:32px}
+  .question-text{font-size:18px;font-weight:400;line-height:1.5;color:var(--fg);margin:0 0 16px}
+  .coaching-hint{margin-top:12px;padding:12px;background:linear-gradient(145deg,#fafafa 0%,#f5f5f5 100%);border:1px solid var(--line);border-radius:4px}
+  .coaching-hint summary{font-size:12px;cursor:pointer;user-select:none;color:var(--muted)}
+  .coaching-hint summary:hover{color:var(--fg)}
+  .coaching-hint p{margin:8px 0 0;font-size:12px;line-height:1.5;color:var(--muted)}
+
+  .ps101-input{margin-bottom:24px}
+  .step-textarea{width:100%;min-height:120px;padding:12px;border:1px solid var(--line);border-radius:4px;font:inherit;font-size:13px;line-height:1.6;resize:vertical;transition:all 0.2s ease}
+  .step-textarea:focus{outline:none;border-color:var(--hair);box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+  .char-count{margin-top:8px;font-size:11px;color:var(--muted);text-align:right}
+
+  .ps101-nav{display:flex;justify-content:space-between;margin-top:32px;gap:16px}
+  .nav-btn{min-width:120px;padding:10px 20px;font-size:13px}
+  .nav-back{background:transparent;border-color:var(--line)}
+  .nav-next{background:linear-gradient(145deg,#fff 0%,#f8f8f8 100%);border-color:var(--hair);font-weight:500}
+  .nav-btn:disabled{opacity:0.5;cursor:not-allowed}
+
+  .autosave-indicator{margin-top:16px;text-align:center;font-size:11px;color:var(--muted);opacity:0;transition:opacity 0.3s ease}
+  .autosave-indicator.visible{opacity:1}
+
+  .ps101-completion{max-width:var(--max);margin:40px auto;padding:40px 20px}
+  .ps101-completion.hidden{display:none}
+  .completion-header{text-align:center;margin-bottom:32px}
+  .completion-title{font-size:22px;font-weight:600;color:var(--fg);margin:0 0 16px}
+  .completion-progress{font-size:16px;color:var(--fg);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .completion-label{font-size:12px;color:var(--muted)}
+  .completion-message{text-align:center;margin-bottom:32px}
+  .completion-message p{font-size:14px;color:var(--muted)}
+  .commitment-highlight{background:linear-gradient(145deg,#fafafa 0%,#f5f5f5 100%);border:1px solid var(--line);border-radius:4px;padding:20px;margin-bottom:32px}
+  .commitment-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--fg);margin:0 0 12px}
+  .commitment-text{font-size:14px;line-height:1.6;color:var(--fg);margin-bottom:8px;white-space:pre-wrap}
+  .commitment-deadline{font-size:12px;color:var(--muted);font-weight:500}
+  .completion-summary{margin-bottom:32px;border:1px solid var(--line);border-radius:4px;padding:16px}
+  .completion-summary summary{cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);user-select:none}
+
+  @media (max-width:768px){
+    .ps101-welcome{margin:40px auto;padding:24px 16px}
+    .welcome-title{font-size:24px}
+    .ps101-container{padding:24px 16px}
+    .question-text{font-size:16px}
+  }
 </style>
 
 <div class="wrap">
@@ -436,6 +560,290 @@
     </div>
     <div id="uploadStatus" class="status" aria-live="polite"></div>
     <button class="close" id="closeUpload">close</button>
+  </div>
+</div>
+
+<!-- PS101 Welcome Screen -->
+<div class="ps101-welcome hidden" id="ps101-welcome">
+  <div class="welcome-content">
+    <h1 class="welcome-title">Welcome to PS101</h1>
+    <p class="welcome-subtitle">Problem Solving 101</p>
+
+    <div class="welcome-description">
+      <p>A 7-step framework to get clarity on your career challenge and create an action plan.</p>
+      <ul class="welcome-features">
+        <li>⏱ Takes 15-30 minutes</li>
+        <li>💾 Progress auto-saves</li>
+        <li>✏️ Edit previous answers anytime</li>
+      </ul>
+    </div>
+
+    <div class="welcome-actions">
+      <button class="quiet welcome-btn-primary" id="start-ps101">
+        Start PS101 Flow
+      </button>
+
+      <button class="quiet welcome-btn-secondary" id="learn-more-ps101">
+        Learn More
+      </button>
+    </div>
+
+    <div class="welcome-resume hidden" id="welcome-resume">
+      <p class="resume-text">Already started? Your progress is saved.</p>
+      <button class="quiet" id="continue-ps101">
+        Continue Where I Left Off
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- PS101 Flow Container -->
+<section id="ps101-flow" class="ps101-container hidden" aria-label="PS101 Coaching Flow">
+  <!-- Progress indicator -->
+  <div class="ps101-progress" role="navigation" aria-label="Progress">
+    <div class="progress-header">
+      <span class="step-label" id="step-label">Step 1 of 10: Problem Identification and Delta Analysis</span>
+    </div>
+    <div class="progress-dots">
+      <button class="dot active" aria-label="Step 1: Problem Identification and Delta Analysis (current)" aria-current="step" data-step="1">1</button>
+      <button class="dot" aria-label="Step 2: Current Situation Analysis" data-step="2">2</button>
+      <button class="dot" aria-label="Step 3: Root Cause Exploration" data-step="3">3</button>
+      <button class="dot" aria-label="Step 4: Self-Efficacy Assessment" data-step="4">4</button>
+      <button class="dot" aria-label="Step 5: Solution Brainstorming" data-step="5">5</button>
+      <button class="dot" aria-label="Step 6: Experimental Design" data-step="6">6</button>
+      <button class="dot" aria-label="Step 7: Obstacle Identification" data-step="7">7</button>
+      <button class="dot" aria-label="Step 8: Action Planning" data-step="8">8</button>
+      <button class="dot" aria-label="Step 9: Reflection and Iteration" data-step="9">9</button>
+      <button class="dot" aria-label="Step 10: Building Mastery and Self-Efficacy" data-step="10">10</button>
+    </div>
+  </div>
+
+  <!-- Previous answers (expandable) -->
+  <details class="previous-answers hidden" id="previous-answers">
+    <summary>
+      <span class="summary-text">▼ Previous Answers (0 steps completed)</span>
+      <span class="summary-hint">Click to review or edit</span>
+    </summary>
+    <div class="answer-list"></div>
+  </details>
+
+  <!-- Current step question -->
+  <div class="ps101-question" id="ps101-question">
+    <h2 class="question-text" id="question-text">
+      <!-- Dynamic: Current step question -->
+    </h2>
+
+    <!-- Optional coaching hint -->
+    <details class="coaching-hint" id="coaching-hint">
+      <summary>💡 Coaching Hint</summary>
+      <p id="hint-text">
+        <!-- Dynamic: Step-specific guidance -->
+      </p>
+    </details>
+  </div>
+
+  <!-- User input area -->
+  <div class="ps101-input" id="ps101-input">
+    <textarea
+      id="step-answer"
+      class="step-textarea"
+      placeholder="Type your answer here..."
+      aria-label="Your answer"
+      rows="6"
+    ></textarea>
+    <div class="char-count" id="char-count" aria-live="polite">
+      <span id="char-current">0</span> / <span id="char-max">500</span>
+    </div>
+  </div>
+
+  <!-- Experiment Components (Steps 6-9) -->
+  <div class="experiment-components hidden" id="experiment-components">
+    <!-- Step 6: Experiment Canvas -->
+    <div class="experiment-canvas hidden" id="experiment-canvas">
+      <h3 class="component-title">Experiment Design</h3>
+      <div class="experiment-form">
+        <div class="form-group">
+          <label for="exp-hypothesis">Hypothesis</label>
+          <textarea id="exp-hypothesis" rows="3" placeholder="What are you testing?"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="exp-success-metric">Success Metric</label>
+          <input type="text" id="exp-success-metric" placeholder="What measurable outcome indicates success?">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="exp-start-date">Start Date</label>
+            <input type="date" id="exp-start-date">
+          </div>
+          <div class="form-group">
+            <label for="exp-review-date">Review Date</label>
+            <input type="date" id="exp-review-date">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="exp-resources">Resources/Support Needed</label>
+          <textarea id="exp-resources" rows="2" placeholder="What do you need to run this experiment?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 7: Obstacle Mapping -->
+    <div class="obstacle-mapping hidden" id="obstacle-mapping">
+      <h3 class="component-title">Obstacle Identification</h3>
+      <div id="obstacles-list"></div>
+      <button class="btn-add" id="add-obstacle-btn">+ Add Obstacle</button>
+      <!-- Add Obstacle Form (hidden by default) -->
+      <div id="add-obstacle-form" class="hidden add-form-container">
+        <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--fg);">Add Obstacle</h4>
+        <div class="form-group">
+          <label for="obstacle-label">What obstacle do you anticipate? *</label>
+          <input
+            type="text"
+            id="obstacle-label"
+            placeholder="e.g., Limited time availability"
+            aria-required="true"
+            aria-describedby="obstacle-label-error"
+          />
+          <span id="obstacle-label-error" class="form-error hidden" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label style="margin-bottom: 8px;">Obstacle Type</label>
+          <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: normal; text-transform: none; letter-spacing: normal;">
+            <input type="radio" name="obstacle-type" value="external" checked />
+            External (e.g., time, resources, other people)
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; text-transform: none; letter-spacing: normal;">
+            <input type="radio" name="obstacle-type" value="internal" />
+            Internal (e.g., self-doubt, fear, lack of knowledge)
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="obstacle-strategy">Strategy to overcome this obstacle *</label>
+          <textarea
+            id="obstacle-strategy"
+            rows="3"
+            placeholder="How will you mitigate this?"
+            aria-required="true"
+            aria-describedby="obstacle-strategy-error"
+          ></textarea>
+          <span id="obstacle-strategy-error" class="form-error hidden" role="alert"></span>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+          <button id="save-obstacle-btn" class="quiet" style="flex: 1;">Add Obstacle</button>
+          <button id="cancel-obstacle-btn" class="quiet" style="flex: 1;">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 8: Action Plan -->
+    <div class="action-plan hidden" id="action-plan">
+      <h3 class="component-title">Action Plan</h3>
+      <div id="actions-list"></div>
+      <button class="btn-add" id="add-action-btn">+ Add Action Item</button>
+      <!-- Add Action Form (hidden by default) -->
+      <div id="add-action-form" class="hidden add-form-container">
+        <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--fg);">Add Action Item</h4>
+        <div class="form-group">
+          <label for="action-label">What action will you take? *</label>
+          <input
+            type="text"
+            id="action-label"
+            placeholder="e.g., Schedule 30-min focus block daily"
+            aria-required="true"
+            aria-describedby="action-label-error"
+          />
+          <span id="action-label-error" class="form-error hidden" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label for="action-due">By when?</label>
+          <input
+            type="text"
+            id="action-due"
+            placeholder="e.g., 2025-11-15 or 'Next Friday'"
+          />
+        </div>
+        <div class="form-group">
+          <label for="action-accountability">Who can help hold you accountable? (optional)</label>
+          <input
+            type="text"
+            id="action-accountability"
+            placeholder="e.g., My mentor, Team lead"
+          />
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+          <button id="save-action-btn" class="quiet" style="flex: 1;">Add Action</button>
+          <button id="cancel-action-btn" class="quiet" style="flex: 1;">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 9: Reflection Log -->
+    <div class="reflection-log hidden" id="reflection-log">
+      <h3 class="component-title">Reflection & Learning</h3>
+      <div class="form-group">
+        <label for="reflection-outcome">Outcomes</label>
+        <textarea id="reflection-outcome" rows="4" placeholder="What were the results of your experiment?"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="reflection-learning">Learning Summary</label>
+        <textarea id="reflection-learning" rows="4" placeholder="What did you learn?"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="reflection-confidence">Confidence After (1-10)</label>
+        <input type="range" id="reflection-confidence" min="1" max="10" value="5">
+        <span id="confidence-value">5</span>
+      </div>
+      <div class="form-group">
+        <label for="reflection-next-move">Next Move</label>
+        <select id="reflection-next-move">
+          <option value="Continue">Continue</option>
+          <option value="Pivot">Pivot</option>
+          <option value="Archive">Archive</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="ps101-nav">
+    <button class="nav-btn nav-back quiet" id="ps101-back" aria-label="Go back to previous step">
+      ← Back
+    </button>
+
+    <button class="nav-btn nav-next quiet" id="ps101-next" aria-label="Continue to next step">
+      Next →
+    </button>
+  </div>
+
+  <!-- Auto-save indicator -->
+  <div class="autosave-indicator" id="autosave-indicator" aria-live="polite">
+    <span class="autosave-text">Saved</span>
+  </div>
+</section>
+
+<!-- PS101 Completion Screen -->
+<div class="ps101-completion hidden" id="ps101-completion">
+  <div class="completion-header">
+    <h2 class="completion-title">PS101 Complete — Your Action Plan</h2>
+    <div class="completion-progress">
+      ● ● ● ● ● ● ● ● ● ●
+      <span class="completion-label">All 10 steps completed</span>
+    </div>
+  </div>
+
+  <div class="completion-message">
+    <p>Well done! You've created a clear action plan.</p>
+  </div>
+
+  <!-- Highlighted commitment -->
+  <div class="commitment-highlight">
+    <h3 class="commitment-label">Your Next Commitment (Step 7):</h3>
+    <div class="commitment-text" id="commitment-text">
+      <!-- Dynamic: User's Step 7 answer -->
+    </div>
+    <div class="commitment-deadline" id="commitment-deadline">
+      <!-- Dynamic: Deadline if provided -->
+    </div>
   </div>
 </div>
 
@@ -1634,6 +2042,721 @@ if(!sessionStorage.getItem('cache_cleared_v3')){
   if(chat && window.innerWidth >= 768){
     chat.style.position = 'fixed';
     makeWindowDraggable(chat);
+  }
+
+  // ========================================
+  // PS101 v2 Flow Manager
+  // ========================================
+
+  const ps101Steps = [
+    {
+      step: 1,
+      title: "Problem Identification and Delta Analysis",
+      prompts: [
+        "What specific career challenge or problem are you facing right now?",
+        "Describe where you are currently in your career and where you'd like to be."
+      ],
+      minChars: 30,
+      maxChars: 500
+    },
+    {
+      step: 2,
+      title: "Current Situation Analysis",
+      prompts: [
+        "Describe your current situation in detail. What are the facts?",
+        "What have you already tried to address this problem?"
+      ],
+      minChars: 30,
+      maxChars: 500
+    },
+    {
+      step: 3,
+      title: "Root Cause Exploration",
+      prompts: [
+        "What do you think is the root cause of this problem?",
+        "What patterns or themes do you notice in this situation?"
+      ],
+      minChars: 30,
+      maxChars: 500
+    },
+    {
+      step: 4,
+      title: "Self-Efficacy Assessment",
+      prompts: [
+        "On a scale of 1-10, how confident do you feel about solving this problem?",
+        "What makes you feel that way? What evidence do you have for this confidence level?"
+      ],
+      minChars: 10,
+      maxChars: 500
+    },
+    {
+      step: 5,
+      title: "Solution Brainstorming",
+      prompts: [
+        "List 3-5 possible approaches you could take to solve this problem.",
+        "For each approach, what is one concrete first step you could take?"
+      ],
+      minChars: 30,
+      maxChars: 500
+    },
+    {
+      step: 6,
+      title: "Experimental Design",
+      prompts: [
+        "Which approach from your brainstorm do you want to try first as an experiment?",
+        "What would success look like for this experiment?"
+      ],
+      minChars: 30,
+      maxChars: 500
+    },
+    {
+      step: 7,
+      title: "Obstacle Identification",
+      prompts: [
+        "What obstacles might prevent you from completing this experiment?",
+        "For each obstacle, what is one strategy you could use to overcome it?"
+      ],
+      minChars: 30,
+      maxChars: 500
+    },
+    {
+      step: 8,
+      title: "Action Planning",
+      prompts: [
+        "What are the specific action steps you'll take to run this experiment?",
+        "When will you complete each action? Who can help hold you accountable?"
+      ],
+      minChars: 30,
+      maxChars: 500
+    },
+    {
+      step: 9,
+      title: "Reflection and Iteration",
+      prompts: [
+        "After running your experiment, what were the results?",
+        "What did you learn? What will you do next: continue, pivot, or try something new?"
+      ],
+      minChars: 30,
+      maxChars: 500
+    },
+    {
+      step: 10,
+      title: "Building Mastery and Self-Efficacy",
+      prompts: [
+        "Reflecting on this problem-solving process, what new skills or knowledge have you gained?",
+        "How can you apply what you've learned to future challenges or goals?",
+        "What strategies will you use to maintain momentum and continue building your problem-solving abilities?",
+        "How has this experience changed your perception of your own capabilities?"
+      ],
+      minChars: 30,
+      maxChars: 1000
+    }
+  ];
+
+  // State Object (v2 - multi-prompt + experiments)
+  const PS101State = {
+    currentStep: 1,
+    currentPromptIndex: 0,
+    steps: {}, // { "1": { prompts: [{ response: "...", completedAt: "..." }] } }
+    experiments: [], // Array of experiment objects
+    startedAt: null,
+    lastUpdated: null,
+    completed: false,
+    completionScores: {},
+
+    init() {
+      const saved = localStorage.getItem('ps101_state_v2');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          Object.assign(this, parsed);
+        } catch (e) {
+          console.error('[PS101] Failed to parse saved state', e);
+        }
+      }
+      if (!this.startedAt) this.startedAt = new Date().toISOString();
+    },
+
+    save() {
+      this.lastUpdated = new Date().toISOString();
+      localStorage.setItem('ps101_state_v2', JSON.stringify(this));
+    },
+
+    reset() {
+      localStorage.removeItem('ps101_state_v2');
+      this.currentStep = 1;
+      this.currentPromptIndex = 0;
+      this.steps = {};
+      this.experiments = [];
+      this.startedAt = new Date().toISOString();
+      this.lastUpdated = null;
+      this.completed = false;
+      this.completionScores = {};
+      this.save();
+    },
+
+    goToStep(stepNumber) {
+      this.currentStep = stepNumber;
+      this.currentPromptIndex = 0;
+      this.save();
+    },
+
+    getAnswer(stepNumber, promptIndex) {
+      if (!this.steps[stepNumber]) return '';
+      const prompts = this.steps[stepNumber].prompts || [];
+      return prompts[promptIndex]?.response || '';
+    },
+
+    setAnswer(stepNumber, promptIndex, response) {
+      if (!this.steps[stepNumber]) {
+        this.steps[stepNumber] = { prompts: [] };
+      }
+      if (!this.steps[stepNumber].prompts) {
+        this.steps[stepNumber].prompts = [];
+      }
+      this.steps[stepNumber].prompts[promptIndex] = {
+        response,
+        completedAt: new Date().toISOString()
+      };
+      this.save();
+    },
+
+    isStepComplete(stepNumber) {
+      const stepData = this.steps[stepNumber];
+      if (!stepData) return false;
+      const stepConfig = ps101Steps.find(s => s.step === stepNumber);
+      if (!stepConfig) return false;
+      const prompts = stepData.prompts || [];
+      return prompts.length >= stepConfig.prompts.length && prompts.every(p => p && p.response && p.response.trim().length > 0);
+    },
+
+    getStepAnswers(stepNumber) {
+      return this.steps[stepNumber] || { prompts: [] };
+    },
+
+    createExperiment() {
+      const exp = {
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+        hypothesis: '',
+        successMetric: '',
+        startDate: '',
+        reviewDate: '',
+        resources: '',
+        obstacles: [],
+        actions: [],
+        reflection: {
+          outcome: '',
+          learning: '',
+          confidenceAfter: 5,
+          nextMove: 'Continue'
+        },
+        status: 'active'
+      };
+      this.experiments.push(exp);
+      this.save();
+      return exp;
+    },
+
+    getActiveExperiment() {
+      return this.experiments.find(e => e.status === 'active') || null;
+    },
+
+    updateExperiment(id, updates) {
+      const exp = this.experiments.find(e => e.id === id);
+      if (exp) {
+        Object.assign(exp, updates);
+        this.save();
+      }
+    }
+  };
+
+  PS101State.init();
+
+  // Expose globally for debugging
+  window.PS101State = PS101State;
+
+  // UI Rendering Functions
+  function renderPS101Flow() {
+    const stepConfig = ps101Steps.find(s => s.step === PS101State.currentStep);
+    if (!stepConfig) return;
+
+    const questionText = $('#question-text');
+    const stepAnswer = $('#step-answer');
+    const stepLabel = $('#step-label');
+    const backBtn = $('#ps101-back');
+    const nextBtn = $('#ps101-next');
+    const charCurrent = $('#char-current');
+    const charMax = $('#char-max');
+    const previousAnswers = $('#previous-answers');
+    const experimentComponents = $('#experiment-components');
+
+    if (stepLabel) {
+      stepLabel.textContent = `Step ${stepConfig.step} of 10: ${stepConfig.title}`;
+    }
+
+    // Multi-prompt handling
+    const currentStep = PS101State.currentStep;
+    const promptIndex = PS101State.currentPromptIndex;
+    const currentPrompt = stepConfig.prompts[promptIndex];
+
+    if (questionText) {
+      questionText.textContent = currentPrompt || '';
+    }
+
+    // Load existing answer for this prompt
+    const isStepComplete = PS101State.isStepComplete(currentStep);
+    const currentAnswer = PS101State.getAnswer(currentStep, promptIndex);
+    if (stepAnswer) {
+      stepAnswer.value = currentAnswer || '';
+      updateCharCount();
+    }
+
+    // Show experiment components for steps 6-9
+    if (experimentComponents) {
+      if ([6, 7, 8, 9].includes(currentStep)) {
+        experimentComponents.classList.remove('hidden');
+        let activeExp = PS101State.getActiveExperiment();
+        if (!activeExp && currentStep === 6) {
+          activeExp = PS101State.createExperiment();
+        }
+        if (activeExp) {
+          if (currentStep === 6) renderExperimentCanvas(activeExp);
+          if (currentStep === 7) renderObstacleMapping(activeExp);
+          if (currentStep === 8) renderActionPlan(activeExp);
+          if (currentStep === 9) renderReflectionLog(activeExp);
+        }
+      } else {
+        experimentComponents.classList.add('hidden');
+      }
+    }
+
+    // Back/Next buttons
+    if (backBtn) {
+      backBtn.disabled = (currentStep === 1 && promptIndex === 0);
+    }
+
+    if (nextBtn) {
+      const allPromptsAnswered = stepConfig.prompts.every((_, idx) => {
+        return PS101State.getAnswer(currentStep, idx).trim().length >= (stepConfig.minChars || 10);
+      });
+      nextBtn.disabled = !allPromptsAnswered;
+      if (currentStep === 10) {
+        nextBtn.textContent = 'Complete PS101';
+      } else {
+        nextBtn.textContent = 'Next →';
+      }
+    }
+
+    // Update progress dots
+    updateProgressDots();
+
+    // Update previous answers section
+    if (previousAnswers) {
+      const completedSteps = Object.keys(PS101State.steps).filter(s => PS101State.isStepComplete(parseInt(s)));
+      if (completedSteps.length > 0) {
+        previousAnswers.classList.remove('hidden');
+        const summaryText = previousAnswers.querySelector('.summary-text');
+        if (summaryText) {
+          summaryText.textContent = `▼ Previous Answers (${completedSteps.length} steps completed)`;
+        }
+        renderPreviousAnswers();
+      } else {
+        previousAnswers.classList.add('hidden');
+      }
+    }
+  }
+
+  function updateProgressDots() {
+    const dots = document.querySelectorAll('.progress-dots .dot');
+    dots.forEach((dot, index) => {
+      const stepNumber = index + 1;
+      dot.classList.remove('active', 'completed');
+      if (stepNumber === PS101State.currentStep) {
+        dot.classList.add('active');
+      } else if (PS101State.isStepComplete(stepNumber)) {
+        dot.classList.add('completed');
+      }
+      dot.disabled = stepNumber > PS101State.currentStep && !PS101State.isStepComplete(stepNumber - 1);
+    });
+  }
+
+  function renderPreviousAnswers() {
+    const answerList = document.querySelector('.answer-list');
+    if (!answerList) return;
+    answerList.innerHTML = '';
+    const completedSteps = Object.keys(PS101State.steps).filter(s => PS101State.isStepComplete(parseInt(s))).map(Number).sort((a, b) => a - b);
+    completedSteps.forEach(stepNum => {
+      const stepConfig = ps101Steps.find(s => s.step === stepNum);
+      const stepAnswers = PS101State.getStepAnswers(stepNum);
+      if (!stepConfig || !stepAnswers.prompts) return;
+      stepAnswers.prompts.forEach((promptData, idx) => {
+        const card = document.createElement('div');
+        card.className = 'answer-card';
+        card.innerHTML = `
+          <div class="answer-header">
+            <span class="answer-step">Step ${stepNum}: ${stepConfig.title} (Q${idx + 1})</span>
+            <button class="answer-edit" data-step="${stepNum}" data-prompt="${idx}">Edit</button>
+          </div>
+          <div class="answer-content">${promptData.response || ''}</div>
+        `;
+        answerList.appendChild(card);
+      });
+    });
+    // Add edit listeners
+    answerList.querySelectorAll('.answer-edit').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const step = parseInt(btn.dataset.step);
+        const prompt = parseInt(btn.dataset.prompt);
+        PS101State.currentStep = step;
+        PS101State.currentPromptIndex = prompt;
+        PS101State.save();
+        renderPS101Flow();
+      });
+    });
+  }
+
+  function updateCharCount() {
+    const stepAnswer = $('#step-answer');
+    const charCurrent = $('#char-current');
+    if (stepAnswer && charCurrent) {
+      charCurrent.textContent = stepAnswer.value.length;
+    }
+  }
+
+  function renderExperimentCanvas(experiment) {
+    const canvas = $('#experiment-canvas');
+    if (!canvas) return;
+    canvas.classList.remove('hidden');
+    $('#exp-hypothesis').value = experiment.hypothesis || '';
+    $('#exp-success-metric').value = experiment.successMetric || '';
+    $('#exp-start-date').value = experiment.startDate || '';
+    $('#exp-review-date').value = experiment.reviewDate || '';
+    $('#exp-resources').value = experiment.resources || '';
+  }
+
+  function renderObstacleMapping(experiment) {
+    const mapping = $('#obstacle-mapping');
+    if (!mapping) return;
+    mapping.classList.remove('hidden');
+    const obstaclesList = $('#obstacles-list');
+    if (!obstaclesList) return;
+    obstaclesList.innerHTML = '';
+    (experiment.obstacles || []).forEach(obstacle => {
+      const item = document.createElement('div');
+      item.className = 'obstacle-item';
+      item.innerHTML = `
+        <div class="obstacle-header">
+          <span>${obstacle.label}</span>
+          <button class="btn-remove" data-id="${obstacle.id}">×</button>
+        </div>
+        <span class="obstacle-type ${obstacle.type}">${obstacle.type}</span>
+        <div class="obstacle-strategy">${obstacle.strategy}</div>
+      `;
+      obstaclesList.appendChild(item);
+    });
+    obstaclesList.querySelectorAll('.btn-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        experiment.obstacles = experiment.obstacles.filter(o => o.id !== id);
+        PS101State.updateExperiment(experiment.id, { obstacles: experiment.obstacles });
+        renderObstacleMapping(experiment);
+      });
+    });
+  }
+
+  function renderActionPlan(experiment) {
+    const plan = $('#action-plan');
+    if (!plan) return;
+    plan.classList.remove('hidden');
+    const actionsList = $('#actions-list');
+    if (!actionsList) return;
+    actionsList.innerHTML = '';
+    (experiment.actions || []).forEach(action => {
+      const item = document.createElement('div');
+      item.className = 'action-item';
+      item.innerHTML = `
+        <div class="action-header">
+          <div class="action-checkbox">
+            <input type="checkbox" ${action.completed ? 'checked' : ''} data-id="${action.id}">
+            <span>${action.label}</span>
+          </div>
+          <button class="btn-remove" data-id="${action.id}">×</button>
+        </div>
+        ${action.dueDate ? `<div class="action-due">Due: ${action.dueDate}</div>` : ''}
+        ${action.accountability ? `<div class="action-due">Accountable: ${action.accountability}</div>` : ''}
+      `;
+      actionsList.appendChild(item);
+    });
+    actionsList.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        const id = checkbox.dataset.id;
+        const action = experiment.actions.find(a => a.id === id);
+        if (action) {
+          action.completed = checkbox.checked;
+          PS101State.updateExperiment(experiment.id, { actions: experiment.actions });
+        }
+      });
+    });
+    actionsList.querySelectorAll('.btn-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        experiment.actions = experiment.actions.filter(a => a.id !== id);
+        PS101State.updateExperiment(experiment.id, { actions: experiment.actions });
+        renderActionPlan(experiment);
+      });
+    });
+  }
+
+  function renderReflectionLog(experiment) {
+    const log = $('#reflection-log');
+    if (!log) return;
+    log.classList.remove('hidden');
+    $('#reflection-outcome').value = experiment.reflection?.outcome || '';
+    $('#reflection-learning').value = experiment.reflection?.learning || '';
+    $('#reflection-confidence').value = experiment.reflection?.confidenceAfter || 5;
+    $('#confidence-value').textContent = experiment.reflection?.confidenceAfter || 5;
+    $('#reflection-next-move').value = experiment.reflection?.nextMove || 'Continue';
+  }
+
+  // Event Listeners for PS101 Flow
+  const startPS101Btn = $('#start-ps101');
+  if (startPS101Btn) {
+    startPS101Btn.addEventListener('click', () => {
+      PS101State.reset();
+      $('#ps101-welcome').classList.add('hidden');
+      $('#ps101-flow').classList.remove('hidden');
+      renderPS101Flow();
+    });
+  }
+
+  const continuePS101Btn = $('#continue-ps101');
+  if (continuePS101Btn) {
+    continuePS101Btn.addEventListener('click', () => {
+      $('#ps101-welcome').classList.add('hidden');
+      $('#ps101-flow').classList.remove('hidden');
+      renderPS101Flow();
+    });
+  }
+
+  const backBtn = $('#ps101-back');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      const state = PS101State;
+      if (state.currentPromptIndex > 0) {
+        state.currentPromptIndex--;
+      } else if (state.currentStep > 1) {
+        state.currentStep--;
+        const prevStepConfig = ps101Steps.find(s => s.step === state.currentStep);
+        state.currentPromptIndex = prevStepConfig ? prevStepConfig.prompts.length - 1 : 0;
+      }
+      state.save();
+      renderPS101Flow();
+    });
+  }
+
+  const nextBtn = $('#ps101-next');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      const state = PS101State;
+      const currentStep = state.currentStep;
+      const promptIndex = state.currentPromptIndex;
+      const stepConfig = ps101Steps.find(s => s.step === currentStep);
+
+      // Save current answer
+      const stepAnswer = $('#step-answer');
+      if (stepAnswer) {
+        const answerText = stepAnswer.value.trim();
+        if (answerText.length >= (stepConfig?.minChars || 10)) {
+          PS101State.setAnswer(currentStep, promptIndex, answerText);
+        }
+      }
+
+      // Save experiment data for steps 6-9
+      if (currentStep === 6) {
+        const activeExp = PS101State.getActiveExperiment();
+        if (activeExp) {
+          activeExp.hypothesis = $('#exp-hypothesis')?.value || '';
+          activeExp.successMetric = $('#exp-success-metric')?.value || '';
+          activeExp.startDate = $('#exp-start-date')?.value || '';
+          activeExp.reviewDate = $('#exp-review-date')?.value || '';
+          activeExp.resources = $('#exp-resources')?.value || '';
+          PS101State.updateExperiment(activeExp.id, activeExp);
+        }
+      }
+
+      if (currentStep === 9) {
+        const activeExp = PS101State.getActiveExperiment();
+        if (activeExp) {
+          activeExp.reflection = {
+            outcome: $('#reflection-outcome')?.value || '',
+            learning: $('#reflection-learning')?.value || '',
+            confidenceAfter: parseInt($('#reflection-confidence')?.value || '5'),
+            nextMove: $('#reflection-next-move')?.value || 'Continue'
+          };
+          activeExp.status = 'completed';
+          PS101State.updateExperiment(activeExp.id, activeExp);
+        }
+      }
+
+      // Move to next prompt or step
+      if (promptIndex < stepConfig.prompts.length - 1) {
+        state.currentPromptIndex++;
+        state.save();
+        renderPS101Flow();
+      } else if (currentStep < 10) {
+        state.currentStep++;
+        state.currentPromptIndex = 0;
+        state.save();
+        renderPS101Flow();
+      } else {
+        // Complete
+        state.completed = true;
+        state.save();
+        showPS101Completion();
+      }
+    });
+  }
+
+  function showPS101Completion() {
+    $('#ps101-flow').classList.add('hidden');
+    $('#ps101-completion').classList.remove('hidden');
+
+    const commitmentText = $('#commitment-text');
+    const step7Answer = PS101State.getAnswer(7, 0);
+    if (commitmentText) {
+      commitmentText.textContent = step7Answer || 'No commitment recorded';
+    }
+  }
+
+  const stepAnswer = $('#step-answer');
+  if (stepAnswer) {
+    stepAnswer.addEventListener('input', updateCharCount);
+  }
+
+  // Confidence slider
+  const reflectionConfidence = $('#reflection-confidence');
+  if (reflectionConfidence) {
+    reflectionConfidence.addEventListener('input', (e) => {
+      const confidenceValue = $('#confidence-value');
+      if (confidenceValue) {
+        confidenceValue.textContent = e.target.value;
+      }
+    });
+  }
+
+  // Obstacle form handlers
+  const addObstacleBtn = $('#add-obstacle-btn');
+  const obstacleForm = $('#add-obstacle-form');
+  const saveObstacleBtn = $('#save-obstacle-btn');
+  const cancelObstacleBtn = $('#cancel-obstacle-btn');
+
+  if (addObstacleBtn && obstacleForm) {
+    addObstacleBtn.addEventListener('click', () => {
+      obstacleForm.classList.remove('hidden');
+    });
+  }
+
+  if (cancelObstacleBtn && obstacleForm) {
+    cancelObstacleBtn.addEventListener('click', () => {
+      obstacleForm.classList.add('hidden');
+      $('#obstacle-label').value = '';
+      $('#obstacle-strategy').value = '';
+    });
+  }
+
+  if (saveObstacleBtn) {
+    saveObstacleBtn.addEventListener('click', () => {
+      const label = $('#obstacle-label')?.value.trim();
+      const strategy = $('#obstacle-strategy')?.value.trim();
+      const type = document.querySelector('input[name="obstacle-type"]:checked')?.value || 'external';
+
+      if (!label || !strategy) return;
+
+      const activeExp = PS101State.getActiveExperiment();
+      if (activeExp) {
+        if (!activeExp.obstacles) activeExp.obstacles = [];
+        activeExp.obstacles.push({
+          id: Date.now().toString(),
+          label,
+          type,
+          strategy
+        });
+        PS101State.updateExperiment(activeExp.id, activeExp);
+        renderObstacleMapping(activeExp);
+        obstacleForm.classList.add('hidden');
+        $('#obstacle-label').value = '';
+        $('#obstacle-strategy').value = '';
+      }
+    });
+  }
+
+  // Action form handlers
+  const addActionBtn = $('#add-action-btn');
+  const actionForm = $('#add-action-form');
+  const saveActionBtn = $('#save-action-btn');
+  const cancelActionBtn = $('#cancel-action-btn');
+
+  if (addActionBtn && actionForm) {
+    addActionBtn.addEventListener('click', () => {
+      actionForm.classList.remove('hidden');
+    });
+  }
+
+  if (cancelActionBtn && actionForm) {
+    cancelActionBtn.addEventListener('click', () => {
+      actionForm.classList.add('hidden');
+      $('#action-label').value = '';
+      $('#action-due').value = '';
+      $('#action-accountability').value = '';
+    });
+  }
+
+  if (saveActionBtn) {
+    saveActionBtn.addEventListener('click', () => {
+      const label = $('#action-label')?.value.trim();
+      const dueDate = $('#action-due')?.value.trim();
+      const accountability = $('#action-accountability')?.value.trim();
+
+      if (!label) return;
+
+      const activeExp = PS101State.getActiveExperiment();
+      if (activeExp) {
+        if (!activeExp.actions) activeExp.actions = [];
+        activeExp.actions.push({
+          id: Date.now().toString(),
+          label,
+          dueDate,
+          accountability,
+          completed: false
+        });
+        PS101State.updateExperiment(activeExp.id, activeExp);
+        renderActionPlan(activeExp);
+        actionForm.classList.add('hidden');
+        $('#action-label').value = '';
+        $('#action-due').value = '';
+        $('#action-accountability').value = '';
+      }
+    });
+  }
+
+  // Progress dot navigation
+  document.querySelectorAll('.progress-dots .dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      const stepNumber = parseInt(dot.dataset.step);
+      if (!dot.disabled && stepNumber <= PS101State.currentStep) {
+        PS101State.goToStep(stepNumber);
+        renderPS101Flow();
+      }
+    });
+  });
+
+  // Check if user has saved progress on page load
+  if (window.PS101State && window.PS101State.steps && Object.keys(window.PS101State.steps).length > 0 && !window.PS101State.completed) {
+    const welcomeResume = $('#welcome-resume');
+    if (welcomeResume) {
+      welcomeResume.classList.remove('hidden');
+    }
   }
 
 
