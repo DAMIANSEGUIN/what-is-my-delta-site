@@ -984,7 +984,7 @@
 (function(){
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-  const API_BASE = 'https://mosaic-platform.vercel.app';
+  const API_BASE = '';  // Use relative paths - Netlify proxies to Railway backend
   
   // Load career coaching knowledge base + PS101 framework
   let careerPrompts = [];
