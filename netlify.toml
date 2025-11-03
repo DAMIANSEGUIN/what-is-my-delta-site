@@ -27,12 +27,6 @@
   force = true
 
 [[redirects]]
-  from = "/wimd"
-  to = "https://what-is-my-delta-site-production.up.railway.app/wimd"
-  status = 200
-  force = true
-
-[[redirects]]
   from = "/wimd/*"
   to = "https://what-is-my-delta-site-production.up.railway.app/wimd/:splat"
   status = 200
