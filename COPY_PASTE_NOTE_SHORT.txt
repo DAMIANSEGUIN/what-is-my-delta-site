@@ -1,0 +1,8 @@
+Railway deployment failing with "python: command not found". Diagnostic document ready:
+
+📄 Cover note: /Users/damianseguin/AI_Workspace/WIMD-Railway-Deploy-Project/FOR_NETLIFY_AGENT_RAILWAY_FIX.md
+
+📄 Full diagnostic: /Users/damianseguin/AI_Workspace/WIMD-Railway-Deploy-Project/docs/NETLIFY_AGENT_RAILWAY_DEPLOYMENT_FIX.md
+
+Both files are in the shared repository.
+

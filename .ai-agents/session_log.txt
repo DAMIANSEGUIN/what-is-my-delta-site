@@ -1,0 +1,1 @@
+[2025-11-03T15:12:53Z] Session: Claude Code - Diagnosed Netlify deployment mismatch. Root cause: mosaic_ui directory out of sync with frontend. Deployed correct version from GitHub origin/main (f709d52) via mosaic_ui directory.

@@ -19,8 +19,41 @@
 - ✅ Phase 1: Migration framework + CSV→AI fallback + feature flags
 - ✅ Phase 2: Experiment engine backend (feature flag disabled)
 - ✅ Phase 3: Self-efficacy metrics + coach escalation + Focus Stack UI
-- ✅ Phase 4: RAG baseline + job feeds + 13 job sources
+- ✅ Phase 4: RAG baseline + job feeds + 12 job sources
 - ✅ Phase 4+: Dynamic source discovery + cost controls + competitive intelligence + OSINT + domain-adjacent search
+- ✅ PS101 v2: Enhanced inline forms + experiment components (restored 2025-11-02)
+- ✅ **Deployment Enforcement:** Automated verification system active (2025-11-03)
+
+## Deployment Commands (MANDATORY - Use Wrapper Scripts)
+
+**❌ DO NOT use raw commands:**
+- `git push railway-origin main`
+- `netlify deploy --prod`
+
+**✅ ALWAYS use wrapper scripts:**
+```bash
+# Deploy frontend with verification
+./scripts/deploy.sh netlify
+
+# Deploy backend with verification
+./scripts/deploy.sh railway
+
+# Deploy both frontend + backend
+./scripts/deploy.sh all
+
+# Push with automated verification
+./scripts/push.sh railway-origin main
+
+# Emergency bypass (logged to audit)
+SKIP_VERIFICATION=true BYPASS_REASON="reason" ./scripts/push.sh railway-origin main
+```
+
+**Why wrapper scripts are required:**
+- Automated pre-deployment verification
+- Critical feature checks
+- Post-deployment verification
+- GitHub Actions verification with manual escalation on failure
+- Prevents false positive deployments
 
 ## API Endpoints
 - Health: `/health`, `/health/comprehensive`, `/health/recover`, `/health/prompts`, `/health/rag`, `/health/experiments`
@@ -38,7 +71,7 @@
 - Cost: `/cost/analytics`, `/cost/limits`
 - Domain Adjacent: `/domain-adjacent/discover`, `/domain-adjacent/health`
 
-## Current Status (Updated: 2025-10-07 - Phase 4 COMPLETE + All 12 Free Sources LIVE)
+## Current Status (Updated: 2025-11-02 - PS101 v2 RESTORED + Comprehensive Diagnostic COMPLETE)
 - ✅ UI frontend: OPERATIONAL
 - ✅ Chat/Coach interface: OPERATIONAL
 - ✅ Backend API: OPERATIONAL (FastAPI on Railway)
@@ -138,7 +171,37 @@
 8. Observability & Governance → Data Ops (+eval traces)
 9. **Safety & Evidence (Foundation)** → **Data Ops + LLM**
 
-## Resolved Issues (v1.0 + v2.0 Phase 1-3)
+## Diagnostic Reports & Implementation Protocols
+
+### 📊 Latest Diagnostics (2025-11-02)
+- **Final Diagnostic:** `.ai-agents/FINAL_DIAGNOSTIC_20251102.md`
+- **Findings Summary:** `.ai-agents/FINDINGS_SUMMARY.md`
+- **Detailed Report:** `.ai-agents/DIAGNOSTIC_REPORT_20251102.md`
+- **System Health:** 🟢 GREEN - 92% feature completeness, 0% error rate
+
+### 🛡️ Safety & Quality Protocols
+**Location:** `.ai-agents/` directory
+- **Session Start Protocol:** `SESSION_START_PROTOCOL.md` - Mandatory checklist for every AI agent
+- **Handoff Protocol:** `HANDOFF_PROTOCOL.md` - Agent-to-agent transition procedures
+- **AI Agent Prompt:** `AI_AGENT_PROMPT.md` - Copy/paste onboarding for new agents
+- **Verification Script:** `scripts/verify_critical_features.sh` - Automated feature checks
+- **Pre-commit Hooks:** `.git/hooks/pre-commit` - Blocks feature removal
+
+### 📖 For Implementation Team
+**Essential Reading (in order):**
+1. `CLAUDE.md` (this file) - Architecture overview
+2. `TROUBLESHOOTING_CHECKLIST.md` - Error prevention & debugging
+3. `SELF_DIAGNOSTIC_FRAMEWORK.md` - Architecture-specific error handling
+4. `.ai-agents/SESSION_START_PROTOCOL.md` - Required first step for all agents
+5. `.ai-agents/FINAL_DIAGNOSTIC_20251102.md` - Current system state
+
+**Quick Links:**
+- Project documentation: `docs/README.md`
+- Deployment scripts: `scripts/` directory
+- Backend health: https://what-is-my-delta-site-production.up.railway.app/health/comprehensive
+- Frontend: https://whatismydelta.com
+
+## Resolved Issues (v1.0 + v2.0 Phase 1-4)
 - ✅ **BLOCKER-UI-ASK**: Chat/coach interface now operational
 - ✅ **BLOCKER-API-BACKEND**: Backend deployed on Railway and connected
 - ✅ **Button functionality**: All Phase 1-3 interactive elements working
@@ -150,6 +213,9 @@
 - ✅ **Password reset**: Forgot password flow implemented (email service pending)
 - ✅ **CSV lookup fix**: Fixed prompt selector to properly handle response/completion fields (api/prompt_selector.py:118)
 - ✅ **Auto-restart monitoring**: Railway health checks with automatic restart on prompt system failure
+- ✅ **PS101 v2 restoration** (2025-11-02): Enhanced inline forms restored without breaking auth
+- ✅ **Incident recovery** (2025-11-02): Auth system restored from commit 70b8392
+- ✅ **Contingency system** (2025-11-02): Pre-commit hooks + verification scripts now active
 
 ## Monitoring & Auto-Restart System
 - **Railway Health Checks**: Configured via `railway.toml` with `/health` endpoint monitoring
@@ -188,6 +254,44 @@
 - Evidence Bridge: Connect classical ML scoring with LLM generation (pending)
 - Governance: Eval traces for observability (pending)
 - Security: API keys managed via Railway environment variables
+
+## MANDATORY: Post-Change Diagnostic Protocol
+
+**⚠️ REQUIRED AFTER ANY CODE CHANGES:**
+
+1. **Run Verification Script:**
+   ```bash
+   ./scripts/verify_critical_features.sh
+   ```
+
+2. **Test Backend Health:**
+   ```bash
+   curl https://what-is-my-delta-site-production.up.railway.app/health/comprehensive
+   ```
+
+3. **Run Comprehensive Diagnostic** (for major changes):
+   ```bash
+   # See .ai-agents/FINAL_DIAGNOSTIC_20251102.md for example
+   # Test all endpoints, verify frontend features, document findings
+   ```
+
+4. **Update Documentation:**
+   - Update `CLAUDE.md` status section
+   - Add findings to `.ai-agents/` directory
+   - Document any new issues or resolutions
+
+**This protocol prevents incidents like the 2025-11-01 auth removal.**
+
+---
+
+## Recent Changes (2025-11-02)
+**PS101 v2 Restoration & Architecture Diagnostic:**
+1. **Incident Response**: Auth system accidentally removed in commit 890d2bc
+2. **Recovery**: Restored auth from commit 70b8392
+3. **Enhancement**: PS101 v2 enhancements merged with authenticated base
+4. **Contingency**: Pre-commit hooks + verification scripts installed
+5. **Diagnostic**: Comprehensive architecture review completed
+6. **Status**: All critical features operational, 92% feature completeness
 
 ## Recent Changes (2025-10-07)
 **Phase 4 Recovery & Full Implementation:**

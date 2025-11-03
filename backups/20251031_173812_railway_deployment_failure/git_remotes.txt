@@ -1,0 +1,4 @@
+origin	https://github.com/DAMIANSEGUIN/wimd-railway-deploy.git (fetch)
+origin	https://github.com/DAMIANSEGUIN/wimd-railway-deploy.git (push)
+railway-origin	https://github.com/DAMIANSEGUIN/what-is-my-delta-site.git (fetch)
+railway-origin	https://github.com/DAMIANSEGUIN/what-is-my-delta-site.git (push)

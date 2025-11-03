@@ -1,0 +1,23 @@
+Railway Deployment Fix Needed - Diagnostic Document Ready
+
+Hi Netlify Agent Runners,
+
+We have a Railway deployment issue that needs diagnosis and repair. A complete diagnostic document has been created in our shared repository.
+
+Issue: Railway deployments failing with "python: command not found" error
+
+Document Location (exact paths):
+- Cover note: /Users/damianseguin/AI_Workspace/WIMD-Railway-Deploy-Project/FOR_NETLIFY_AGENT_RAILWAY_FIX.md
+- Full diagnostic: /Users/damianseguin/AI_Workspace/WIMD-Railway-Deploy-Project/docs/NETLIFY_AGENT_RAILWAY_DEPLOYMENT_FIX.md
+
+The cover note provides a quick summary and points to the full diagnostic document which contains:
+- Complete error analysis
+- Root cause identification
+- 5-step diagnosis process
+- Step-by-step fix instructions
+- Verification steps
+
+Please review the diagnostic document and follow the repair steps.
+
+Thanks!
+

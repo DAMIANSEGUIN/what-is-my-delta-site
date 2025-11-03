@@ -1,0 +1,63 @@
+name: Deployment Verification
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verify-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Pre-deployment verification
+        run: |
+          echo "Running pre-deployment checks..."
+          chmod +x ./scripts/verify_critical_features.sh
+          ./scripts/verify_critical_features.sh
+
+      - name: Deploy to Netlify
+        if: success()
+        run: |
+          npm install -g netlify-cli
+          netlify deploy --prod --dir=mosaic_ui
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Wait for propagation
+        if: success()
+        run: |
+          echo "Waiting 60 seconds for CDN propagation..."
+          sleep 60
+
+      - name: Verify live deployment
+        if: success()
+        run: |
+          chmod +x ./scripts/verify_live_deployment.sh
+          ./scripts/verify_live_deployment.sh
+
+      - name: Manual rollback required
+        if: failure()
+        run: |
+          echo "❌ Deployment verification failed."
+          echo "Manual intervention required before retrying deploy."
+          echo "Recommended actions:"
+          echo "  1. Inspect Netlify and Railway logs."
+          echo "  2. Coordinate human-approved rollback if production is impacted."
+          echo "  3. Capture findings in DEPLOYMENT_CHECKLIST.md."
+
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "✅ Deployment verified successfully"
+          echo "Live at: https://whatismydelta.com/"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed verification"
+          echo "Check logs above for details"

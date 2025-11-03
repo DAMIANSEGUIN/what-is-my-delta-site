@@ -1,0 +1,4 @@
+Railway Source Repo: DAMIANSEGUIN/what-is-my-delta-site
+Deployment failing: pip not found
+NARs recommendation: Check Railway Root Directory setting
+nixpacks.toml removed per NARs guidance

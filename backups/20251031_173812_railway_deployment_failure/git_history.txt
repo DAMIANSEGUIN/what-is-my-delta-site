@@ -1,0 +1,20 @@
+70b8392 Remove nixpacks.toml per NARs recommendation - let Railway auto-detect Python
+d38d255 Fix pip path: Use 'python -m pip' instead of 'pip' command
+d6f7798 Fix pip not found: Add python311Packages.pip to nixPkgs
+8ef02c3 Fix Railway deployment: Force Python 3.11 buildpack
+aab0de0 Fix PS101 v2 Issue #1: Replace browser prompts with inline forms
+d5705e4 Strip experimental UI features, add simple onboarding
+1d82af1 Add Mosaic adaptive UX states (calm/focus/recovery/explore) + channel chooser
+a8fdea0 Add architecture feedback for ChatGPT
+33fda8d Add complete session summary documentation
+d4cb2f6 Complete Google Drive organization and cleanup
+cde8844 Add ChatGPT Master Implementation Plan + Local cleanup
+81110d2 Add ChatGPT redesign architecture to project structure
+f118bf0 Add ChatGPT integration instructions - use GitHub directly
+f9e0367 Implement appointment booking + discount code system per specs
+666d382 Remove incorrect booking implementation - specs define frontend-only Google Calendar integration
+4d673ae Add booking router error diagnostics
+355dfea Add diagnostic script for booking router import issue
+9ffa7d3 Fix booking router import error - add typing-extensions for Python 3.7 compatibility
+fa95c45 Add error logging for booking router import
+c7ef6cd Fix booking.py auth import - add get_current_user dependency

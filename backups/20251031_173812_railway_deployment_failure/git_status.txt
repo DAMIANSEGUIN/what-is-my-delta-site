@@ -1,0 +1,29 @@
+On branch main
+Your branch is ahead of 'origin/main' by 27 commits.
+  (use "git push" to publish your local commits)
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	CLAUDE_CODE_ACCOUNTABILITY.md
+	RAILWAY_DEPLOYMENT_FACTS.md
+	SESSION_START_README.md
+	backups/
+	check_railway_deployment.sh
+	docs/AGENT_TASK_TEMPLATE.md
+	docs/CHECKPOINT_PLAN_IMPLEMENTATION_COMPLETE.md
+	docs/CODEX_REVIEW_REQUEST.md
+	docs/CURSOR_FIXES_REQUIRED.md
+	docs/DEPLOYMENT_VERIFICATION_CHECKLIST.md
+	docs/DEVELOPMENT_PROCESS_REVIEW.md
+	docs/FINAL_SUMMARY_FOR_DAMIAN.md
+	docs/IMPLEMENTATION_SUMMARY_PS101_V2.md
+	docs/SHARE_CHECKPOINT_SYSTEM_FOR_CODEX_REVIEW.md
+	docs/SHARE_PROJECT_PLAN_ADJUSTMENTS.md
+	docs/START_HERE_DOCUMENTATION_INDEX.md
+	docs/TEAM_ANNOUNCEMENT_PS101_V2.md
+	docs/TEAM_EMAIL_READY_TO_SHARE.md
+	docs/TEAM_EMAIL_SHORT.md
+	docs/TEAM_REVIEW_CHECKLIST.md
+	docs/TEAM_UPDATE_TEMPLATE.md
+
+nothing added to commit but untracked files present (use "git add" to track)

@@ -4,6 +4,12 @@
 
 ## Pre-Deployment
 
+- [ ] Ensure enforcement hooks are installed
+  ```bash
+  ./scripts/setup_hooks.sh
+  # If config is locked, run: git config core.hooksPath .githooks
+  ```
+
 - [ ] Verify git remote configuration
   ```bash
   git remote -v
@@ -25,9 +31,9 @@
 
 ## Deployment
 
-- [ ] Push to **PRODUCTION** remote (not origin!)
+- [ ] Push to **PRODUCTION** using wrapper (not origin!)
   ```bash
-  git push railway-origin main
+  ./scripts/push.sh railway-origin main
   ```
 
 - [ ] Confirm push succeeded
@@ -72,13 +78,45 @@
 ## Common Mistakes to Avoid
 
 ❌ **WRONG:** `git push` (goes to 'origin' = backup repo)
-✅ **RIGHT:** `git push railway-origin main` (goes to production)
+✅ **RIGHT:** `./scripts/push.sh railway-origin main` (enforced verification + production push)
+
+❌ **WRONG:** `git push railway-origin main` (bypasses wrapper script)
+✅ **RIGHT:** `./scripts/push.sh railway-origin main` (wrapper enforces verification)
+
+❌ **WRONG:** `netlify deploy --prod` (no verification)
+✅ **RIGHT:** `./scripts/deploy.sh netlify` (automated verification)
 
 ❌ **WRONG:** Marking as "deployed" immediately after push
 ✅ **RIGHT:** Wait 2-3 minutes, verify live, THEN mark as deployed
 
 ❌ **WRONG:** Assuming deployment worked
 ✅ **RIGHT:** Always verify with curl/browser test
+
+## Deployment Wrapper Scripts (MANDATORY)
+
+**Always use wrapper scripts - they enforce automated verification:**
+
+```bash
+# Deploy frontend only
+./scripts/deploy.sh netlify
+
+# Deploy backend only
+./scripts/deploy.sh railway
+
+# Deploy both
+./scripts/deploy.sh all
+
+# Push to production (with verification)
+./scripts/push.sh railway-origin main
+
+# Push to backup repo (no verification required)
+./scripts/push.sh origin main
+```
+
+**Emergency bypass (logged to audit):**
+```bash
+SKIP_VERIFICATION=true BYPASS_REASON="Production hotfix" ./scripts/push.sh railway-origin main
+```
 
 ## Quick Reference
 
@@ -87,17 +125,25 @@
 git add <files>
 git commit -m "message"
 
-# 2. Push to PRODUCTION
-git push railway-origin main
+# 2. Deploy to PRODUCTION (uses wrapper script)
+./scripts/push.sh railway-origin main
 
-# 3. Wait 2-3 minutes
+# Script will automatically:
+# - Run verification checks
+# - Push to railway-origin
+# - Display next steps
+
+# 3. Wait 3 minutes for Railway + Netlify
 
 # 4. Verify deployment
-curl -s https://whatismydelta.com/ | grep "<search-term>"
+./scripts/verify_deployment.sh
 
 # 5. Test in browser (hard refresh first)
 ```
 
 ---
 
-**Remember:** If you can't verify it's live, it's NOT deployed.
+**Remember:**
+- If you can't verify it's live, it's NOT deployed
+- Always use wrapper scripts (`./scripts/push.sh`, `./scripts/deploy.sh`)
+- Never use raw `git push` or `netlify deploy` commands

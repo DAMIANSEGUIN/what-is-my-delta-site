@@ -1,0 +1,82 @@
+#!/bin/bash
+# Pre-Push Hook - Deployment Automation Enforcement
+# Prevents pushes to production without verification
+# Emergency bypass: SKIP_VERIFICATION=true git push ...
+
+set -euo pipefail
+
+REMOTE="$1"
+URL="$2"
+
+echo "======================================"
+echo "PRE-PUSH ENFORCEMENT HOOK"
+echo "======================================"
+echo "Remote: $REMOTE"
+echo "URL: $URL"
+echo ""
+
+# Only enforce verification for railway-origin (production)
+if [[ "$REMOTE" != "railway-origin" ]]; then
+  echo "ℹ️  Pushing to non-production remote ($REMOTE)"
+  echo "Skipping verification"
+  echo ""
+  exit 0
+fi
+
+echo "🚨 PRODUCTION PUSH DETECTED (railway-origin)"
+echo ""
+
+# Check for emergency bypass
+if [[ "${SKIP_VERIFICATION:-false}" == "true" ]]; then
+  echo "⚠️  EMERGENCY BYPASS ACTIVATED"
+  echo ""
+
+  # Log bypass to audit log
+  TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
+  USER=$(git config user.name || echo "unknown")
+  COMMIT=$(git rev-parse HEAD)
+  REASON="${BYPASS_REASON:-No reason provided}"
+
+  echo "$TIMESTAMP | $USER | $REMOTE | $REASON | $COMMIT" >> .verification_audit.log
+
+  echo "✅ Bypass logged to .verification_audit.log"
+  echo "⚠️  WARNING: Verification checks were SKIPPED"
+  echo "⚠️  Ensure you manually verify deployment after push"
+  echo ""
+  exit 0
+fi
+
+# Run verification script
+echo "Running mandatory pre-push verification..."
+echo ""
+
+if ! ./scripts/pre_push_verification.sh; then
+  echo ""
+  echo "======================================"
+  echo "❌ PUSH BLOCKED"
+  echo "======================================"
+  echo ""
+  echo "Pre-push verification failed."
+  echo ""
+  echo "Options:"
+  echo "1. Fix the issues reported above and try again"
+  echo "2. Emergency bypass (logged): SKIP_VERIFICATION=true git push railway-origin main"
+  echo ""
+  exit 1
+fi
+
+echo ""
+echo "======================================"
+echo "✅ VERIFICATION PASSED - ALLOWING PUSH"
+echo "======================================"
+echo ""
+echo "This push will trigger:"
+echo "  - Railway backend rebuild (~2 min)"
+echo "  - Netlify frontend auto-deploy (~1 min)"
+echo ""
+echo "After push completes:"
+echo "  - Wait 3 minutes for deployments"
+echo "  - Run: ./scripts/verify_deployment.sh"
+echo ""
+
+exit 0
