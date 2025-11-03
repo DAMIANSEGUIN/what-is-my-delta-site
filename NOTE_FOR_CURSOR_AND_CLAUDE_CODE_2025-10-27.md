@@ -26,6 +26,7 @@ Recent hardening items are in place:
 - `.githooks/pre-push` holds the enforcement hook under version control. Run `./scripts/setup_hooks.sh` (or `git config core.hooksPath .githooks`) after cloning to activate it.
 - `scripts/push.sh` now honors `SKIP_VERIFICATION=true`, delegating logging to the hook so emergency bypass guidance matches runtime behavior.
 - `.github/workflows/deploy-verification.yml` no longer auto-reverts `main`; failures stop and instruct human-led rollback, avoiding history damage.
+- Workflow deploy step updated to pass `--auth`/`--site` flags so Netlify CLI uses repo secrets without interactive login.
 - Documentation (checklist, CLAUDE.md, enforcement plan, implementation report) updated to reflect the tracked hook, setup script, and manual rollback flow.
 
 Still outstanding:

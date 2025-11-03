@@ -21,12 +21,16 @@ jobs:
 
       - name: Deploy to Netlify
         if: success()
-        run: |
-          npm install -g netlify-cli
-          netlify deploy --prod --dir=mosaic_ui
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          npm install -g netlify-cli
+          netlify deploy \
+            --prod \
+            --dir=mosaic_ui \
+            --auth "$NETLIFY_AUTH_TOKEN" \
+            --site "$NETLIFY_SITE_ID"
 
       - name: Wait for propagation
         if: success()
