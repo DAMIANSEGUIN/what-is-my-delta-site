@@ -54,7 +54,8 @@ echo ""
 echo "Step 4: Content verification..."
 if [ -f "mosaic_ui/index.html" ]; then
   ACTUAL_LINES=$(wc -l mosaic_ui/index.html | awk '{print $1}')
-  EXPECTED_LINES=3427
+  # PS101 v2 UI (with auth) renders 3,875 lines; update if spec changes.
+  EXPECTED_LINES=3875
 
   if [ "$ACTUAL_LINES" != "$EXPECTED_LINES" ]; then
     echo "⚠️  Warning: Line count mismatch"
