@@ -1926,11 +1926,29 @@
     window.location.reload();
   }
 
+  function hideAuthModal(){
+    const authModal = $('#authModal');
+    if(authModal){
+      authModal.style.display = 'none';
+    }
+  }
+
+  function scheduleTrialExpiry(){
+    if(isAuthenticated || !trialStartTime) return;
+    const elapsed = Date.now() - parseInt(trialStartTime, 10);
+    const remaining = TRIAL_DURATION - elapsed;
+    if(remaining > 0){
+      setTimeout(checkTrialExpired, remaining);
+    }else{
+      checkTrialExpired();
+    }
+  }
+
   function startTrial(){
     if(!isAuthenticated && !trialStartTime){
       trialStartTime = Date.now().toString();
       localStorage.setItem(TRIAL_START_KEY, trialStartTime);
-      setTimeout(checkTrialExpired, TRIAL_DURATION);
+      scheduleTrialExpiry();
     }
   }
 
@@ -1952,6 +1970,29 @@
       }
     }
   }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    sessionId = localStorage.getItem(SESSION_KEY) || '';
+    trialStartTime = localStorage.getItem(TRIAL_START_KEY);
+
+    if(sessionId){
+      hideAuthModal();
+      updateUserProgress();
+    }else{
+      if(!trialStartTime){
+        startTrial();
+        hideAuthModal();
+      }else{
+        scheduleTrialExpiry();
+        const elapsed = Date.now() - parseInt(trialStartTime, 10);
+        if(elapsed < TRIAL_DURATION){
+          hideAuthModal();
+        }else{
+          checkTrialExpired();
+        }
+      }
+    }
+  }, { once: true });
 
   function softRoute(txt) {
     const t = (txt || '').toLowerCase();
