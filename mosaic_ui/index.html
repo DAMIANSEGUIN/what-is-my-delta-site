@@ -287,7 +287,7 @@
   </nav>
 
   <!-- LOGIN/REGISTER MODAL -->
-  <div id="authModal" class="modal" style="display:block">
+  <div id="authModal" class="modal" style="display:none">
     <div class="panel" style="max-width:400px">
       <h2 style="font:600 14px/1.2 Helvetica,Arial;margin:0 0 20px;text-transform:uppercase;letter-spacing:.08em;text-align:center">welcome to your career transition</h2>
       
@@ -1972,22 +1972,31 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    console.log('[TRIAL] Initializing auth/trial mode...');
     sessionId = localStorage.getItem(SESSION_KEY) || '';
     trialStartTime = localStorage.getItem(TRIAL_START_KEY);
 
+    console.log('[TRIAL] sessionId:', sessionId ? 'exists' : 'none');
+    console.log('[TRIAL] trialStartTime:', trialStartTime || 'none');
+
     if(sessionId){
+      console.log('[TRIAL] User has session - hiding modal');
       hideAuthModal();
       updateUserProgress();
     }else{
       if(!trialStartTime){
+        console.log('[TRIAL] New visitor - starting trial and hiding modal');
         startTrial();
-        hideAuthModal();
+        // Modal already hidden by default
       }else{
         scheduleTrialExpiry();
         const elapsed = Date.now() - parseInt(trialStartTime, 10);
+        console.log('[TRIAL] Existing trial - elapsed:', Math.floor(elapsed/1000), 'seconds');
         if(elapsed < TRIAL_DURATION){
-          hideAuthModal();
+          console.log('[TRIAL] Trial still valid - hiding modal');
+          // Modal already hidden by default
         }else{
+          console.log('[TRIAL] Trial expired - showing modal');
           checkTrialExpired();
         }
       }
