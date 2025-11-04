@@ -23,6 +23,34 @@ echo "======================================"
 echo "Target: $TARGET"
 echo ""
 
+# Calculate BUILD_ID and SPEC_SHA
+echo "Step 0: Calculating BUILD_ID and SPEC_SHA..."
+echo ""
+
+export BUILD_ID=$(git rev-parse HEAD)
+export SPEC_SHA=$(shasum -a 256 Mosaic/PS101_Continuity_Kit/manifest.can.json | cut -d' ' -f1 | cut -c1-8)
+
+echo "BUILD_ID: $BUILD_ID"
+echo "SPEC_SHA: $SPEC_SHA"
+echo ""
+
+# Inject BUILD_ID into footer
+echo "Step 0.5: Injecting BUILD_ID into footer..."
+echo ""
+
+if [ -f "Mosaic/PS101_Continuity_Kit/inject_build_id.js" ]; then
+  if command -v node &> /dev/null; then
+    node Mosaic/PS101_Continuity_Kit/inject_build_id.js
+    echo "✅ BUILD_ID injected into footer"
+  else
+    echo "⚠️  Node.js not found - skipping BUILD_ID injection"
+  fi
+else
+  echo "⚠️  inject_build_id.js not found - skipping BUILD_ID injection"
+fi
+
+echo ""
+
 # Pre-deployment verification
 echo "Step 1: Pre-deployment verification..."
 echo ""

@@ -29,6 +29,23 @@
   # Should show: "nothing to commit, working tree clean"
   ```
 
+- [ ] Update related documentation and audit logs
+  - Refresh deployment notes, incident trackers, and `NOTE_FOR_CURSOR_AND_CLAUDE_CODE_2025-10-27.md` as needed
+  - Record checkpoints in `.verification_audit.log` or relevant handoff files
+
+- [ ] Run PS101 continuity helper scripts
+  ```bash
+  ./Mosaic/PS101_Continuity_Kit/check_spec_hash.sh
+  node Mosaic/PS101_Continuity_Kit/inject_build_id.js
+  ```
+  - Confirm `check_spec_hash.sh` reports the expected SHA
+  - Ensure `frontend/index.html` and `mosaic_ui/index.html` footer comment shows `BUILD_ID:<commit>|SHA:<manifest>`
+
+- [ ] **Documentation:** Any UI/code change requires documentation updates before sign-off
+  - Update relevant docs (architecture, API, user guides)
+  - Cursor's reviewer role includes flagging documentation drift (see `docs/EXTERNAL_ARCHITECTURE_OVERVIEW_2025-11-03.md`)
+  - Ensure all changes are documented in review documents
+
 ## Deployment
 
 - [ ] Push to **PRODUCTION** using wrapper (not origin!)
@@ -60,7 +77,13 @@
   ```bash
   # Example: Check if new function exists in deployed code
   curl -s https://whatismydelta.com/ | grep "LOGGING_OUT"
+  # Confirm footer BUILD_ID is updated
+  curl -s https://whatismydelta.com/ | grep "BUILD_ID"
   ```
+
+- [ ] Log deployment outcome
+  - Append verification results to `.verification_audit.log`
+  - Update deployment docs/checklists with timestamp and BUILD_ID
 
 - [ ] Hard refresh browser (Ctrl+Shift+R / Cmd+Shift+R)
 

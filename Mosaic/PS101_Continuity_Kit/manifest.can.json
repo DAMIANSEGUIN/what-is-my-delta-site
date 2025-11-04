@@ -1,0 +1,17 @@
+{
+  "package": "PS101 Continuity Disambiguation Kit",
+  "version": "FINAL-2025-11-03",
+  "components": [
+    "manifest.can.json",
+    "README_NOTE_FOR_BUILD_TEAM.md",
+    "PS101_Continuity_Disambiguation_Plan_2025-11-03.md",
+    "inject_build_id.js",
+    "check_spec_hash.sh",
+    ".github/workflows/ps101_gate.yml",
+    ".github/workflows/ps101_netlify_deploy.yml",
+    ".github/workflows/ps101_railway_deploy.yml",
+    "netlify.toml",
+    "RAILWAY_CONFIG_NOTE.md"
+  ],
+  "nudge": "Adopt the single gate + manifest + footer BUILD_ID immediately."
+}
