@@ -1,0 +1,52 @@
+<!-- PS101 / Mosaic trial-mode bootstrap (idempotent) -->
+<script>
+(function () {
+  const TTL_MS = 5 * 60 * 1000;
+  const LS_KEY = "ps101_trial_started_at";
+  const READY_MAX_WAIT_MS = 8000;
+  const READY_POLL_MS = 100;
+  function now() { return Date.now(); }
+  function trialRemaining() {
+    const startedAt = Number(localStorage.getItem(LS_KEY) || 0);
+    if (!startedAt) return 0;
+    const remaining = (startedAt + TTL_MS) - now();
+    return remaining > 0 ? remaining : 0;
+  }
+  function ensureAuthModalHidden() {
+    const modal = document.getElementById("authModal");
+    if (!modal) return;
+    modal.setAttribute("aria-hidden", "true");
+    modal.style.display = "none";
+    modal.classList.add("hidden", "inert");
+  }
+  function startOrResumeTrial(app) {
+    const authed = !!(app && typeof app.isAuthenticated === "function" && app.isAuthenticated());
+    if (authed) return;
+    let remaining = trialRemaining();
+    if (remaining <= 0) {
+      localStorage.setItem(LS_KEY, String(now()));
+      remaining = TTL_MS;
+    }
+    try {
+      if (app?.PS101State?.startTrial) {
+        app.PS101State.startTrial(remaining);
+      }
+      ensureAuthModalHidden();
+      if (app?.UI?.showToast) app.UI.showToast("Trial mode active · " + Math.ceil(remaining / 1000) + "s left");
+    } catch (e) { console.error("Trial init error:", e); }
+  }
+  function initWhenReady() {
+    const t0 = now();
+    (function poll() {
+      const app = window.MosaicApp || window.PS101 || window.App;
+      const hasState = !!(app && app.PS101State);
+      if (hasState) { startOrResumeTrial(app); return; }
+      if (now() - t0 < READY_MAX_WAIT_MS) { setTimeout(poll, READY_POLL_MS); }
+      else { ensureAuthModalHidden(); console.warn("Trial init timed out; modal hidden as failsafe."); }
+    })();
+  }
+  const params = new URLSearchParams(location.search);
+  if (params.get("forceLogin") === "1") { localStorage.removeItem(LS_KEY); }
+  else { initWhenReady(); }
+})();
+</script>
