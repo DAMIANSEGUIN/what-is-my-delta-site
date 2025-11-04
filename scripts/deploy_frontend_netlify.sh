@@ -2,15 +2,22 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-FRONTEND_DIR="$ROOT_DIR/frontend"
+# Default to PS101-compliant mosaic UI; allow override via NETLIFY_DEPLOY_DIR
 SITE_FILE="$ROOT_DIR/.netlify_site_id"
+DEPLOY_DIR="${NETLIFY_DEPLOY_DIR:-$ROOT_DIR/mosaic_ui}"
 
-echo "=== WIMD Frontend Deploy (Netlify) ==="
+if [ ! -d "$DEPLOY_DIR" ] && [ -d "$ROOT_DIR/frontend" ]; then
+  echo "⚠️  Directory '$DEPLOY_DIR' not found; falling back to legacy frontend/"
+  DEPLOY_DIR="$ROOT_DIR/frontend"
+fi
 
-if [ ! -d "$FRONTEND_DIR" ]; then
-  echo "Error: Frontend directory '$FRONTEND_DIR' missing" >&2
+if [ ! -d "$DEPLOY_DIR" ]; then
+  echo "Error: Deploy directory '$DEPLOY_DIR' missing" >&2
   exit 1
 fi
+
+echo "=== WIMD Frontend Deploy (Netlify) ==="
+echo "Using deploy directory: $DEPLOY_DIR"
 
 if ! command -v netlify >/dev/null 2>&1; then
   echo "Netlify CLI not found. Install with: npm install -g netlify-cli" >&2
@@ -37,7 +44,7 @@ if [ -z "$SITE_ID" ]; then
   echo "$SITE_ID" > "$SITE_FILE"
 fi
 
-echo "Deploying '$FRONTEND_DIR' to Netlify site '$SITE_ID'..."
-netlify deploy --dir "$FRONTEND_DIR" --prod --site "$SITE_ID"
+echo "Deploying '$DEPLOY_DIR' to Netlify site '$SITE_ID'..."
+netlify deploy --dir "$DEPLOY_DIR" --prod --site "$SITE_ID"
 
 echo "=== Frontend deploy complete ==="
