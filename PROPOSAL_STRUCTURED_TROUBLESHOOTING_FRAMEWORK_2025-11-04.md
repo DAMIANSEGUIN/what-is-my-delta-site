@@ -289,3 +289,456 @@ If framework proves effective, adopt as standard operating procedure for all pro
 **END PROPOSAL**
 
 **Next Action:** Await Codex review and approval to proceed with Stage 1.
+
+---
+
+## ADDENDUM: TOKEN EFFICIENCY & COMMUNICATION PROTOCOL
+
+### Hard-Coded Communication Rules
+
+**RULE 1: Batched Decision Points (One Permission Per Session)**
+
+Default mode: **Batch all decisions into a single permission request per session.**
+
+**Implementation:**
+```
+At session start, agent presents:
+
+**SESSION PLAN**
+I will execute the following without further approval:
+1. [Action 1 with expected outcome]
+2. [Action 2 with expected outcome]  
+3. [Action 3 with expected outcome]
+
+**CHECKPOINT REQUIRED** if:
+- Any action fails verification test
+- Evidence contradicts initial hypothesis
+- User feedback indicates wrong direction
+
+Do you approve this plan? Reply "APPROVED" or specify revisions.
+```
+
+**Exceptions requiring immediate stop:**
+- ⚠️ **CATASTROPHIC RISK**: Potential data loss without retrievable backup
+  - Examples: Dropping database tables, deleting git history, overwriting files without .bak
+  - Action: STOP, get explicit approval, verify backup exists
+  
+- ⚠️ **BREAKING CHANGE**: Modification that could break production
+  - Examples: Changing API contracts, altering database schema, modifying authentication flow
+  - Action: STOP, present multi-persona risk assessment, get approval
+
+**Token Savings:** Reduces back-and-forth from ~500 tokens per approval to ~100 tokens for batch plan.
+
+---
+
+**RULE 2: Compressed Status Updates**
+
+Use structured status format instead of conversational explanations:
+
+**Verbose (wasteful):**
+```
+I've completed the first step of adding the try-catch block to the initialization 
+code. This should help us catch any errors that might be occurring. Now I'm going 
+to move on to the next step which is testing whether this works...
+```
+**Tokens:** ~45
+
+**Compressed (efficient):**
+```
+✅ Step 1 complete: try-catch added
+→ Next: Test initialization
+```
+**Tokens:** ~12
+
+**Implementation:**
+All status updates use this format:
+```
+✅ [completed action]: [outcome]
+⚠️ [warning/issue]: [impact]  
+→ Next: [upcoming action]
+🔴 BLOCKED: [blocker description]
+```
+
+**Token Savings:** 70% reduction in status update overhead.
+
+---
+
+**RULE 3: Evidence-First Communication**
+
+Replace explanations with evidence, then synthesize.
+
+**Verbose:**
+```
+I think the problem might be related to the way we're handling localStorage 
+because I noticed in the code that we're trying to access it in a certain way 
+that could potentially cause issues...
+```
+**Tokens:** ~38
+
+**Evidence-First:**
+```
+Evidence:
+- localStorage.getItem() at line 2023
+- Execution stops after line 2022
+- No error in catch block
+
+Hypothesis: Silent exception in localStorage access
+Test: Add logging before/after getItem call
+```
+**Tokens:** ~28
+
+**Implementation:**
+Structure all technical communication as:
+```
+Evidence: [Observable facts]
+Hypothesis: [Theory explaining evidence]
+Test: [How to verify/refute]
+```
+
+**Token Savings:** 25-40% reduction per technical discussion.
+
+---
+
+**RULE 4: Reusable Verification Templates**
+
+Pre-define verification checks as templates to avoid regenerating.
+
+**Standard Deployment Verification Template:**
+```
+DEPLOY_CHECK:
+1. Syntax: node --check [file] → [✅/❌]
+2. Build: [command] → [exit code]
+3. Live: curl [endpoint] → [status]
+4. Feature: [user action] → [expected result]
+```
+
+**Agent simply fills in results:**
+```
+DEPLOY_CHECK (commit abc1234):
+1. Syntax: node --check mosaic_ui/index.html → ✅
+2. Build: npm run build → exit 0
+3. Live: curl https://whatismydelta.com/ → 200
+4. Feature: Click chat button → [PENDING USER TEST]
+```
+
+**Token Savings:** 60% reduction for repetitive verification tasks.
+
+**Repository Location:** Store templates in `.ai-agents/templates/` for reference.
+
+---
+
+**RULE 5: Differential Communication (Changes Only)**
+
+When providing updates, report only deltas from previous state.
+
+**Verbose:**
+```
+The site has these features working: login modal, registration form, trial mode, 
+and the three main sections. However, the chat button is still not working, and 
+we're still investigating the JavaScript execution issue...
+```
+**Tokens:** ~35
+
+**Differential:**
+```
+DELTA since last update:
++ Added: try-catch logging
+- Still broken: chat button
+○ Unchanged: trial mode logic
+```
+**Tokens:** ~15
+
+**Token Savings:** 55% reduction in progress reports.
+
+---
+
+### Token Budget Management
+
+**Per-Session Allocation:**
+- **Stage 1 (Planning):** 2,000 tokens max
+  - Includes: Current State definition, Desired Outcome, approval request
+  
+- **Stage 2-3 (Diagnosis):** 5,000 tokens max
+  - Includes: Chain-of-Verification, Zero-Shot analysis, evidence gathering
+  
+- **Stage 4 (Solution):** 3,000 tokens max  
+  - Includes: Multi-Persona debate, synthesis, approval request
+  
+- **Stage 5 (Implementation):** 4,000 tokens max
+  - Includes: Code changes, deployment, checkpoint confirmations
+  
+- **Stage 6 (Verification):** 1,000 tokens max
+  - Includes: Test results, final documentation
+
+**Total Session Budget:** 15,000 tokens (well under 200k limit)
+
+**If Budget Exceeded:**
+1. Use Summary-Expand Loop (TIER 5 from companion guide)
+2. Start fresh session with compressed context
+3. Link sessions via git commit hashes for continuity
+
+---
+
+### Self-Correction & Evolution Protocols
+
+**PROTOCOL 1: Retrospective After Each Issue Resolution**
+
+After Stage 6 completion, agent generates:
+
+```
+## RETROSPECTIVE: [Issue Name]
+
+What worked:
+- [Technique/approach that was effective]
+
+What failed:
+- [Approach that wasted time/tokens]
+
+Lessons for next time:
+- [Specific improvement to framework]
+- [New template to add to .ai-agents/templates/]
+
+Framework evolution proposal:
+- [Modification to 6-stage process]
+- [New rule to add to communication protocol]
+```
+
+**Storage:** `.ai-agents/retrospectives/YYYY-MM-DD-[issue-name].md`
+
+**Review cadence:** Codex reviews monthly, incorporates improvements into framework
+
+---
+
+**PROTOCOL 2: Feature Flag for Framework Strictness**
+
+Allow graduated enforcement based on issue severity:
+
+```javascript
+// .ai-agents/config.json
+{
+  "frameworkMode": "strict",  // Options: "strict" | "standard" | "fast"
+  "tokenBudgetEnforced": true,
+  "checkpointsRequired": ["stage2", "stage4"],  // Which stages need approval
+  "autoRollbackEnabled": true
+}
+```
+
+**Modes:**
+- **strict:** All 6 stages, all checkpoints (current proposal)
+- **standard:** Stages 1,2,4,6 with checkpoints only at 2 and 4
+- **fast:** Stages 1,5,6 only (for trivial bugs with clear fixes)
+
+**Decision criteria:**
+```
+Use STRICT if:
+- Unknown root cause
+- Multiple failed fix attempts  
+- Production user impact
+
+Use STANDARD if:
+- Clear diagnosis
+- Low regression risk
+- Isolated component
+
+Use FAST if:  
+- Obvious typo/syntax error
+- No user impact
+- Fully reversible change
+```
+
+---
+
+**PROTOCOL 3: Automated Checkpoint Validation**
+
+Instead of manual "does this look good?" checkpoints, use automated tests:
+
+```bash
+# .ai-agents/checkpoint_validator.sh
+
+#!/bin/zsh
+# Runs after each Stage 5 action
+
+echo "=== Checkpoint Validation ==="
+
+# 1. Syntax check
+if ! node --check mosaic_ui/index.html 2>/dev/null; then
+  echo "❌ CHECKPOINT FAILED: Syntax error"
+  exit 1
+fi
+
+# 2. Lint check (if applicable)
+# eslint mosaic_ui/index.html --quiet || exit 1
+
+# 3. Line count sanity check (prevent accidental deletion)
+CURRENT_LINES=$(wc -l < mosaic_ui/index.html)
+EXPECTED_MIN=3000
+if [ $CURRENT_LINES -lt $EXPECTED_MIN ]; then
+  echo "❌ CHECKPOINT FAILED: File too short ($CURRENT_LINES < $EXPECTED_MIN)"
+  exit 1
+fi
+
+# 4. Critical feature presence check
+if ! grep -q "id=\"authModal\"" mosaic_ui/index.html; then
+  echo "❌ CHECKPOINT FAILED: Auth modal removed"
+  exit 1
+fi
+
+echo "✅ All checkpoint validations passed"
+exit 0
+```
+
+**Integration:** Agent runs this script after each code change. If exit code ≠ 0, automatic rollback.
+
+**Token Savings:** Eliminates "did that work?" conversation loops.
+
+---
+
+**PROTOCOL 4: Cached Diagnosis Patterns**
+
+Build knowledge base of diagnosed issues to avoid re-diagnosing similar problems:
+
+```
+# .ai-agents/known_issues.json
+{
+  "js_silent_failure": {
+    "symptoms": ["console.log shows first line only", "no error in console"],
+    "diagnosis_steps": [
+      "Check for syntax error with node --check",
+      "Search for Unicode artifacts (tool▁call markers)",
+      "Verify try-catch boundaries exist"
+    ],
+    "common_causes": [
+      "Corrupted text from copy-paste",
+      "Mismatched quotes/braces", 
+      "Scope conflict in IIFE"
+    ],
+    "test_commands": [
+      "node --check [file]",
+      "grep -n 'tool▁call\\|▁' [file]"
+    ]
+  }
+}
+```
+
+**Usage:** When symptoms match a known pattern, agent can say:
+```
+Symptom matches known issue: js_silent_failure
+Skipping Stage 2-3 diagnosis (cached)
+Proceeding directly to Stage 4 with established solution pattern
+```
+
+**Token Savings:** Can eliminate entire diagnosis phase for repeat issues (5,000+ tokens).
+
+---
+
+### Resilience & Self-Correction Mechanisms
+
+**MECHANISM 1: Automatic State Snapshots**
+
+Before any Stage 5 action:
+```bash
+# Create snapshot
+SNAPSHOT_ID=$(git rev-parse --short HEAD)
+git tag -a "pre-action-$SNAPSHOT_ID" -m "Snapshot before [action description]"
+
+# After action, if validation fails:
+git reset --hard "pre-action-$SNAPSHOT_ID"
+git tag -d "pre-action-$SNAPSHOT_ID"
+```
+
+**Benefit:** Zero-risk experimentation. Any action can be undone in 1 command.
+
+---
+
+**MECHANISM 2: Graceful Degradation Design**
+
+All features should fail open, not closed:
+
+**Bad (fail closed):**
+```javascript
+if (!sessionId) {
+  showAuthModal();  // Blocks user
+  return;  // Stops execution
+}
+// Rest of app
+```
+
+**Good (fail open):**
+```javascript
+try {
+  if (sessionId) {
+    loadUserData();
+  } else {
+    startTrialMode();  // Fallback allows usage
+  }
+} catch(error) {
+  console.error('Auth error:', error);
+  // Continue execution - user can still use site
+}
+// Rest of app runs regardless
+```
+
+**Principle:** Prefer degraded functionality over complete failure.
+
+---
+
+**MECHANISM 3: Evolutionary Test Suite**
+
+After each fix, add test case to prevent regression:
+
+```bash
+# scripts/regression_tests.sh (grows over time)
+
+#!/bin/zsh
+echo "=== Regression Test Suite ==="
+
+# Test 1: JS syntax (added after syntax error incident)
+node --check mosaic_ui/index.html || exit 1
+
+# Test 2: No Unicode artifacts (added after tool▁call incident)  
+if grep -q '▁' mosaic_ui/index.html; then
+  echo "FAIL: Unicode artifacts found"
+  exit 1
+fi
+
+# Test 3: Auth modal exists (added after modal deletion incident)
+if ! grep -q 'id="authModal"' mosaic_ui/index.html; then
+  echo "FAIL: Auth modal missing"
+  exit 1
+fi
+
+# (Future tests added here as issues are discovered and fixed)
+
+echo "All regression tests passed"
+```
+
+**Evolution:** Each resolved issue adds a new test. Framework learns from mistakes.
+
+---
+
+## IMPLEMENTATION CHECKLIST
+
+To activate this protocol:
+
+**Immediate (today):**
+- [ ] Add `.ai-agents/templates/` directory with standard templates
+- [ ] Create `.ai-agents/checkpoint_validator.sh` script
+- [ ] Add token budget tracking to session start messages
+- [ ] Codex confirms batched-approval workflow acceptable
+
+**This week:**
+- [ ] Create `.ai-agents/known_issues.json` from recent incidents
+- [ ] Implement `regression_tests.sh` with current 3 tests
+- [ ] Add retrospective template to `.ai-agents/templates/`
+
+**Ongoing:**
+- [ ] After each issue: Add test to regression suite
+- [ ] Monthly: Codex reviews retrospectives, updates framework
+- [ ] Quarterly: Evaluate token savings, adjust budgets
+
+---
+
+**PROTOCOL STATUS:** Proposed, awaiting Codex approval.
+
+**Next Action:** Codex reviews full proposal (original + addendum), approves or requests revisions.
+
