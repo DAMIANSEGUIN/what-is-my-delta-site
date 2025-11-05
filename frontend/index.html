@@ -2019,25 +2019,45 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    sessionId = localStorage.getItem(SESSION_KEY) || '';
-    trialStartTime = localStorage.getItem(TRIAL_START_KEY);
+    try {
+      console.log('[TRIAL] Initializing auth/trial mode...');
 
-    if(sessionId){
-      hideAuthModal();
-      updateUserProgress();
-    }else{
-      if(!trialStartTime){
-        startTrial();
-        hideAuthModal();
+      // Re-read localStorage in case values changed
+      const currentSessionId = localStorage.getItem(SESSION_KEY) || '';
+      const currentTrialStart = localStorage.getItem(TRIAL_START_KEY);
+
+      console.log('[TRIAL] sessionId:', currentSessionId ? 'exists' : 'none');
+      console.log('[TRIAL] trialStartTime:', currentTrialStart || 'none');
+
+      if(currentSessionId){
+        console.log('[TRIAL] User has session - ensuring access');
+        sessionId = currentSessionId;
+        // Modal already hidden by default
       }else{
-        scheduleTrialExpiry();
-        const elapsed = Date.now() - parseInt(trialStartTime, 10);
-        if(elapsed < TRIAL_DURATION){
-          hideAuthModal();
+        if(!currentTrialStart){
+          console.log('[TRIAL] New visitor - starting trial');
+          startTrial();
+          // Modal already hidden by default
         }else{
-          checkTrialExpired();
+          trialStartTime = currentTrialStart;
+          scheduleTrialExpiry();
+          const elapsed = Date.now() - parseInt(currentTrialStart, 10);
+          console.log('[TRIAL] Existing trial - elapsed:', Math.floor(elapsed/1000), 'seconds');
+          if(elapsed < TRIAL_DURATION){
+            console.log('[TRIAL] Trial still valid');
+            // Modal already hidden by default
+          }else{
+            console.log('[TRIAL] Trial expired - showing modal');
+            checkTrialExpired();
+          }
         }
       }
+
+      console.log('[TRIAL] Initialization complete');
+    } catch(error) {
+      console.error('[TRIAL] Initialization error:', error);
+      // Fail open - let user access site even if trial logic fails
+      console.log('[TRIAL] Falling back to open access');
     }
   }, { once: true });
 
