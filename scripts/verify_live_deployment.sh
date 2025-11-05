@@ -27,7 +27,8 @@ echo ""
 
 # Check 2: Line count matches expected
 echo "Check 2: Content line count..."
-EXPECTED_LINES=3427
+# PS101 v2 with auth UI: 3873 lines (commit ffbd9f8)
+EXPECTED_LINES=3873
 ACTUAL_LINES=$(curl -s -m 10 "$BASE_URL" | wc -l | tr -d ' ')
 
 if [ "$ACTUAL_LINES" != "$EXPECTED_LINES" ]; then
