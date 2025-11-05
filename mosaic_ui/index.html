@@ -287,7 +287,7 @@
   </nav>
 
   <!-- LOGIN/REGISTER MODAL -->
-  <div id="authModal" class="modal" style="display:none">
+  <div id="authModal" class="modal" style="display:block">
     <div class="panel" style="max-width:400px">
       <h2 style="font:600 14px/1.2 Helvetica,Arial;margin:0 0 20px;text-transform:uppercase;letter-spacing:.08em;text-align:center">welcome to your career transition</h2>
       
@@ -1050,53 +1050,6 @@
     <button class="close" id="closeUpload">close</button>
   </div>
 </div>
-
-<noscript>
-  <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px">
-    <div style="background:#fff;padding:40px;max-width:600px;border-radius:8px;text-align:center">
-      <h2 style="color:#d32f2f;margin:0 0 20px;font-size:24px">JavaScript Required</h2>
-      <p style="margin:0 0 20px;font-size:16px;line-height:1.6">This site requires JavaScript to function. Please enable JavaScript in your browser settings.</p>
-
-      <details style="text-align:left;margin:20px 0;padding:15px;background:#f5f5f5;border-radius:4px">
-        <summary style="cursor:pointer;font-weight:600;margin-bottom:10px">How to enable JavaScript in Chrome</summary>
-        <ol style="margin:10px 0 0 20px;line-height:1.8">
-          <li>Click the three dots menu (⋮) in the top right</li>
-          <li>Go to <strong>Settings</strong></li>
-          <li>Click <strong>Privacy and security</strong></li>
-          <li>Click <strong>Site Settings</strong></li>
-          <li>Click <strong>JavaScript</strong></li>
-          <li>Select <strong>"Sites can use JavaScript"</strong></li>
-          <li>Refresh this page</li>
-        </ol>
-      </details>
-
-      <details style="text-align:left;margin:20px 0;padding:15px;background:#f5f5f5;border-radius:4px">
-        <summary style="cursor:pointer;font-weight:600;margin-bottom:10px">How to enable JavaScript in Firefox</summary>
-        <ol style="margin:10px 0 0 20px;line-height:1.8">
-          <li>Type <strong>about:config</strong> in the address bar</li>
-          <li>Click <strong>"Accept the Risk and Continue"</strong></li>
-          <li>Search for <strong>javascript.enabled</strong></li>
-          <li>Make sure it's set to <strong>true</strong></li>
-          <li>Refresh this page</li>
-        </ol>
-      </details>
-
-      <details style="text-align:left;margin:20px 0;padding:15px;background:#f5f5f5;border-radius:4px">
-        <summary style="cursor:pointer;font-weight:600;margin-bottom:10px">How to enable JavaScript in Safari</summary>
-        <ol style="margin:10px 0 0 20px;line-height:1.8">
-          <li>Open Safari menu → <strong>Preferences</strong></li>
-          <li>Click the <strong>Security</strong> tab</li>
-          <li>Check <strong>"Enable JavaScript"</strong></li>
-          <li>Refresh this page</li>
-        </ol>
-      </details>
-
-      <p style="margin:20px 0 0;font-size:14px;color:#666">
-        <strong>Supported browsers:</strong> Chrome 88+, Firefox 78+, Safari 14+, Edge 88+
-      </p>
-    </div>
-  </div>
-</noscript>
 
 <script>
 (function(){
@@ -1973,29 +1926,11 @@
     window.location.reload();
   }
 
-  function hideAuthModal(){
-    const authModal = $('#authModal');
-    if(authModal){
-      authModal.style.display = 'none';
-    }
-  }
-
-  function scheduleTrialExpiry(){
-    if(isAuthenticated || !trialStartTime) return;
-    const elapsed = Date.now() - parseInt(trialStartTime, 10);
-    const remaining = TRIAL_DURATION - elapsed;
-    if(remaining > 0){
-      setTimeout(checkTrialExpired, remaining);
-    }else{
-      checkTrialExpired();
-    }
-  }
-
   function startTrial(){
     if(!isAuthenticated && !trialStartTime){
       trialStartTime = Date.now().toString();
       localStorage.setItem(TRIAL_START_KEY, trialStartTime);
-      scheduleTrialExpiry();
+      setTimeout(checkTrialExpired, TRIAL_DURATION);
     }
   }
 
@@ -2015,623 +1950,6 @@
       if(authStatus){
         setStatus(authStatus, 'trial period ended - sign up to continue', 'info');
       }
-    }
-  }
-
-  // Safe localStorage helper with defensive error handling
-  function safeLocalStorageGet(key, defaultValue = '') {
-    try {
-      const value = localStorage.getItem(key);
-      return value !== null ? value : defaultValue;
-    } catch (error) {
-      console.warn(`[STORAGE] Failed to read ${key}:`, error);
-      return defaultValue;
-    }
-  }
-
-  function safeLocalStorageSet(key, value) {
-    try {
-      localStorage.setItem(key, value);
-      return true;
-    } catch (error) {
-      console.warn(`[STORAGE] Failed to write ${key}:`, error);
-      return false;
-    }
-  }
-
-  // Consolidated application initializer
-  function initApp() {
-    try {
-      console.log('[INIT] Starting application initialization...');
-
-      // Phase 1: Trial/Auth Initialization
-      console.log('[INIT] Phase 1: Initializing auth/trial mode...');
-      const currentSessionId = safeLocalStorageGet(SESSION_KEY, '');
-      const currentTrialStart = safeLocalStorageGet(TRIAL_START_KEY);
-
-      console.log('[INIT] sessionId:', currentSessionId ? 'exists' : 'none');
-      console.log('[INIT] trialStartTime:', currentTrialStart || 'none');
-
-      if(currentSessionId){
-        console.log('[INIT] User has session - ensuring access');
-        sessionId = currentSessionId;
-      }else{
-        if(!currentTrialStart){
-          console.log('[INIT] New visitor - starting trial');
-          startTrial();
-        }else{
-          trialStartTime = currentTrialStart;
-          scheduleTrialExpiry();
-          const elapsed = Date.now() - parseInt(currentTrialStart, 10);
-          console.log('[INIT] Existing trial - elapsed:', Math.floor(elapsed/1000), 'seconds');
-          if(elapsed < TRIAL_DURATION){
-            console.log('[INIT] Trial still valid');
-          }else{
-            console.log('[INIT] Trial expired - showing modal');
-            checkTrialExpired();
-          }
-        }
-      }
-      console.log('[INIT] Phase 1 complete');
-
-      // Phase 2: UI Visibility Setup
-      console.log('[INIT] Phase 2: Setting up UI visibility...');
-      const feedbackSection = document.getElementById('feedback');
-      if (feedbackSection) {
-        feedbackSection.style.display = 'block';
-        feedbackSection.style.visibility = 'visible';
-      }
-      console.log('[INIT] Phase 2 complete');
-
-      // Phase 3: Data-coach fixes and link handlers
-      console.log('[INIT] Phase 3: Setting up navigation and link handlers...');
-      const coachElements = document.querySelectorAll('[data-coach]');
-      coachElements.forEach(el => {
-        const prompt = el.dataset.coach;
-        el.dataset.prompt = prompt;
-        delete el.dataset.coach;
-      });
-      
-      // Fix data-prompt link handlers
-      document.querySelectorAll('[data-prompt]').forEach(link => {
-        link.addEventListener('click', async (e) => {
-          e.preventDefault();
-          const prompt = link.dataset.prompt;
-          if (prompt) {
-            const coachAsk = document.getElementById('coachAsk');
-            const coachSend = document.getElementById('coachSend');
-            
-            if (coachAsk) coachAsk.value = prompt;
-            if (coachSend) sendStrip();
-          }
-        });
-      });
-      
-      // Fix resource section internal links
-      const resourceLinks = document.querySelectorAll('#resources a[href^="#"]');
-      resourceLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const targetId = link.getAttribute('href').substring(1);
-          const targetSection = document.getElementById(targetId);
-          if (targetSection) {
-            targetSection.scrollIntoView({ behavior: 'smooth' });
-          }
-        });
-      });
-      
-      // Obfuscate email address to prevent spam bots
-      const emailSpan = document.getElementById('emailContact');
-      if (emailSpan) {
-        const parts = ['hello', 'whatismydelta', 'com'];
-        const email = parts[0] + '@' + parts[1] + '.' + parts[2];
-        emailSpan.innerHTML = `<a href="mailto:${email}">${email}</a>`;
-      }
-      
-      // Handle contact form submission
-      const contactForm = document.getElementById('contactForm');
-      if (contactForm) {
-        contactForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          
-          const statusSpan = document.getElementById('contactStatus');
-          const submitBtn = contactForm.querySelector('button[type="submit"]');
-          
-          const formData = {
-            name: document.getElementById('contactName').value,
-            email: document.getElementById('contactEmail').value,
-            subject: document.getElementById('contactSubject').value,
-            message: document.getElementById('contactMessage').value,
-            timestamp: new Date().toISOString(),
-            userAgent: navigator.userAgent,
-            bcc: 'damianseguin@gmail.com'
-          };
-          
-          submitBtn.disabled = true;
-          submitBtn.textContent = 'Sending...';
-          statusSpan.textContent = 'Sending message...';
-          statusSpan.style.color = 'var(--muted)';
-          
-          try {
-            const response = await fetch('/', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              body: new URLSearchParams({
-                'form-name': 'contact',
-                ...formData
-              })
-            });
-            
-            if (response.ok) {
-              statusSpan.textContent = 'Message sent successfully!';
-              statusSpan.style.color = 'green';
-              contactForm.reset();
-            } else {
-              throw new Error('Network response was not ok');
-            }
-          } catch (error) {
-            console.error('Contact form error:', error);
-            statusSpan.textContent = 'Error sending message. Please try the email link above.';
-            statusSpan.style.color = 'red';
-          } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Send Message';
-            
-            setTimeout(() => {
-              statusSpan.textContent = '';
-            }, 5000);
-          }
-        });
-      }
-      
-      // Voice input functionality
-      const voiceBtn = document.getElementById('voiceBtn');
-      const coachAsk = document.getElementById('coachAsk');
-      
-      if (voiceBtn && coachAsk && 'webkitSpeechRecognition' in window) {
-        const recognition = new webkitSpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
-        
-        let isListening = false;
-        
-        voiceBtn.addEventListener('click', () => {
-          if (isListening) {
-            recognition.stop();
-            return;
-          }
-          
-          recognition.start();
-          isListening = true;
-          voiceBtn.textContent = '⏹️';
-          voiceBtn.title = 'Stop recording';
-          coachAsk.placeholder = 'Listening...';
-        });
-        
-        recognition.onresult = (event) => {
-          const transcript = event.results[0][0].transcript;
-          coachAsk.value = transcript;
-          
-          setTimeout(() => {
-            sendStrip();
-          }, 500);
-        };
-        
-        recognition.onend = () => {
-          isListening = false;
-          voiceBtn.textContent = '🎤';
-          voiceBtn.title = 'Voice input';
-          coachAsk.placeholder = 'type a question or try: help me get started';
-        };
-        
-        recognition.onerror = (event) => {
-          console.warn('Speech recognition error:', event.error);
-          isListening = false;
-          voiceBtn.textContent = '🎤';
-          voiceBtn.title = 'Voice input';
-          coachAsk.placeholder = 'type a question or try: help me get started';
-        };
-      } else if (voiceBtn) {
-        voiceBtn.style.display = 'none';
-      }
-      console.log('[INIT] Phase 3 complete');
-
-      // Phase 4: PS101 Event Listeners (deferred to end of function)
-      console.log('[INIT] Phase 4: Setting up PS101 event listeners...');
-      initPS101EventListeners();
-      console.log('[INIT] Phase 4 complete');
-
-      console.log('[INIT] Application initialization complete');
-    } catch(error) {
-      console.error('[INIT] Initialization error:', error);
-      console.log('[INIT] Falling back to open access');
-    }
-  }
-
-  // PS101 Event Listeners Setup (extracted for clarity)
-  function initPS101EventListeners() {
-    // Welcome screen buttons
-    const startBtn = document.getElementById('start-ps101');
-    if (startBtn) {
-      startBtn.addEventListener('click', () => {
-        PS101State.currentStep = 1;
-        PS101State.save();
-        renderCurrentStep();
-      });
-    }
-
-    const continueBtn = document.getElementById('continue-ps101');
-    if (continueBtn) {
-      continueBtn.addEventListener('click', () => {
-        renderCurrentStep();
-      });
-    }
-
-    const learnMoreBtn = document.getElementById('learn-more-ps101');
-    if (learnMoreBtn) {
-      learnMoreBtn.addEventListener('click', () => {
-        scrollToSection('about');
-      });
-    }
-
-    // Navigation buttons
-    const backBtn = document.getElementById('ps101-back');
-    if (backBtn) {
-      backBtn.addEventListener('click', () => {
-        PS101State.prevPrompt();
-      });
-    }
-
-    const nextBtn = document.getElementById('ps101-next');
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        const isValid = validateCurrentStep();
-        if (isValid) {
-          const textarea = document.getElementById('step-answer');
-          if (textarea) {
-            PS101State.setAnswer(PS101State.currentStep, PS101State.currentPromptIndex, textarea.value);
-            PS101State.nextPrompt();
-          }
-        }
-      });
-    }
-
-    // Progress dots (click to jump to step)
-    document.querySelectorAll('.progress-dots .dot').forEach(dot => {
-      dot.addEventListener('click', (e) => {
-        if (!e.target.disabled) {
-          const stepNumber = parseInt(e.target.dataset.step);
-          PS101State.goToStep(stepNumber);
-        }
-      });
-    });
-
-    // Textarea input (auto-save + char count)
-    const textarea = document.getElementById('step-answer');
-    if (textarea) {
-      textarea.addEventListener('input', (e) => {
-        const step = PS101State.getCurrentStep();
-        if (step) {
-          updateCharCount(e.target.value.length, step.maxChars);
-          PS101State.setAnswer(PS101State.currentStep, PS101State.currentPromptIndex, e.target.value);
-          // Trigger validation update for button state
-          const promptIndex = PS101State.currentPromptIndex || 0;
-          const totalPrompts = step.prompts ? step.prompts.length : 1;
-          updateNavButtons(PS101State.currentStep, promptIndex, totalPrompts);
-        }
-      });
-    }
-
-    // Completion screen buttons
-    const downloadBtn = document.getElementById('download-summary');
-    if (downloadBtn) {
-      downloadBtn.addEventListener('click', downloadSummary);
-    }
-
-    const startOverBtn = document.getElementById('start-over');
-    if (startOverBtn) {
-      startOverBtn.addEventListener('click', () => {
-        if (confirm('Are you sure you want to start over? This will clear all your answers.')) {
-          PS101State.reset();
-        }
-      });
-    }
-
-    // Experiment component event listeners
-    // Experiment Canvas (Step 6) - auto-save on change
-    const expHypothesis = document.getElementById('exp-hypothesis');
-    const expSuccessMetric = document.getElementById('exp-success-metric');
-    const expStartDate = document.getElementById('exp-start-date');
-    const expReviewDate = document.getElementById('exp-review-date');
-    const expResources = document.getElementById('exp-resources');
-    
-    function saveExperimentCanvas() {
-      const activeExp = PS101State.getActiveExperiment();
-      if (!activeExp) return;
-      
-      PS101State.updateExperiment(activeExp.id, {
-        hypothesis: expHypothesis?.value || '',
-        successMetric: expSuccessMetric?.value || '',
-        duration: {
-          start: expStartDate?.value || '',
-          review: expReviewDate?.value || ''
-        },
-        resources: expResources?.value || '',
-        status: 'draft'
-      });
-      showAutosaveIndicator('Experiment saved');
-    }
-    
-    if (expHypothesis) expHypothesis.addEventListener('input', () => saveExperimentCanvas());
-    if (expSuccessMetric) expSuccessMetric.addEventListener('input', () => saveExperimentCanvas());
-    if (expStartDate) expStartDate.addEventListener('change', () => saveExperimentCanvas());
-    if (expReviewDate) expReviewDate.addEventListener('change', () => saveExperimentCanvas());
-    if (expResources) expResources.addEventListener('input', () => saveExperimentCanvas());
-    
-    // Add Obstacle button (Step 7)
-    // Implementation: Replaces browser prompt()/confirm() dialogs with inline form per Decision #003
-    const addObstacleBtn = document.getElementById('add-obstacle-btn');
-    const addObstacleForm = document.getElementById('add-obstacle-form');
-    const saveObstacleBtn = document.getElementById('save-obstacle-btn');
-    const cancelObstacleBtn = document.getElementById('cancel-obstacle-btn');
-    const obstacleLabelInput = document.getElementById('obstacle-label');
-    const obstacleStrategyInput = document.getElementById('obstacle-strategy');
-    const obstacleLabelError = document.getElementById('obstacle-label-error');
-    const obstacleStrategyError = document.getElementById('obstacle-strategy-error');
-    
-    if (addObstacleBtn && addObstacleForm) {
-      // Show form when Add button clicked
-      addObstacleBtn.addEventListener('click', () => {
-        addObstacleForm.classList.remove('hidden');
-        addObstacleBtn.style.display = 'none';
-        obstacleLabelError.classList.add('hidden');
-        obstacleStrategyError.classList.add('hidden');
-        setTimeout(() => obstacleLabelInput?.focus(), 50);
-      });
-      
-      // Cancel button
-      if (cancelObstacleBtn) {
-        cancelObstacleBtn.addEventListener('click', () => {
-          addObstacleForm.classList.add('hidden');
-          addObstacleBtn.style.display = 'block';
-          if (obstacleLabelInput) obstacleLabelInput.value = '';
-          if (obstacleStrategyInput) obstacleStrategyInput.value = '';
-          const externalRadio = document.querySelector('input[name="obstacle-type"][value="external"]');
-          if (externalRadio) externalRadio.checked = true;
-          obstacleLabelError.classList.add('hidden');
-          obstacleStrategyError.classList.add('hidden');
-        });
-        
-        // ESC key handler
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && !addObstacleForm.classList.contains('hidden')) {
-            cancelObstacleBtn.click();
-          }
-        });
-      }
-      
-      // Save button
-      if (saveObstacleBtn) {
-        saveObstacleBtn.addEventListener('click', () => {
-          const label = obstacleLabelInput?.value.trim() || '';
-          const strategy = obstacleStrategyInput?.value.trim() || '';
-          const typeRadio = document.querySelector('input[name="obstacle-type"]:checked');
-          const type = typeRadio?.value || 'external';
-          
-          let isValid = true;
-          
-          if (!label) {
-            obstacleLabelError.textContent = 'Please describe the obstacle.';
-            obstacleLabelError.classList.remove('hidden');
-            isValid = false;
-            obstacleLabelInput?.focus();
-          } else {
-            obstacleLabelError.classList.add('hidden');
-          }
-          
-          if (!strategy) {
-            obstacleStrategyError.textContent = 'Please add a strategy to overcome this obstacle.';
-            obstacleStrategyError.classList.remove('hidden');
-            isValid = false;
-            if (label) obstacleStrategyInput?.focus();
-          } else {
-            obstacleStrategyError.classList.add('hidden');
-          }
-          
-          if (!isValid) return;
-          
-          const activeExp = PS101State.getActiveExperiment();
-          if (activeExp) {
-            PS101State.addObstacle(activeExp.id, {
-              type: type,
-              label: label,
-              strategy: strategy
-            });
-            
-            obstacleLabelInput.value = '';
-            obstacleStrategyInput.value = '';
-            const externalRadioReset = document.querySelector('input[name="obstacle-type"][value="external"]');
-            if (externalRadioReset) externalRadioReset.checked = true;
-            addObstacleForm.classList.add('hidden');
-            addObstacleBtn.style.display = 'block';
-            
-            renderObstacleMapping(activeExp);
-          }
-        });
-        
-        // Enter key submission
-        if (obstacleLabelInput) {
-          obstacleLabelInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              saveObstacleBtn.click();
-            }
-          });
-        }
-        if (obstacleStrategyInput) {
-          obstacleStrategyInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              saveObstacleBtn.click();
-            }
-          });
-        }
-      }
-      
-      // Real-time error clearing
-      if (obstacleLabelInput) {
-        obstacleLabelInput.addEventListener('input', () => {
-          if (obstacleLabelInput.value.trim()) {
-            obstacleLabelError.classList.add('hidden');
-          }
-        });
-      }
-      if (obstacleStrategyInput) {
-        obstacleStrategyInput.addEventListener('input', () => {
-          if (obstacleStrategyInput.value.trim()) {
-            obstacleStrategyError.classList.add('hidden');
-          }
-        });
-      }
-    }
-    
-    // Add Action button (Step 8)
-    const addActionBtn = document.getElementById('add-action-btn');
-    const addActionForm = document.getElementById('add-action-form');
-    const saveActionBtn = document.getElementById('save-action-btn');
-    const cancelActionBtn = document.getElementById('cancel-action-btn');
-    const actionLabelInput = document.getElementById('action-label');
-    const actionDueInput = document.getElementById('action-due');
-    const actionAccountabilityInput = document.getElementById('action-accountability');
-    const actionLabelError = document.getElementById('action-label-error');
-    
-    if (addActionBtn && addActionForm) {
-      addActionBtn.addEventListener('click', () => {
-        addActionForm.classList.remove('hidden');
-        addActionBtn.style.display = 'none';
-        actionLabelError.classList.add('hidden');
-        setTimeout(() => actionLabelInput?.focus(), 50);
-      });
-      
-      if (cancelActionBtn) {
-        cancelActionBtn.addEventListener('click', () => {
-          addActionForm.classList.add('hidden');
-          addActionBtn.style.display = 'block';
-          if (actionLabelInput) actionLabelInput.value = '';
-          if (actionDueInput) actionDueInput.value = '';
-          if (actionAccountabilityInput) actionAccountabilityInput.value = '';
-          actionLabelError.classList.add('hidden');
-        });
-        
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && !addActionForm.classList.contains('hidden')) {
-            cancelActionBtn.click();
-          }
-        });
-      }
-      
-      if (saveActionBtn) {
-        saveActionBtn.addEventListener('click', () => {
-          const label = actionLabelInput?.value.trim() || '';
-          const due = actionDueInput?.value.trim() || '';
-          const accountability = actionAccountabilityInput?.value.trim() || '';
-          
-          if (!label) {
-            actionLabelError.textContent = 'Please describe the action you will take.';
-            actionLabelError.classList.remove('hidden');
-            actionLabelInput?.focus();
-            return;
-          } else {
-            actionLabelError.classList.add('hidden');
-          }
-          
-          const activeExp = PS101State.getActiveExperiment();
-          if (activeExp) {
-            PS101State.addAction(activeExp.id, {
-              label: label,
-              due: due,
-              accountability: accountability
-            });
-            
-            actionLabelInput.value = '';
-            actionDueInput.value = '';
-            actionAccountabilityInput.value = '';
-            addActionForm.classList.add('hidden');
-            addActionBtn.style.display = 'block';
-            
-            renderActionPlan(activeExp);
-          }
-        });
-        
-        if (actionLabelInput) {
-          actionLabelInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              saveActionBtn.click();
-            }
-          });
-        }
-        if (actionDueInput) {
-          actionDueInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              saveActionBtn.click();
-            }
-          });
-        }
-        if (actionAccountabilityInput) {
-          actionAccountabilityInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              saveActionBtn.click();
-            }
-          });
-        }
-      }
-      
-      if (actionLabelInput) {
-        actionLabelInput.addEventListener('input', () => {
-          if (actionLabelInput.value.trim()) {
-            actionLabelError.classList.add('hidden');
-          }
-        });
-      }
-    }
-    
-    // Reflection fields (Step 9) - auto-save
-    const reflectionOutcome = document.getElementById('reflection-outcome');
-    const reflectionLearning = document.getElementById('reflection-learning');
-    const reflectionConfidence = document.getElementById('reflection-confidence');
-    const reflectionNextMove = document.getElementById('reflection-next-move');
-    
-    function saveReflection() {
-      const activeExp = PS101State.getActiveExperiment();
-      if (!activeExp) return;
-      
-      PS101State.updateReflection(activeExp.id, {
-        outcome: reflectionOutcome?.value || '',
-        learning: reflectionLearning?.value || '',
-        confidence: {
-          after: parseInt(reflectionConfidence?.value || '5')
-        },
-        nextMove: reflectionNextMove?.value || 'Continue'
-      });
-      showAutosaveIndicator('Reflection saved');
-    }
-    
-    if (reflectionOutcome) reflectionOutcome.addEventListener('input', () => saveReflection());
-    if (reflectionLearning) reflectionLearning.addEventListener('input', () => saveReflection());
-    if (reflectionConfidence) reflectionConfidence.addEventListener('change', () => saveReflection());
-    if (reflectionNextMove) reflectionNextMove.addEventListener('change', () => saveReflection());
-
-    // Initial render - only show screens if user has progress or completed
-    if (PS101State.completed) {
-      renderCompletionScreen();
-    } else if (PS101State.steps && Object.keys(PS101State.steps).length > 0) {
-      renderCurrentStep();
     }
   }
 
@@ -2845,6 +2163,15 @@
     }
   }
 
+  // Make feedback section visible by default
+  document.addEventListener('DOMContentLoaded', () => {
+    const feedbackSection = document.getElementById('feedback');
+    if (feedbackSection) {
+      feedbackSection.style.display = 'block';
+      feedbackSection.style.visibility = 'visible';
+    }
+  });
+
   // Enhanced API error handling
   const originalFetch = window.fetch;
   window.fetch = function(...args) {
@@ -2860,6 +2187,173 @@
         throw error;
       });
   };
+
+  // Fix remaining data-coach references and add secondary link handlers
+  document.addEventListener('DOMContentLoaded', () => {
+    const coachElements = document.querySelectorAll('[data-coach]');
+    coachElements.forEach(el => {
+      const prompt = el.dataset.coach;
+      el.dataset.prompt = prompt;
+      delete el.dataset.coach;
+    });
+    
+    // Fix data-prompt link handlers
+    document.querySelectorAll('[data-prompt]').forEach(link => {
+      link.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const prompt = link.dataset.prompt;
+        if (prompt) {
+          const coachAsk = document.getElementById('coachAsk');
+          const coachSend = document.getElementById('coachSend');
+          
+          // Set the prompt in the input field
+          coachAsk.value = prompt;
+          
+          // Trigger the send function directly
+          sendStrip();
+        }
+      });
+    });
+    
+    // Fix resource section internal links
+    const resourceLinks = document.querySelectorAll('#resources a[href^="#"]');
+    resourceLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+    
+    // Obfuscate email address to prevent spam bots
+    const emailSpan = document.getElementById('emailContact');
+    if (emailSpan) {
+      // Obfuscated: hello@whatismydelta.com
+      const parts = ['hello', 'whatismydelta', 'com'];
+      const email = parts[0] + '@' + parts[1] + '.' + parts[2];
+      emailSpan.innerHTML = `<a href="mailto:${email}">${email}</a>`;
+    }
+    
+    // Handle contact form submission
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+      contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const statusSpan = document.getElementById('contactStatus');
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        
+        // Get form data
+        const formData = {
+          name: document.getElementById('contactName').value,
+          email: document.getElementById('contactEmail').value,
+          subject: document.getElementById('contactSubject').value,
+          message: document.getElementById('contactMessage').value,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          // BCC to your email
+          bcc: 'damianseguin@gmail.com'
+        };
+        
+        // Update UI
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        statusSpan.textContent = 'Sending message...';
+        statusSpan.style.color = 'var(--muted)';
+        
+        try {
+          // Send via Netlify Forms or your preferred service
+          const response = await fetch('/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              'form-name': 'contact',
+              ...formData
+            })
+          });
+          
+          if (response.ok) {
+            statusSpan.textContent = 'Message sent successfully!';
+            statusSpan.style.color = 'green';
+            contactForm.reset();
+          } else {
+            throw new Error('Network response was not ok');
+          }
+        } catch (error) {
+          console.error('Contact form error:', error);
+          statusSpan.textContent = 'Error sending message. Please try the email link above.';
+          statusSpan.style.color = 'red';
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send Message';
+          
+          // Clear status after 5 seconds
+          setTimeout(() => {
+            statusSpan.textContent = '';
+          }, 5000);
+        }
+      });
+    }
+    
+    // Voice input functionality
+    const voiceBtn = document.getElementById('voiceBtn');
+    const coachAsk = document.getElementById('coachAsk');
+    
+    if (voiceBtn && coachAsk && 'webkitSpeechRecognition' in window) {
+      const recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      
+      let isListening = false;
+      
+      voiceBtn.addEventListener('click', () => {
+        if (isListening) {
+          recognition.stop();
+          return;
+        }
+        
+        recognition.start();
+        isListening = true;
+        voiceBtn.textContent = '⏹️';
+        voiceBtn.title = 'Stop recording';
+        coachAsk.placeholder = 'Listening...';
+      });
+      
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        coachAsk.value = transcript;
+        
+        // Auto-submit after voice input
+        setTimeout(() => {
+          sendStrip();
+        }, 500);
+      };
+      
+      recognition.onend = () => {
+        isListening = false;
+        voiceBtn.textContent = '🎤';
+        voiceBtn.title = 'Voice input';
+        coachAsk.placeholder = 'type a question or try: help me get started';
+      };
+      
+      recognition.onerror = (event) => {
+        console.warn('Speech recognition error:', event.error);
+        isListening = false;
+        voiceBtn.textContent = '🎤';
+        voiceBtn.title = 'Voice input';
+        coachAsk.placeholder = 'type a question or try: help me get started';
+      };
+    } else if (voiceBtn) {
+      // Hide voice button if not supported
+      voiceBtn.style.display = 'none';
+    }
+  });
 
   // PS101 Implementation
   (function() {
@@ -3920,8 +3414,424 @@
       }
     }
 
-    // Event listeners setup - now handled by consolidated initApp() via initPS101EventListeners()
-    // Removed duplicate DOMContentLoaded handler - all logic consolidated into initPS101EventListeners()
+    // Event listeners setup
+    document.addEventListener('DOMContentLoaded', () => {
+      // Welcome screen buttons
+      const startBtn = document.getElementById('start-ps101');
+      if (startBtn) {
+        startBtn.addEventListener('click', () => {
+          PS101State.currentStep = 1;
+          PS101State.save();
+          renderCurrentStep();
+        });
+      }
+
+      const continueBtn = document.getElementById('continue-ps101');
+      if (continueBtn) {
+        continueBtn.addEventListener('click', () => {
+          renderCurrentStep();
+        });
+      }
+
+      const learnMoreBtn = document.getElementById('learn-more-ps101');
+      if (learnMoreBtn) {
+        learnMoreBtn.addEventListener('click', () => {
+          scrollToSection('about');
+        });
+      }
+
+      // Navigation buttons
+      const backBtn = document.getElementById('ps101-back');
+      if (backBtn) {
+        backBtn.addEventListener('click', () => {
+          PS101State.prevPrompt();
+        });
+      }
+
+      const nextBtn = document.getElementById('ps101-next');
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          const isValid = validateCurrentStep();
+          if (isValid) {
+            const textarea = document.getElementById('step-answer');
+            if (textarea) {
+              PS101State.setAnswer(PS101State.currentStep, PS101State.currentPromptIndex, textarea.value);
+              PS101State.nextPrompt();
+            }
+          }
+        });
+      }
+
+      // Progress dots (click to jump to step)
+      document.querySelectorAll('.progress-dots .dot').forEach(dot => {
+        dot.addEventListener('click', (e) => {
+          if (!e.target.disabled) {
+            const stepNumber = parseInt(e.target.dataset.step);
+            PS101State.goToStep(stepNumber);
+          }
+        });
+      });
+
+      // Textarea input (auto-save + char count)
+      const textarea = document.getElementById('step-answer');
+      if (textarea) {
+        textarea.addEventListener('input', (e) => {
+          const step = PS101State.getCurrentStep();
+          if (step) {
+            updateCharCount(e.target.value.length, step.maxChars);
+            PS101State.setAnswer(PS101State.currentStep, PS101State.currentPromptIndex, e.target.value);
+            // Trigger validation update for button state
+            const promptIndex = PS101State.currentPromptIndex || 0;
+            const totalPrompts = step.prompts ? step.prompts.length : 1;
+            updateNavButtons(PS101State.currentStep, promptIndex, totalPrompts);
+          }
+        });
+      }<｜tool▁call▁end｜><｜tool▁call▁begin｜>
+grep
+
+      // Completion screen buttons
+      const downloadBtn = document.getElementById('download-summary');
+      if (downloadBtn) {
+        downloadBtn.addEventListener('click', downloadSummary);
+      }
+
+      const startOverBtn = document.getElementById('start-over');
+      if (startOverBtn) {
+        startOverBtn.addEventListener('click', () => {
+          if (confirm('Are you sure you want to start over? This will clear all your answers.')) {
+            PS101State.reset();
+          }
+        });
+      }
+
+      // Experiment component event listeners
+      // Experiment Canvas (Step 6) - auto-save on change
+      const expHypothesis = document.getElementById('exp-hypothesis');
+      const expSuccessMetric = document.getElementById('exp-success-metric');
+      const expStartDate = document.getElementById('exp-start-date');
+      const expReviewDate = document.getElementById('exp-review-date');
+      const expResources = document.getElementById('exp-resources');
+      
+      function saveExperimentCanvas() {
+        const activeExp = PS101State.getActiveExperiment();
+        if (!activeExp) return;
+        
+        PS101State.updateExperiment(activeExp.id, {
+          hypothesis: expHypothesis?.value || '',
+          successMetric: expSuccessMetric?.value || '',
+          duration: {
+            start: expStartDate?.value || '',
+            review: expReviewDate?.value || ''
+          },
+          resources: expResources?.value || '',
+          status: 'draft'
+        });
+        showAutosaveIndicator('Experiment saved');
+      }
+      
+      if (expHypothesis) expHypothesis.addEventListener('input', () => saveExperimentCanvas());
+      if (expSuccessMetric) expSuccessMetric.addEventListener('input', () => saveExperimentCanvas());
+      if (expStartDate) expStartDate.addEventListener('change', () => saveExperimentCanvas());
+      if (expReviewDate) expReviewDate.addEventListener('change', () => saveExperimentCanvas());
+      if (expResources) expResources.addEventListener('input', () => saveExperimentCanvas());
+      
+      // Add Obstacle button (Step 7)
+      // Implementation: Replaces browser prompt()/confirm() dialogs with inline form per Decision #003
+      const addObstacleBtn = document.getElementById('add-obstacle-btn');
+      const addObstacleForm = document.getElementById('add-obstacle-form');
+      const saveObstacleBtn = document.getElementById('save-obstacle-btn');
+      const cancelObstacleBtn = document.getElementById('cancel-obstacle-btn');
+      const obstacleLabelInput = document.getElementById('obstacle-label');
+      const obstacleStrategyInput = document.getElementById('obstacle-strategy');
+      const obstacleLabelError = document.getElementById('obstacle-label-error');
+      const obstacleStrategyError = document.getElementById('obstacle-strategy-error');
+      
+      if (addObstacleBtn && addObstacleForm) {
+        // Show form when Add button clicked
+        // Form appears inline below button, button hides, first field auto-focuses
+        addObstacleBtn.addEventListener('click', () => {
+          addObstacleForm.classList.remove('hidden');
+          addObstacleBtn.style.display = 'none';
+          // Clear any previous errors from last form use
+          obstacleLabelError.classList.add('hidden');
+          obstacleStrategyError.classList.add('hidden');
+          // Focus first input with slight delay to ensure form is visible
+          setTimeout(() => obstacleLabelInput?.focus(), 50);
+        });
+        
+        // Cancel button: Hides form, restores button, clears all input state
+        if (cancelObstacleBtn) {
+          cancelObstacleBtn.addEventListener('click', () => {
+            addObstacleForm.classList.add('hidden');
+            addObstacleBtn.style.display = 'block';
+            // Clear all input values to reset form state
+            if (obstacleLabelInput) obstacleLabelInput.value = '';
+            if (obstacleStrategyInput) obstacleStrategyInput.value = '';
+            // Reset radio button to default (external)
+            const externalRadio = document.querySelector('input[name="obstacle-type"][value="external"]');
+            if (externalRadio) externalRadio.checked = true;
+            // Clear any validation error messages
+            obstacleLabelError.classList.add('hidden');
+            obstacleStrategyError.classList.add('hidden');
+          });
+          
+          // ESC key handler: Cancel form when Escape pressed (keyboard accessibility)
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !addObstacleForm.classList.contains('hidden')) {
+              cancelObstacleBtn.click();
+            }
+          });
+        }
+        
+        // Save button: Validates inputs, shows inline errors, saves to state if valid
+        if (saveObstacleBtn) {
+          saveObstacleBtn.addEventListener('click', () => {
+            const label = obstacleLabelInput?.value.trim() || '';
+            const strategy = obstacleStrategyInput?.value.trim() || '';
+            const typeRadio = document.querySelector('input[name="obstacle-type"]:checked');
+            const type = typeRadio?.value || 'external';
+            
+            // Validation: Both label and strategy are required
+            // Inline error messages appear below fields (no alert() dialogs)
+            let isValid = true;
+            
+            if (!label) {
+              obstacleLabelError.textContent = 'Please describe the obstacle.';
+              obstacleLabelError.classList.remove('hidden');
+              isValid = false;
+              obstacleLabelInput?.focus(); // Focus first invalid field
+            } else {
+              obstacleLabelError.classList.add('hidden');
+            }
+            
+            if (!strategy) {
+              obstacleStrategyError.textContent = 'Please add a strategy to overcome this obstacle.';
+              obstacleStrategyError.classList.remove('hidden');
+              isValid = false;
+              // Only focus strategy field if label was valid (to avoid jumping)
+              if (label) obstacleStrategyInput?.focus();
+            } else {
+              obstacleStrategyError.classList.add('hidden');
+            }
+            
+            // Stop if validation failed
+            if (!isValid) return;
+            
+            // Save obstacle to state via PS101State method (per Decision #003)
+            const activeExp = PS101State.getActiveExperiment();
+            if (activeExp) {
+              PS101State.addObstacle(activeExp.id, {
+                type: type,
+                label: label,
+                strategy: strategy
+              });
+              
+              // Reset form state: clear inputs, reset defaults, hide form, show button
+              obstacleLabelInput.value = '';
+              obstacleStrategyInput.value = '';
+              const externalRadioReset = document.querySelector('input[name="obstacle-type"][value="external"]');
+              if (externalRadioReset) externalRadioReset.checked = true;
+              addObstacleForm.classList.add('hidden');
+              addObstacleBtn.style.display = 'block';
+              
+              // Re-render obstacle list to show new item
+              renderObstacleMapping(activeExp);
+            }
+          });
+          
+          // Enter key submission: Allow form submission when Enter pressed in any field
+          // Form fields will trigger save when Enter is pressed (default form behavior)
+          if (obstacleLabelInput) {
+            obstacleLabelInput.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveObstacleBtn.click();
+              }
+            });
+          }
+          if (obstacleStrategyInput) {
+            obstacleStrategyInput.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+                e.preventDefault();
+                saveObstacleBtn.click();
+              }
+            });
+          }
+        }
+        
+        // Real-time error clearing: Hide error messages as user types (better UX)
+        if (obstacleLabelInput) {
+          obstacleLabelInput.addEventListener('input', () => {
+            if (obstacleLabelInput.value.trim()) {
+              obstacleLabelError.classList.add('hidden');
+            }
+          });
+        }
+        if (obstacleStrategyInput) {
+          obstacleStrategyInput.addEventListener('input', () => {
+            if (obstacleStrategyInput.value.trim()) {
+              obstacleStrategyError.classList.add('hidden');
+            }
+          });
+        }
+      }
+      
+      // Add Action button (Step 8)
+      // Implementation: Replaces browser prompt() dialogs with inline form per Decision #003
+      const addActionBtn = document.getElementById('add-action-btn');
+      const addActionForm = document.getElementById('add-action-form');
+      const saveActionBtn = document.getElementById('save-action-btn');
+      const cancelActionBtn = document.getElementById('cancel-action-btn');
+      const actionLabelInput = document.getElementById('action-label');
+      const actionDueInput = document.getElementById('action-due');
+      const actionAccountabilityInput = document.getElementById('action-accountability');
+      const actionLabelError = document.getElementById('action-label-error');
+      
+      if (addActionBtn && addActionForm) {
+        // Show form when Add button clicked
+        // Form appears inline below button, button hides, first field auto-focuses
+        addActionBtn.addEventListener('click', () => {
+          addActionForm.classList.remove('hidden');
+          addActionBtn.style.display = 'none';
+          // Clear any previous errors from last form use
+          actionLabelError.classList.add('hidden');
+          // Focus first input with slight delay to ensure form is visible
+          setTimeout(() => actionLabelInput?.focus(), 50);
+        });
+        
+        // Cancel button: Hides form, restores button, clears all input state
+        if (cancelActionBtn) {
+          cancelActionBtn.addEventListener('click', () => {
+            addActionForm.classList.add('hidden');
+            addActionBtn.style.display = 'block';
+            // Clear all input values to reset form state
+            if (actionLabelInput) actionLabelInput.value = '';
+            if (actionDueInput) actionDueInput.value = '';
+            if (actionAccountabilityInput) actionAccountabilityInput.value = '';
+            // Clear any validation error messages
+            actionLabelError.classList.add('hidden');
+          });
+          
+          // ESC key handler: Cancel form when Escape pressed (keyboard accessibility)
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !addActionForm.classList.contains('hidden')) {
+              cancelActionBtn.click();
+            }
+          });
+        }
+        
+        // Save button: Validates inputs, shows inline errors, saves to state if valid
+        if (saveActionBtn) {
+          saveActionBtn.addEventListener('click', () => {
+            const label = actionLabelInput?.value.trim() || '';
+            const due = actionDueInput?.value.trim() || '';
+            const accountability = actionAccountabilityInput?.value.trim() || '';
+            
+            // Validation: Label is required (due and accountability are optional)
+            // Inline error message appears below field (no alert() dialogs)
+            if (!label) {
+              actionLabelError.textContent = 'Please describe the action you will take.';
+              actionLabelError.classList.remove('hidden');
+              actionLabelInput?.focus(); // Focus invalid field
+              return;
+            } else {
+              actionLabelError.classList.add('hidden');
+            }
+            
+            // Save action to state via PS101State method (per Decision #003)
+            const activeExp = PS101State.getActiveExperiment();
+            if (activeExp) {
+              PS101State.addAction(activeExp.id, {
+                label: label,
+                due: due,
+                accountability: accountability
+              });
+              
+              // Reset form state: clear inputs, hide form, show button
+              actionLabelInput.value = '';
+              actionDueInput.value = '';
+              actionAccountabilityInput.value = '';
+              addActionForm.classList.add('hidden');
+              addActionBtn.style.display = 'block';
+              
+              // Re-render action list to show new item
+              renderActionPlan(activeExp);
+            }
+          });
+          
+          // Enter key submission: Allow form submission when Enter pressed in any field
+          if (actionLabelInput) {
+            actionLabelInput.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveActionBtn.click();
+              }
+            });
+          }
+          if (actionDueInput) {
+            actionDueInput.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveActionBtn.click();
+              }
+            });
+          }
+          if (actionAccountabilityInput) {
+            actionAccountabilityInput.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveActionBtn.click();
+              }
+            });
+          }
+        }
+        
+        // Real-time error clearing: Hide error messages as user types (better UX)
+        if (actionLabelInput) {
+          actionLabelInput.addEventListener('input', () => {
+            if (actionLabelInput.value.trim()) {
+              actionLabelError.classList.add('hidden');
+            }
+          });
+        }
+      }
+      
+      // Reflection fields (Step 9) - auto-save
+      const reflectionOutcome = document.getElementById('reflection-outcome');
+      const reflectionLearning = document.getElementById('reflection-learning');
+      const reflectionConfidence = document.getElementById('reflection-confidence');
+      const reflectionNextMove = document.getElementById('reflection-next-move');
+      
+      function saveReflection() {
+        const activeExp = PS101State.getActiveExperiment();
+        if (!activeExp) return;
+        
+        PS101State.updateReflection(activeExp.id, {
+          outcome: reflectionOutcome?.value || '',
+          learning: reflectionLearning?.value || '',
+          confidence: {
+            after: parseInt(reflectionConfidence?.value || '5')
+          },
+          nextMove: reflectionNextMove?.value || 'Continue'
+        });
+        showAutosaveIndicator('Reflection saved');
+      }
+      
+      if (reflectionOutcome) reflectionOutcome.addEventListener('input', () => saveReflection());
+      if (reflectionLearning) reflectionLearning.addEventListener('input', () => saveReflection());
+      if (reflectionConfidence) reflectionConfidence.addEventListener('change', () => saveReflection());
+      if (reflectionNextMove) reflectionNextMove.addEventListener('change', () => saveReflection());
+
+      // Initial render - only show screens if user has progress or completed
+      // Don't auto-show welcome screen on page load - wait for user to click "start with questions"
+      if (PS101State.completed) {
+        renderCompletionScreen();
+      } else if (PS101State.steps && Object.keys(PS101State.steps).length > 0) {
+        // User has progress - show current step
+        renderCurrentStep();
+      }
+      // Otherwise, keep welcome screen hidden until user clicks link
+    });
 
     // Add link to PS101 module to start flow
     const ps101Module = document.getElementById('ps101');
@@ -3961,10 +3871,4 @@
     }
   })();
 
-  // Single consolidated DOMContentLoaded handler
-  document.addEventListener('DOMContentLoaded', initApp, { once: true });
-
-})();
-
 </script>
-<!-- BUILD_ID:local-dev|SHA:0000000 -->
