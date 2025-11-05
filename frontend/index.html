@@ -396,6 +396,7 @@
       <button class="quiet" id="showJourney" title="show all sections">see everything</button>
       <button class="quiet" id="saveBtn" title="Save progress to file">save</button>
       <label class="quiet" for="loadFile" title="Load a saved file">load<input id="loadFile" type="file" accept="application/json" hidden></label>
+      <button class="quiet" id="showAuthModal" title="Sign up or log in to save progress permanently" style="display:none">sign up / log in</button>
     </div>
     <details class="micro"><summary>what's the difference?</summary>
       <small><strong>Start with questions:</strong> 5-10 minutes of guided questions to get clarity, then make a plan.<br>
@@ -2239,10 +2240,30 @@
       }
       console.log('[INIT] Phase 3 complete');
 
-      // Phase 4: PS101 Event Listeners (deferred to end of function)
-      console.log('[INIT] Phase 4: Setting up PS101 event listeners...');
-      initPS101EventListeners();
+      // Phase 4: Auth Modal Button Setup
+      console.log('[INIT] Phase 4: Setting up auth modal button...');
+      const showAuthModalBtn = $('#showAuthModal');
+      if (showAuthModalBtn) {
+        // Show button for unauthenticated users without active session
+        if (!isAuthenticated && !sessionId) {
+          showAuthModalBtn.style.display = 'inline-block';
+          showAuthModalBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const authModal = $('#authModal');
+            if (authModal) {
+              authModal.style.display = 'block';
+            }
+          });
+        } else {
+          showAuthModalBtn.style.display = 'none';
+        }
+      }
       console.log('[INIT] Phase 4 complete');
+
+      // Phase 5: PS101 Event Listeners (deferred to end of function)
+      console.log('[INIT] Phase 5: Setting up PS101 event listeners...');
+      initPS101EventListeners();
+      console.log('[INIT] Phase 5 complete');
 
       console.log('[INIT] Application initialization complete');
     } catch(error) {
@@ -3959,12 +3980,10 @@
         });
       }
     }
-  })();
-
-  // Single consolidated DOMContentLoaded handler
-  document.addEventListener('DOMContentLoaded', initApp, { once: true });
-
 })();
+
+// Single consolidated DOMContentLoaded handler
+document.addEventListener('DOMContentLoaded', initApp, { once: true });
 
 </script>
 <!-- BUILD_ID:0fa234f975563036d87b59d699223c082a2d19aa|SHA:7795ae25 -->
