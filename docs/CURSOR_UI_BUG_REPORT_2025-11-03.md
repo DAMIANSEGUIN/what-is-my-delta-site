@@ -54,3 +54,18 @@ This bug was encountered during a critical merge operation where:
 
 **Priority:** High - Affects user workflow and command execution accuracy
 
+---
+
+## Update - 2025-11-04
+
+**Status:** Issue persists across sessions
+
+The overlapping Run/Stop button issue continues to occur. User reports: "that issues with the overlapping stop run is persisting"
+
+This is a persistent UI bug that affects:
+- Command execution accuracy
+- User workflow confidence
+- Agent-user interaction reliability
+
+**Action Required:** Cursor team needs to investigate and fix the button layout/click target alignment in the terminal command execution UI component.
+

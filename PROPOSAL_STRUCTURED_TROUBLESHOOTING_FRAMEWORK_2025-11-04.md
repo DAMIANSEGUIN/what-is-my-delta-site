@@ -1,4 +1,5 @@
 # PROPOSAL: Structured Troubleshooting Framework with Team Oversight
+> **Status Note (2025-11-05):** Superseded by `REVISED_TROUBLESHOOTING_FRAMEWORK_2025-11-05.md`, which integrates this proposal with existing enforcement protocols. Retain this file for historical reference only.
 **Date:** 2025-11-04  
 **Proposed by:** Claude Code (SSE)  
 **For Review:** Codex (Oversight)  
@@ -741,4 +742,3 @@ To activate this protocol:
 **PROTOCOL STATUS:** Proposed, awaiting Codex approval.
 
 **Next Action:** Codex reviews full proposal (original + addendum), approves or requests revisions.
-
