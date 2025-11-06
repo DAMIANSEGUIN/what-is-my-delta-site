@@ -1,8 +1,29 @@
 # Stage 3 Verification – Consolidated Build Deployment (2025-11-05)
 
-**Status:** 🔄 In Progress  
-**Deployment:** Commit `7612285` - Consolidated build + Netlify config updates  
-**Production URL:** https://whatismydelta.com
+**Status:** 🔄 In Progress - Deployment Blocked  
+**Latest Deployment Attempt:** 2025-11-06T16:57:58Z - **FAILED** (EPERM error)  
+**Production URL:** https://whatismydelta.com  
+**Handoff:** See `.ai-agents/HANDOFF_NETLIFY_RUNNER_2025-11-06.md`
+
+---
+
+## Deployment Status
+
+**⚠️ CRITICAL:** Latest deployment attempt failed. Production still serves old bundle.
+
+**Deployment Attempts:**
+- **2025-11-06T16:57:58Z:** Terminal Codex attempted deployment
+  - Command: `NETLIFY_SITE_ID=resonant-crostata-90b706 ./scripts/deploy_frontend_netlify.sh`
+  - Result: ❌ **FAILED** - Netlify CLI cannot write `~/Library/Preferences/netlify/config.json` (EPERM error)
+  - Production: Still serving old bundle (3,992 lines - login modal missing, chat dead)
+  - Local state: Git tree clean, `pre_push_verification.sh` passes
+  - Escalated: Handoff to Netlify Runner Agent
+
+**Code Ready for Deployment (Commit `0c44e11`):**
+- Code change: Removed `&& !sessionId` condition from Phase 4 auth button logic
+- Expected behavior: Auth button should show whenever `!isAuthenticated` (not blocked by stale sessionId)
+- Intended fix: Address issue where users with previous sessions couldn't access login CTA
+- **Status:** ⚠️ **NOT YET DEPLOYED** - Awaiting Netlify Runner Agent
 
 ---
 
@@ -215,7 +236,7 @@ Response body (if applicable): [to be logged]
 
 ## Issues Found
 
-**Automated Verification:** None - All checks passed
+**Automated Verification:** Content checks passed (line count, title, UI presence) - **Does not verify functionality**
 
 **Manual Verification:** _[To be documented after manual checks]_
 
@@ -225,19 +246,26 @@ _[Document any issues discovered during manual verification]_
 
 ## Resolution Status
 
-- [x] ✅ Automated checks pass - Production restored
-- [ ] Manual browser verification pending (initApp, auth modal, chat)
+- [x] Code changes committed (commit `0c44e11`)
+- [x] Local verification passes (`pre_push_verification.sh`)
+- [ ] **Deployment pending** - Netlify Runner Agent required (EPERM blocked Terminal Codex)
+- [ ] Manual browser verification pending (initApp, auth modal, chat) - **Cannot verify until deployment succeeds**
 - [ ] Issues found - Document in Stage 2 diagnosis for follow-up
-- [ ] Blockers - Escalate to Codex
+- [x] Blockers identified - Escalated to Netlify Runner Agent
 
 **Current Status:** 
-- ✅ Automated verification complete - All checks pass
-- ⏳ Manual verification pending - Three specific checks required:
-  1. `typeof window.initApp` → expect `"function"`
-  2. Auth modal hides after init in fresh session → expect hidden, UI visible
-  3. Chat submission sends `/wimd` request → expect status 200/202
+- ✅ Code changes committed (commit `0c44e11`)
+- ✅ Local verification passes (`pre_push_verification.sh`)
+- ❌ **Deployment BLOCKED** - Netlify CLI permissions issue on Terminal Codex host
+- ⏳ **Awaiting Netlify Runner Agent** - Deployment must complete before verification possible
+- ⏳ **Manual browser verification REQUIRED** - Fix not proven until verified:
+  1. `typeof window.initApp` → expect `"function"` (NOT verified yet - deployment pending)
+  2. Auth modal hides after init in fresh session → expect hidden, UI visible (NOT verified yet - deployment pending)
+  3. Chat submission sends `/wimd` request → expect status 200/202 (NOT verified yet - deployment pending)
 
-**Once all three manual checks pass, incident can be marked resolved.**
+**⚠️ DO NOT mark as fixed/resolved until:**
+1. Deployment succeeds (Netlify Runner Agent)
+2. Manual browser verification confirms all three checks pass in production
 
 ---
 
@@ -248,10 +276,10 @@ _[Document any issues discovered during manual verification]_
 2. Log results in "Manual Browser Verification" section
 3. Update "Manual Verification Summary" checkboxes
 
-**If all manual checks pass:**
-- ✅ Mark incident resolved in Stage 2 diagnosis
-- Update Stage 2 diagnosis Part 4 (Codex decision) with resolution
-- Close incident
+**If all manual checks pass (ONLY after deployment succeeds and verification confirms):**
+- Mark incident resolved in Stage 2 diagnosis (with evidence)
+- Update Stage 2 diagnosis Part 4 (Codex decision) with resolution (with proof)
+- Close incident (only after all checks verified)
 - Proceed with automation template work per revised framework
 
 **If manual checks fail:**
@@ -265,5 +293,8 @@ _[Document any issues discovered during manual verification]_
 ## References
 
 - Stage 2 Diagnosis: `.ai-agents/STAGE2_DIAGNOSIS_2025-11-05.md`
-- Deployment Playbook: `MOSAIC_DEPLOYMENT_FULL_2025-11-05.md`
-- Commit: `7612285`
+- Deployment Playbook: `Mosaic_Production_UI_Recovery_Playbook_2025-11-06.md`
+- Deployment Wrapper Recovery: `Mosaic_Deployment_Wrapper_Recovery_Guide_2025-11-06.md`
+- Netlify Runner Handoff: `.ai-agents/HANDOFF_NETLIFY_RUNNER_2025-11-06.md`
+- Previous Deploy Commit: `7612285`
+- Latest Code Commit: `0c44e11` (not yet deployed)
