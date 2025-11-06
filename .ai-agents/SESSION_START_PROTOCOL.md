@@ -2,6 +2,9 @@
 
 **MANDATORY: Every AI agent MUST run this at session start**
 
+> Codex Reset Protocol → When invoked, re-run Steps 1–5 below.  
+> Restate Present State → Desired Outcome, and re-log the session.
+
 ## Step 1: Identify Yourself (FIRST MESSAGE)
 
 ```
@@ -79,6 +82,13 @@ ls -1 URGENT_* FOR_*_AGENT*.md 2>/dev/null
 **If urgent files exist:**
 - Read them BEFORE proceeding with other tasks
 - These files contain critical information from previous sessions
+
+**Scan shared Stage/Team notes:**
+```bash
+ls -1t .ai-agents/STAGE*.md .ai-agents/TEAM_NOTE_*.md 2>/dev/null | head
+```
+- Re-read any document updated since your last session (compare timestamps or `git diff --stat HEAD@{1}`).
+- Update the relevant Stage file with an acknowledgment line (e.g., `Cursor Acknowledged: ✅`) before moving on.
 
 ## Step 5: Declare Readiness
 

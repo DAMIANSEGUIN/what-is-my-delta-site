@@ -17,66 +17,49 @@
 
 ---
 
-## Questions for Team Input
+## Questions for Team Input (Responses logged 2025-11-05 by CIT ✅)
 
 ### 1. Documentation Discipline Script Scope
 
-**Question:** Are there extra checks or file paths the documentation discipline script must verify beyond the standard trio (CLAUDE.md, .verification_audit.log, incident note)?
+**Decision:** ✅ Include four mandatory touchpoints  
+- `CLAUDE.md`  
+- `.verification_audit.log`  
+- Active incident note (`FOR_*_*.md`)  
+- Relevant checklist used for the session (e.g., `TROUBLESHOOTING_CHECKLIST.md`, `DEPLOYMENT_CHECKLIST.md`)
+
+Architecture decisions and handoff docs remain optional (notify reviewer when changed, but no hard gate).
 
 **Context:** The script (`scripts/verify_documentation_discipline.sh`) will enforce Operating Rule #8 from the session protocol, which requires agents to update documentation before declaring tasks complete.
-
-**Current scope:**
-- `CLAUDE.md` - Main documentation file
-- `.verification_audit.log` - Audit trail
-- Incident notes (e.g., `FOR_*_*.md`)
-
-**Need team input on:**
-- Additional required files?
-- Architecture decision logs?
-- Deployment checklists?
-- Handoff manifests?
 
 ---
 
 ### 2. Regression Test Suite Scope
 
-**Question:** What level of coverage do we expect for the first regression suite iteration—minimum smoke (trial init, chat button) or anything broader?
+**Decision:** ✅ Ship a minimum smoke suite initially  
+- Verify `[INIT]` log sequence to confirm trial initializer  
+- Check auth modal visibility + form elements  
+- Confirm chat button/input exist and handler is attached
 
 **Context:** The script (`scripts/regression_tests.sh`) will serve as the baseline UX regression suite. Initial version can wrap existing smoke tests.
-
-**Options:**
-- **Minimum smoke:** Trial init, chat button, auth modal visibility
-- **Broader:** Include PS101 flow navigation, form validation, localStorage persistence
-- **Comprehensive:** Full feature matrix (future iteration)
-
-**Need team input on:**
-- Minimum viable scope for first iteration?
-- Which features are critical path?
-- Any features to explicitly exclude initially?
 
 ---
 
 ### 3. Checkpoint Validator Enforcement Level
 
-**Question:** Should the checkpoint validator enforce formatting (e.g., linting) or just critical signatures?
+**Decision:** ✅ Keep the validator lightweight  
+- Quick syntax check  
+- Critical signature presence (auth modal, PS101 markers, chat DOM nodes)  
+- Hard fail only when signatures missing; leave lint/style enforcement to pre-commit hooks
 
 **Context:** The validator (`.ai-agents/checkpoint_validator.sh`) is a fast lint/feature smoke test that runs after each significant change. It's a subset of pre-push checks designed to fail fast.
-
-**Options:**
-- **Critical signatures only:** Verify key functions/features exist, no formatting checks
-- **Formatting included:** Run linter, enforce code style
-- **Hybrid:** Critical signatures + basic syntax validation (no style enforcement)
-
-**Need team input on:**
-- Balance between speed and thoroughness?
-- Should it block on style issues or just warn?
-- Integration with existing pre-commit hooks?
 
 ---
 
 ### 4. Retrospective Scheduling
 
-**Question:** Any scheduling constraints for the retrospective once production is stable?
+**Decision:** ✅ 30-minute live session the day after production stability  
+- Attendees: Codex (planning), Cursor (implementation), Netlify Ops rep, owners for chat/auth  
+- Use call to lock in framework adoption timing; capture actions in short follow-up doc
 
 **Context:** After the outage is confirmed closed and automation templates are built, we'll hold a short post-fix retrospective to:
 - Review how FAST mode went
@@ -116,13 +99,12 @@ Once team questions are answered and outage fix is locked in the repo, Codex wil
 
 ## Action Items
 
-- [ ] **Team:** Answer questions above (provide input via Slack/Discord/PM thread)
-- [ ] **Codex:** Wait for team input before starting template work
-- [ ] **Cursor:** Stand by for automation script implementation assignments
+- [x] **Team:** Provide decisions on automation scope (CIT, 2025-11-05)
+- [ ] **Codex:** Update automation work plan + notify Cursor (in progress)
+- [ ] **Cursor:** Implement automation scripts/templates per decisions
 - [ ] **Terminal Codex:** Available for deep searches/log pulls during testing
 - [ ] **Claude Code:** Standby for deployment/log validation once scripts ready
 
 ---
 
 **Next Steps:** Once team questions are answered, Codex will proceed with template/script build and coordinate testing across agents.
-

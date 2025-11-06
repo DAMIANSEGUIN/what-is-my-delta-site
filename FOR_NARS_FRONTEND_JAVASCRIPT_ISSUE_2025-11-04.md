@@ -155,9 +155,11 @@ Multiple DOMContentLoaded handlers (4 total) were creating race conditions and e
 - ✅ Single DOMContentLoaded handler confirmed
 
 ### Next Steps
-1. Deploy to production and verify trial initialization completes in console
-2. Monitor for `[INIT] Application initialization complete` log message
-3. Verify all 4 initialization phases execute successfully
+1. Update login CTA guard to rely on `!isAuthenticated` (ignore stale `sessionId`)
+2. Deploy to production and verify trial initialization completes in console
+3. Monitor for `[INIT] Application initialization complete` log message
+4. Verify all 4 initialization phases execute successfully
+5. Confirm chat panel sends `/wimd` requests after CTA fix
 
 ---
 **RESOLUTION COMPLETE**
