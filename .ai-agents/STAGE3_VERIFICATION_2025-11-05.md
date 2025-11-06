@@ -1,7 +1,8 @@
 # Stage 3 Verification – Consolidated Build Deployment (2025-11-05)
 
-**Status:** 🔄 In Progress - Deployment Blocked  
-**Latest Deployment Attempt:** 2025-11-06T16:57:58Z - **FAILED** (EPERM error)  
+**Status:** 🔄 In Progress - Deployment Triggered  
+**Latest Deployment Attempt:** 2025-11-06T22:35:14Z - **IN PROGRESS** (Netlify Runner Agent)  
+**Previous Attempt:** 2025-11-06T16:57:58Z - FAILED (EPERM error, Terminal Codex)  
 **Production URL:** https://whatismydelta.com  
 **Handoff:** See `.ai-agents/HANDOFF_NETLIFY_RUNNER_2025-11-06.md`
 
@@ -9,21 +10,24 @@
 
 ## Deployment Status
 
-**⚠️ CRITICAL:** Latest deployment attempt failed. Production still serves old bundle.
+**⚠️ DEPLOYMENT IN PROGRESS:** Netlify Runner Agent has triggered deployment. Awaiting completion and verification.
 
 **Deployment Attempts:**
+- **2025-11-06T22:35:14Z:** Netlify Runner Agent triggered deployment
+  - Status: 🔄 **IN PROGRESS** - Deployment initiated
+  - Agent: Netlify Runner Agent
+  - **Awaiting:** Deploy completion, then verification required
+
 - **2025-11-06T16:57:58Z:** Terminal Codex attempted deployment
   - Command: `NETLIFY_SITE_ID=resonant-crostata-90b706 ./scripts/deploy_frontend_netlify.sh`
   - Result: ❌ **FAILED** - Netlify CLI cannot write `~/Library/Preferences/netlify/config.json` (EPERM error)
-  - Production: Still serving old bundle (3,992 lines - login modal missing, chat dead)
-  - Local state: Git tree clean, `pre_push_verification.sh` passes
   - Escalated: Handoff to Netlify Runner Agent
 
-**Code Ready for Deployment (Commit `0c44e11`):**
+**Code Being Deployed (Commit `0c44e11`):**
 - Code change: Removed `&& !sessionId` condition from Phase 4 auth button logic
 - Expected behavior: Auth button should show whenever `!isAuthenticated` (not blocked by stale sessionId)
 - Intended fix: Address issue where users with previous sessions couldn't access login CTA
-- **Status:** ⚠️ **NOT YET DEPLOYED** - Awaiting Netlify Runner Agent
+- **Status:** 🔄 **DEPLOYMENT IN PROGRESS** - Awaiting completion and verification
 
 ---
 
@@ -256,16 +260,18 @@ _[Document any issues discovered during manual verification]_
 **Current Status:** 
 - ✅ Code changes committed (commit `0c44e11`)
 - ✅ Local verification passes (`pre_push_verification.sh`)
-- ❌ **Deployment BLOCKED** - Netlify CLI permissions issue on Terminal Codex host
-- ⏳ **Awaiting Netlify Runner Agent** - Deployment must complete before verification possible
+- 🔄 **Deployment IN PROGRESS** - Netlify Runner Agent triggered deployment (2025-11-06T22:35:14Z)
+- ⏳ **Awaiting deployment completion** - Then verification required
 - ⏳ **Manual browser verification REQUIRED** - Fix not proven until verified:
-  1. `typeof window.initApp` → expect `"function"` (NOT verified yet - deployment pending)
-  2. Auth modal hides after init in fresh session → expect hidden, UI visible (NOT verified yet - deployment pending)
-  3. Chat submission sends `/wimd` request → expect status 200/202 (NOT verified yet - deployment pending)
+  1. `typeof window.initApp` → expect `"function"` (NOT verified yet - deployment in progress)
+  2. Auth modal hides after init in fresh session → expect hidden, UI visible (NOT verified yet - deployment in progress)
+  3. Chat submission sends `/wimd` request → expect status 200/202 (NOT verified yet - deployment in progress)
 
 **⚠️ DO NOT mark as fixed/resolved until:**
-1. Deployment succeeds (Netlify Runner Agent)
-2. Manual browser verification confirms all three checks pass in production
+1. Deployment completes successfully
+2. Wait 60-90 seconds for CDN propagation
+3. Run automated verification: `./scripts/verify_live_deployment.sh`
+4. Manual browser verification confirms all three checks pass in production
 
 ---
 
