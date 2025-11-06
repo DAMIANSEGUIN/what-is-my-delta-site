@@ -2244,8 +2244,8 @@
       console.log('[INIT] Phase 4: Setting up auth modal button...');
       const showAuthModalBtn = $('#showAuthModal');
       if (showAuthModalBtn) {
-        // Show button for unauthenticated users without active session
-        if (!isAuthenticated && !sessionId) {
+        // Surface the CTA whenever we are not confirmed authenticated
+        if (!isAuthenticated) {
           showAuthModalBtn.style.display = 'inline-block';
           showAuthModalBtn.addEventListener('click', (e) => {
             e.preventDefault();
