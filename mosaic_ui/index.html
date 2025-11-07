@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- DEPLOY_MARKER_START: mosaic_ui/index.html | Commit: c689b50+ | Timestamp: 2025-11-07T16:30:00Z -->
 <meta charset="utf-8">
 <title>What Is My Delta — Find Your Next Career Move</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2014,6 +2015,7 @@
 
   // Consolidated application initializer
   function initApp() {
+    // DEPLOY_MARKER: initApp function definition | Line ~2017
     try {
       console.log('[INIT] Starting application initialization...');
 
@@ -4012,8 +4014,10 @@
     }
 
   // Single consolidated DOMContentLoaded handler
+  // DEPLOY_MARKER: DOMContentLoaded listener | Line ~4016 | Should be INSIDE IIFE
   document.addEventListener('DOMContentLoaded', initApp, { once: true });
 })();
+// DEPLOY_MARKER: IIFE closes | Line ~4018
 
 </script>
 <!-- BUILD_ID:6d8f2ed13cce0d75c2d94aae9c7814a515f80554|SHA:7795ae25 -->
