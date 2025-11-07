@@ -1205,7 +1205,9 @@
     return highestScore > 0 ? bestMatch : null;
   }
 
-  $('#y').textContent = new Date().getFullYear();
+  // Safe footer year update with null-guard
+  const yearEl = $('#y');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
   
   // Initialize prompts on page load
   loadPrompts();
@@ -1234,36 +1236,13 @@
     }
   }
   
-  checkAPI();
-  // Retry API check every 30 seconds if offline
-  setInterval(() => {
-    if ($('#apiStatus').className.includes('error')) {
-      checkAPI();
-    }
-  }, 30000);
+  // API check and chat listeners moved to initApp Phase 2.5
+  // (prevents DOM access before elements exist)
 
-  // Enhanced Chat System with Real API Integration
-  const chat = $('#chat');
-  const chatLog = $('#chatLog');
-  const chatInput = $('#chatInput');
-  const sendMsg = $('#sendMsg');
-
-  $('#openChat').addEventListener('click', e => {
-    e.preventDefault(); 
-    chat.style.display = 'block';
-    chatInput.focus();
-  });
-  
-  $('#closeChat').addEventListener('click', () => {
-    chat.style.display = 'none';
-  });
-
-  // Close chat on Escape key
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && chat.style.display === 'block') {
-      chat.style.display = 'none';
-    }
-  });
+  // Chat element references - will be set in initApp
+  let chatLog = null;
+  let sendMsg = null;
+  let chatInput = null;
 
   function addMsg(txt, who = 'you') {
     const div = document.createElement('div');
@@ -1333,14 +1312,7 @@
     softRoute(v);
   }
 
-  chatInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      send();
-    }
-  });
-  
-  sendMsg.addEventListener('click', send);
+  // chatInput Enter key listener moved to initApp Phase 2.5
 
   // Enhanced Coach Strip (immediate input)
   const coachAsk = document.getElementById('coachAsk');
@@ -2083,6 +2055,64 @@
         feedbackSection.style.visibility = 'visible';
       }
       console.log('[INIT] Phase 2 complete');
+
+      // Phase 2.5: Initialize API check and chat system
+      console.log('[INIT] Phase 2.5: Initializing API check and chat...');
+
+      // API Status Check
+      checkAPI();
+      // Retry API check every 30 seconds if offline
+      setInterval(() => {
+        const apiStatus = $('#apiStatus');
+        if (apiStatus && apiStatus.className.includes('error')) {
+          checkAPI();
+        }
+      }, 30000);
+
+      // Chat System Setup
+      const chat = $('#chat');
+      chatInput = $('#chatInput'); // Set module-level variable
+      chatLog = $('#chatLog'); // Set module-level variable
+      sendMsg = $('#sendMsg'); // Set module-level variable
+      const openChatBtn = $('#openChat');
+      const closeChatBtn = $('#closeChat');
+
+      if (openChatBtn && chat && chatInput) {
+        openChatBtn.addEventListener('click', e => {
+          e.preventDefault();
+          chat.style.display = 'block';
+          chatInput.focus();
+        });
+      }
+
+      if (closeChatBtn && chat) {
+        closeChatBtn.addEventListener('click', () => {
+          chat.style.display = 'none';
+        });
+      }
+
+      // Close chat on Escape key
+      document.addEventListener('keydown', e => {
+        if (chat && e.key === 'Escape' && chat.style.display === 'block') {
+          chat.style.display = 'none';
+        }
+      });
+
+      // Setup send message handlers
+      if (sendMsg) {
+        sendMsg.addEventListener('click', send);
+      }
+
+      if (chatInput) {
+        chatInput.addEventListener('keydown', e => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            send();
+          }
+        });
+      }
+
+      console.log('[INIT] Phase 2.5 complete');
 
       // Phase 3: Data-coach fixes and link handlers
       console.log('[INIT] Phase 3: Setting up navigation and link handlers...');
