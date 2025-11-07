@@ -2,6 +2,9 @@
   base = "mosaic_ui"
   publish = "mosaic_ui"
 
+[context.production]
+  publish = "mosaic_ui"
+
 [[redirects]]
   from = "/health"
   to = "https://what-is-my-delta-site-production.up.railway.app/health"
