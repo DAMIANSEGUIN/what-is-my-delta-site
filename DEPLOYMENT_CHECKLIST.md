@@ -36,10 +36,10 @@
 - [ ] Run PS101 continuity helper scripts
   ```bash
   ./Mosaic/PS101_Continuity_Kit/check_spec_hash.sh
-  node Mosaic/PS101_Continuity_Kit/inject_build_id.js
   ```
   - Confirm `check_spec_hash.sh` reports the expected SHA
-  - Ensure `frontend/index.html` and `mosaic_ui/index.html` footer comment shows `BUILD_ID:<commit>|SHA:<manifest>`
+  - `inject_build_id.js` now runs against a temporary deploy artefact (handled by `scripts/deploy_frontend_netlify.sh`)
+  - No manual `BUILD_ID` commit required; repository should remain clean before and after deploy
 
 - [ ] **Documentation:** Any UI/code change requires documentation updates before sign-off
   - Update relevant docs (architecture, API, user guides)
@@ -84,6 +84,7 @@
 - [ ] Log deployment outcome
   - Append verification results to `.verification_audit.log`
   - Update deployment docs/checklists with timestamp and BUILD_ID
+- [ ] Confirm git working tree is still clean (`git status --short`)
 
 - [ ] Hard refresh browser (Ctrl+Shift+R / Cmd+Shift+R)
 

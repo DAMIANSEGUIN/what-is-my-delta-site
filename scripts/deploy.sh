@@ -34,19 +34,16 @@ echo "BUILD_ID: $BUILD_ID"
 echo "SPEC_SHA: $SPEC_SHA"
 echo ""
 
-# Inject BUILD_ID into footer
-echo "Step 0.5: Injecting BUILD_ID into footer..."
+# Build ID injection handled during target deployment
+echo "Step 0.5: Preparing BUILD_ID injection..."
 echo ""
 
-if [ -f "Mosaic/PS101_Continuity_Kit/inject_build_id.js" ]; then
-  if command -v node &> /dev/null; then
-    node Mosaic/PS101_Continuity_Kit/inject_build_id.js
-    echo "✅ BUILD_ID injected into footer"
-  else
-    echo "⚠️  Node.js not found - skipping BUILD_ID injection"
-  fi
+if [ ! -f "Mosaic/PS101_Continuity_Kit/inject_build_id.js" ]; then
+  echo "⚠️  inject_build_id.js not found - deployment will proceed without stamping"
+elif ! command -v node &> /dev/null; then
+  echo "⚠️  Node.js not found - BUILD_ID stamping will be skipped"
 else
-  echo "⚠️  inject_build_id.js not found - skipping BUILD_ID injection"
+  echo "ℹ️  BUILD_ID will be injected into temporary deployment artefacts during publish"
 fi
 
 echo ""

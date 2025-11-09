@@ -45,6 +45,28 @@ if [ -z "$SITE_ID" ]; then
 fi
 
 echo "Deploying '$DEPLOY_DIR' to Netlify site '$SITE_ID'..."
-netlify deploy --dir "$DEPLOY_DIR" --prod --site "$SITE_ID"
+
+STAGING_DIR="$(mktemp -d "${TMPDIR:-/tmp}/wimd_netlify_XXXXXX")"
+cleanup() {
+  rm -rf "$STAGING_DIR"
+}
+trap cleanup EXIT INT TERM
+
+echo "Creating staging artefact at: $STAGING_DIR"
+if command -v rsync >/dev/null 2>&1; then
+  rsync -a "$DEPLOY_DIR"/ "$STAGING_DIR"/
+else
+  cp -R "$DEPLOY_DIR"/. "$STAGING_DIR"/
+fi
+
+INJECT_SCRIPT="$ROOT_DIR/Mosaic/PS101_Continuity_Kit/inject_build_id.js"
+if [ -f "$INJECT_SCRIPT" ] && command -v node >/dev/null 2>&1; then
+  echo "Stamping BUILD_ID into staging artefact..."
+  (cd "$ROOT_DIR" && BUILD_ID_TARGET_ROOT="$STAGING_DIR" BUILD_ID_TARGETS="index.html" node "$INJECT_SCRIPT")
+else
+  echo "⚠️  BUILD_ID injection skipped (missing script or node.js)"
+fi
+
+netlify deploy --dir "$STAGING_DIR" --prod --site "$SITE_ID"
 
 echo "=== Frontend deploy complete ==="
