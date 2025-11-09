@@ -4015,9 +4015,14 @@
 
   // Single consolidated DOMContentLoaded handler
   // DEPLOY_MARKER: DOMContentLoaded listener | Line ~4016 | Should be INSIDE IIFE
-  document.addEventListener('DOMContentLoaded', initApp, { once: true });
+  // Fix: Check readyState since script is at end of HTML
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp, { once: true });
+  } else {
+    initApp();
+  }
 })();
 // DEPLOY_MARKER: IIFE closes | Line ~4018
 
 </script>
-<!-- BUILD_ID:6d8f2ed13cce0d75c2d94aae9c7814a515f80554|SHA:7795ae25 -->
+<!-- BUILD_ID:bbd7c08c8f3209b4fdfdd453328c6ab641188349|SHA:7795ae25 -->
