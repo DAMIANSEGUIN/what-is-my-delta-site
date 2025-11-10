@@ -8,6 +8,7 @@
   - `Mosaic/PS101_Continuity_Kit/inject_build_id.js` accepts `BUILD_ID_TARGET_ROOT`/`BUILD_ID_TARGETS` overrides so we can point it at the staging copy.
   - `scripts/deploy.sh` still exports `BUILD_ID`/`SPEC_SHA`, but only checks readiness; it no longer mutates tracked HTML.
 - Updated `DEPLOYMENT_CHECKLIST.md` to reflect the new stamping workflow and to call out the post-deploy `git status` check.
+- Follow-up (current session): hardened chat/auth wiring so the “first visit” nudge and chat helpers only run after Phase 2.5 initializes DOM references. `chat`, `chatLog`, `chatInput`, and `sendMsg` now live at module scope with a `chatGuard` helper, and the nudge block moved inside `initApp`. Mirrors applied to both HTML entry points.
 
 ## Verification already run
 - `./scripts/verify_critical_features.sh` ✅ (warnings about API_BASE / prod auth unchanged)
@@ -22,6 +23,11 @@
    - Stamp `BUILD_ID` inside that folder,
    - Deploy to Netlify without dirtying the repo.
 3. After deploy finishes, run `git status --short` to confirm we stayed clean, then follow the checklist to log results and verify the live footer (`curl https://whatismydelta.com | grep BUILD_ID`).
-4. On the live site, load DevTools before refresh and confirm the console log order reaches `[INIT] Starting application initialization...`; also sanity-check auth, chat send, and PS101 prompts.
+4. Post-deploy verification (browser): open DevTools before refresh and confirm
+   - `[INIT] Phase 2.5 chat readiness` reports all `true`
+   - `[INIT SETUP] DOM ...` logs fire exactly once
+   - Login CTA shows (button `#showAuthModal` visible when logged-out)
+   - Chat send/response succeeds (watch Network tab for `/wimd` POST)
+   Document console + network findings in the active Stage 2/3 files.
 
 Ping me if you want me to drive the deploy; otherwise everything’s queued up for you.
