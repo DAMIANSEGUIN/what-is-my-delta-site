@@ -2462,7 +2462,13 @@
     // Completion screen buttons
     const downloadBtn = document.getElementById('download-summary');
     if (downloadBtn) {
-      downloadBtn.addEventListener('click', downloadSummary);
+      downloadBtn.addEventListener('click', () => {
+        if (typeof downloadSummary === 'function') {
+          downloadSummary();
+        } else {
+          console.warn('[PS101] downloadSummary handler not ready yet');
+        }
+      });
     }
 
     const startOverBtn = document.getElementById('start-over');
