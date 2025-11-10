@@ -1242,18 +1242,28 @@
   // (prevents DOM access before elements exist)
 
   // Chat element references - will be set in initApp
-  let chat = null;
-  let chatLog = null;
-  let sendMsg = null;
-  let chatInput = null;
+  let chat = document.getElementById('chat');
+  let chatLog = document.getElementById('chatLog');
+  let sendMsg = document.getElementById('sendMsg');
+  let chatInput = document.getElementById('chatInput');
 
-  const chatGuard = (context) => {
-    if (chat && chatLog) {
+  const ensureChatRefs = () => {
+    chat = chat || document.getElementById('chat');
+    chatLog = chatLog || document.getElementById('chatLog');
+    sendMsg = sendMsg || document.getElementById('sendMsg');
+    chatInput = chatInput || document.getElementById('chatInput');
+  };
+
+  const chatGuard = (context, requireInput = false) => {
+    ensureChatRefs();
+    const ready = chat && chatLog && (!requireInput || chatInput);
+    if (ready) {
       return true;
     }
     console.warn(`[CHAT] ${context} called before chat widgets ready`, {
       chatReady: !!chat,
-      chatLogReady: !!chatLog
+      chatLogReady: !!chatLog,
+      chatInputReady: !!chatInput
     });
     return false;
   };
@@ -1304,15 +1314,11 @@
   }
 
   async function send() {
-    if (!chatInput) {
-      console.warn('[CHAT] send called before chatInput ready');
+    if (!chatGuard('send', true)) {
       return;
     }
     const v = chatInput.value.trim();
     if (!v) return;
-    if (!chatGuard('send')) {
-      return;
-    }
     
     addMsg(v, 'you');
     chatInput.value = '';
@@ -1379,21 +1385,8 @@
     softRoute(v);
   }
 
-  if (coachSend) {
-    coachSend.addEventListener('click', (e) => {
-      e.preventDefault();
-      sendStrip();
-    });
-  }
-  
-  if (coachAsk) {
-    coachAsk.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        sendStrip();
-      }
-    });
-  }
+  // coachSend and coachAsk listeners moved to initApp Phase 2.5
+  // (prevents calling sendStrip before chat variables are initialized)
 
   // Enhanced Upload with Real API Integration
   const modal = $('#uploadModal');
@@ -2097,7 +2090,8 @@
       console.log('[INIT] Phase 2.5 chat readiness', {
         chatReady: !!chat,
         chatLogReady: !!chatLog,
-        chatInputReady: !!chatInput
+        chatInputReady: !!chatInput,
+        sendMsgReady: !!sendMsg
       });
       const openChatBtn = $('#openChat');
       const closeChatBtn = $('#closeChat');
@@ -2146,6 +2140,23 @@
           if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             send();
+          }
+        });
+      }
+
+      // Setup coach strip (ask field) event listeners
+      if (coachSend) {
+        coachSend.addEventListener('click', (e) => {
+          e.preventDefault();
+          sendStrip();
+        });
+      }
+
+      if (coachAsk) {
+        coachAsk.addEventListener('keydown', e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            sendStrip();
           }
         });
       }
