@@ -1345,10 +1345,20 @@
   // chatInput Enter key listener moved to initApp Phase 2.5
 
   // Enhanced Coach Strip (immediate input)
-  const coachAsk = document.getElementById('coachAsk');
-  const coachSend = document.getElementById('coachSend');
+  let coachAsk = document.getElementById('coachAsk');
+  let coachSend = document.getElementById('coachSend');
+
+  const ensureCoachStripRefs = () => {
+    coachAsk = coachAsk || document.getElementById('coachAsk');
+    coachSend = coachSend || document.getElementById('coachSend');
+  };
 
   async function sendStrip() {
+    ensureCoachStripRefs();
+    if (!coachAsk) {
+      console.warn('[COACH] sendStrip called before coachAsk ready');
+      return;
+    }
     const v = (coachAsk.value || '').trim();
     if (!v) return;
     if (!chatGuard('sendStrip')) {
@@ -2087,11 +2097,15 @@
       chatInput = $('#chatInput'); // Set module-level variable
       chatLog = $('#chatLog'); // Set module-level variable
       sendMsg = $('#sendMsg'); // Set module-level variable
+      coachAsk = $('#coachAsk') || coachAsk;
+      coachSend = $('#coachSend') || coachSend;
       console.log('[INIT] Phase 2.5 chat readiness', {
         chatReady: !!chat,
         chatLogReady: !!chatLog,
         chatInputReady: !!chatInput,
-        sendMsgReady: !!sendMsg
+        sendMsgReady: !!sendMsg,
+        coachAskReady: !!coachAsk,
+        coachSendReady: !!coachSend
       });
       const openChatBtn = $('#openChat');
       const closeChatBtn = $('#closeChat');
