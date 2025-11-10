@@ -1344,28 +1344,33 @@ const chatGuard = (context, requireInput = false) => {
   // chatInput Enter key listener moved to initApp Phase 2.5
 
   // Enhanced Coach Strip (immediate input)
-  let coachAsk = document.getElementById('coachAsk');
-  let coachSend = document.getElementById('coachSend');
+  let coachAskEl = document.getElementById('coachAsk');
+  let coachSendEl = document.getElementById('coachSend');
 
   const ensureCoachStripRefs = () => {
-    coachAsk = coachAsk || document.getElementById('coachAsk');
-    coachSend = coachSend || document.getElementById('coachSend');
+    if (!coachAskEl) {
+      coachAskEl = document.getElementById('coachAsk');
+    }
+    if (!coachSendEl) {
+      coachSendEl = document.getElementById('coachSend');
+    }
+    return { coachAskEl, coachSendEl };
   };
 
   async function sendStrip() {
     ensureCoachStripRefs();
-    if (!coachAsk) {
+    if (!coachAskEl) {
       console.warn('[COACH] sendStrip called before coachAsk ready');
       return;
     }
-    const v = (coachAsk.value || '').trim();
+    const v = (coachAskEl.value || '').trim();
     if (!v) return;
     if (!chatGuard('sendStrip')) {
       return;
     }
     chat.style.display = 'block';
     addMsg(v, 'you');
-    coachAsk.value = '';
+    coachAskEl.value = '';
     
     // Show loading
     const loadingDiv = document.createElement('div');
@@ -2095,15 +2100,14 @@ const chatGuard = (context, requireInput = false) => {
   chatInput = $('#chatInput'); // Set module-level variable
   chatLog = $('#chatLog'); // Set module-level variable
   sendMsg = $('#sendMsg'); // Set module-level variable
-  coachAsk = $('#coachAsk') || coachAsk;
-  coachSend = $('#coachSend') || coachSend;
+  ensureCoachStripRefs();
   console.log('[INIT] Phase 2.5 chat readiness', {
     chatReady: !!chat,
     chatLogReady: !!chatLog,
     chatInputReady: !!chatInput,
     sendMsgReady: !!sendMsg,
-    coachAskReady: !!coachAsk,
-    coachSendReady: !!coachSend
+    coachAskReady: !!coachAskEl,
+    coachSendReady: !!coachSendEl
   });
       const openChatBtn = $('#openChat');
       const closeChatBtn = $('#closeChat');
@@ -2158,12 +2162,12 @@ const chatGuard = (context, requireInput = false) => {
 
       // Setup coach strip (ask field) event listeners
       console.log('[INIT] Phase 2.5 coach strip setup', {
-        coachSend: !!coachSend,
-        coachAsk: !!coachAsk
+        coachSendReady: !!coachSendEl,
+        coachAskReady: !!coachAskEl
       });
 
-      if (coachSend) {
-        coachSend.addEventListener('click', (e) => {
+      if (coachSendEl) {
+        coachSendEl.addEventListener('click', (e) => {
           e.preventDefault();
           console.log('[COACH] coachSend clicked');
           sendStrip();
@@ -2172,8 +2176,8 @@ const chatGuard = (context, requireInput = false) => {
         console.warn('[INIT] coachSend element not found');
       }
 
-      if (coachAsk) {
-        coachAsk.addEventListener('keydown', e => {
+      if (coachAskEl) {
+        coachAskEl.addEventListener('keydown', e => {
           if (e.key === 'Enter') {
             e.preventDefault();
             console.log('[COACH] coachAsk Enter pressed');
@@ -2200,12 +2204,13 @@ const chatGuard = (context, requireInput = false) => {
         link.addEventListener('click', async (e) => {
           e.preventDefault();
           const prompt = link.dataset.prompt;
-          if (prompt) {
-            const coachAsk = document.getElementById('coachAsk');
-            const coachSend = document.getElementById('coachSend');
-            
-            if (coachAsk) coachAsk.value = prompt;
-            if (coachSend) sendStrip();
+          if (!prompt) return;
+          const { coachAskEl: askEl, coachSendEl: sendEl } = ensureCoachStripRefs();
+          if (askEl) {
+            askEl.value = prompt;
+          }
+          if (sendEl) {
+            sendStrip();
           }
         });
       });
@@ -2291,52 +2296,57 @@ const chatGuard = (context, requireInput = false) => {
       
       // Voice input functionality
       const voiceBtn = document.getElementById('voiceBtn');
-      const coachAsk = document.getElementById('coachAsk');
       
-      if (voiceBtn && coachAsk && 'webkitSpeechRecognition' in window) {
-        const recognition = new webkitSpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
-        
-        let isListening = false;
-        
-        voiceBtn.addEventListener('click', () => {
-          if (isListening) {
-            recognition.stop();
-            return;
-          }
+      if (voiceBtn && 'webkitSpeechRecognition' in window) {
+        ensureCoachStripRefs();
+        if (!coachAskEl) {
+          console.warn('[COACH] Voice input unavailable — coachAsk not ready');
+        } else {
+          const recognition = new webkitSpeechRecognition();
+          recognition.continuous = false;
+          recognition.interimResults = false;
+          recognition.lang = 'en-US';
           
-          recognition.start();
-          isListening = true;
-          voiceBtn.textContent = '⏹️';
-          voiceBtn.title = 'Stop recording';
-          coachAsk.placeholder = 'Listening...';
-        });
-        
-        recognition.onresult = (event) => {
-          const transcript = event.results[0][0].transcript;
-          coachAsk.value = transcript;
+          let isListening = false;
           
-          setTimeout(() => {
-            sendStrip();
-          }, 500);
-        };
-        
-        recognition.onend = () => {
-          isListening = false;
-          voiceBtn.textContent = '🎤';
-          voiceBtn.title = 'Voice input';
-          coachAsk.placeholder = 'type a question or try: help me get started';
-        };
-        
-        recognition.onerror = (event) => {
-          console.warn('Speech recognition error:', event.error);
-          isListening = false;
-          voiceBtn.textContent = '🎤';
-          voiceBtn.title = 'Voice input';
-          coachAsk.placeholder = 'type a question or try: help me get started';
-        };
+          voiceBtn.addEventListener('click', () => {
+            if (isListening) {
+              recognition.stop();
+              return;
+            }
+            
+            recognition.start();
+            isListening = true;
+            voiceBtn.textContent = '⏹️';
+            voiceBtn.title = 'Stop recording';
+            coachAskEl.placeholder = 'Listening...';
+          });
+          
+          recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            coachAskEl.value = transcript;
+            
+            setTimeout(() => {
+              sendStrip();
+            }, 500);
+          };
+          
+          recognition.onend = () => {
+            isListening = false;
+            voiceBtn.textContent = '🎤';
+            voiceBtn.title = 'Voice input';
+            coachAskEl.placeholder = 'type a question or try: help me get started';
+          };
+          
+          recognition.onerror = (event) => {
+            console.warn('Speech recognition error:', event.error);
+            isListening = false;
+            voiceBtn.textContent = '🎤';
+            voiceBtn.title = 'Voice input';
+            coachAskEl.placeholder = 'type a question or try: help me get started';
+          };
+        }
+      }
       } else if (voiceBtn) {
         voiceBtn.style.display = 'none';
       }
