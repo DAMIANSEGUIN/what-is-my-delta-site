@@ -1290,15 +1290,19 @@
     }
   }
 
-  async function askCoach(prompt) {
+  async function askCoach(prompt, context = []) {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
-      
+      const payload = { prompt: prompt.trim() };
+      if (Array.isArray(context) && context.length > 0) {
+        payload.context = context;
+      }
+
       const response = await fetch(`${API_BASE}/wimd`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt.trim() }),
+        body: JSON.stringify(payload),
         signal: controller.signal
       });
       
@@ -1309,7 +1313,8 @@
       }
       
       const data = await response.json();
-      return data?.result?.message || data?.result || 'no response from coach';
+      const message = data?.result?.message ?? data?.result ?? data?.message ?? '';
+      return typeof message === 'string' ? message.trim() : '';
     } catch (error) {
       if (error.name === 'AbortError') {
         return 'request timed out - please try again';
@@ -1337,9 +1342,14 @@
     chatLog.scrollTop = chatLog.scrollHeight;
     
     try {
-      const response = await askCoach(v);
+      const response = await askCoach(v, ps101Framework);
+      const answer = (response || '').trim();
       loadingDiv.remove();
-      addMsg(response, 'bot');
+      if (answer) {
+        addMsg(answer, 'bot');
+      } else {
+        addMsg('no response from coach yet — please try asking in a different way.', 'bot');
+      }
     } catch (error) {
       loadingDiv.remove();
       addMsg('connection issue - please try again', 'bot');
@@ -1400,11 +1410,11 @@
 
     try {
       const response = await askCoach(v, ps101Framework);
-      if (response) {
-        loadingDiv.remove();
-        addMsg(response, 'bot');
+      loadingDiv.remove();
+      const answer = (response || '').trim();
+      if (answer) {
+        addMsg(answer, 'bot');
       } else {
-        loadingDiv.remove();
         if (!hasStrongMatch) {
           addMsg('no response from coach yet — please try asking in a different way.', 'bot');
         }

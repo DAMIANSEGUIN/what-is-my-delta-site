@@ -1289,31 +1289,36 @@ const chatGuard = (context, requireInput = false) => {
     }
   }
 
-  async function askCoach(prompt) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
-      
-      const response = await fetch(`${API_BASE}/wimd`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt.trim() }),
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
+async function askCoach(prompt, context = []) {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    const payload = { prompt: prompt.trim() };
+    if (Array.isArray(context) && context.length > 0) {
+      payload.context = context;
+    }
+
+    const response = await fetch(`${API_BASE}/wimd`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      return data?.result?.message || data?.result || 'no response from coach';
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        return 'request timed out - please try again';
-      }
-      console.error('Coach API error:', error);
+    }
+    
+    const data = await response.json();
+    const message = data?.result?.message ?? data?.result ?? data?.message ?? '';
+    return typeof message === 'string' ? message.trim() : '';
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      return 'request timed out - please try again';
+    }
+    console.error('Coach API error:', error);
       return `connection issue (${error.message || 'unknown error'})`;
     }
   }
@@ -1335,14 +1340,19 @@ const chatGuard = (context, requireInput = false) => {
     chatLog.appendChild(loadingDiv);
     chatLog.scrollTop = chatLog.scrollHeight;
     
-    try {
-      const response = await askCoach(v);
-      loadingDiv.remove();
-      addMsg(response, 'bot');
-    } catch (error) {
-      loadingDiv.remove();
-      addMsg('connection issue - please try again', 'bot');
+  try {
+    const response = await askCoach(v, ps101Framework);
+    loadingDiv.remove();
+    const answer = (response || '').trim();
+    if (answer) {
+      addMsg(answer, 'bot');
+    } else {
+      addMsg('no response from coach yet — please try asking in a different way.', 'bot');
     }
+  } catch (error) {
+    loadingDiv.remove();
+    addMsg('connection issue - please try again', 'bot');
+  }
     
     softRoute(v);
   }
@@ -1399,11 +1409,11 @@ const chatGuard = (context, requireInput = false) => {
 
   try {
     const response = await askCoach(v, ps101Framework);
-    if (response) {
-      loadingDiv.remove();
-      addMsg(response, 'bot');
+    loadingDiv.remove();
+    const answer = (response || '').trim();
+    if (answer) {
+      addMsg(answer, 'bot');
     } else {
-      loadingDiv.remove();
       if (!hasStrongMatch) {
         addMsg('no response from coach yet — please try asking in a different way.', 'bot');
       }
