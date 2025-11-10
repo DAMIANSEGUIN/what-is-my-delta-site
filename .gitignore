@@ -32,3 +32,6 @@ build/
 *.log
 .claude-run/
 .verification_audit.log
+mosaic_ui/assets/
+mosaic_ui/data/
+mosaic_ui/src/
