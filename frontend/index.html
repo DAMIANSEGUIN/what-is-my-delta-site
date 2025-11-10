@@ -1172,11 +1172,13 @@
     }
   }
   
-  // Smart prompt matching
-  function findBestMatch(userInput) {
-    if (!careerPrompts.length) return null;
-    
-    const input = userInput.toLowerCase();
+// Smart prompt matching
+const MATCH_THRESHOLD = 3;
+
+function findBestMatch(userInput) {
+  if (!careerPrompts.length) return null;
+  
+  const input = userInput.toLowerCase();
     let bestMatch = null;
     let highestScore = 0;
     
@@ -1193,18 +1195,22 @@
       });
       
       // Exact phrase matching (higher weight)
-      if (prompt.prompt.toLowerCase().includes(input)) {
-        score += 10;
-      }
-      
-      if (score > highestScore) {
-        highestScore = score;
-        bestMatch = prompt;
-      }
-    });
+    if (prompt.prompt.toLowerCase().includes(input)) {
+      score += 10;
+    }
     
-    return highestScore > 0 ? bestMatch : null;
+    if (score > highestScore) {
+      highestScore = score;
+      bestMatch = { ...prompt, score };
+    }
+  });
+  
+  if (!bestMatch) {
+    return null;
   }
+
+  return bestMatch.score > 0 ? bestMatch : null;
+}
 
   // Safe footer year update with null-guard
   const yearEl = $('#y');
@@ -1380,21 +1386,36 @@ const chatGuard = (context, requireInput = false) => {
     chatLog.scrollTop = chatLog.scrollHeight;
     
     // Try local CSV prompts first (607 career coaching responses)
-    const match = findBestMatch(v);
-    if (match) {
+  const match = findBestMatch(v);
+  const hasStrongMatch = match && match.score >= MATCH_THRESHOLD;
+  if (hasStrongMatch) {
+    console.log('[COACH] Using knowledge base match', {
+      score: match.score,
+      prompt: match.prompt?.slice(0, 80) || ''
+    });
+    addMsg(match.completion, 'bot');
+    loadingDiv.textContent = 'bringing in fresh insights...';
+  }
+
+  try {
+    const response = await askCoach(v, ps101Framework);
+    if (response) {
       loadingDiv.remove();
-      addMsg(match.completion, 'bot');
+      addMsg(response, 'bot');
     } else {
-      // Fallback to API with PS101 framework context
-      try {
-        const response = await askCoach(v, ps101Framework);
-        loadingDiv.remove();
-        addMsg(response, 'bot');
-      } catch (error) {
-        loadingDiv.remove();
-        addMsg('I understand you\'re looking for guidance. Could you try rephrasing your question? I work best with specific situations like "I feel stuck in my career" or "I don\'t know what I want to do."', 'bot');
+      loadingDiv.remove();
+      if (!hasStrongMatch) {
+        addMsg('no response from coach yet — please try asking in a different way.', 'bot');
       }
     }
+  } catch (error) {
+    loadingDiv.remove();
+    if (!hasStrongMatch) {
+      addMsg('I understand you\'re looking for guidance. Could you try rephrasing your question? I work best with specific situations like "I feel stuck in my career" or "I don\'t know what I want to do."', 'bot');
+    } else {
+      addMsg('having trouble reaching the live coach — I\'ll keep listening for now.', 'bot');
+    }
+  }
     
     softRoute(v);
   }

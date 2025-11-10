@@ -1174,6 +1174,8 @@
   }
   
   // Smart prompt matching
+  const MATCH_THRESHOLD = 3;
+
   function findBestMatch(userInput) {
     if (!careerPrompts.length) return null;
     
@@ -1200,11 +1202,15 @@
       
       if (score > highestScore) {
         highestScore = score;
-        bestMatch = prompt;
+        bestMatch = { ...prompt, score };
       }
     });
     
-    return highestScore > 0 ? bestMatch : null;
+    if (!bestMatch) {
+      return null;
+    }
+
+    return bestMatch.score > 0 ? bestMatch : null;
   }
 
   // Safe footer year update with null-guard
@@ -1382,18 +1388,33 @@
     
     // Try local CSV prompts first (607 career coaching responses)
     const match = findBestMatch(v);
-    if (match) {
-      loadingDiv.remove();
+    const hasStrongMatch = match && match.score >= MATCH_THRESHOLD;
+    if (hasStrongMatch) {
+      console.log('[COACH] Using knowledge base match', {
+        score: match.score,
+        prompt: match.prompt?.slice(0, 80) || ''
+      });
       addMsg(match.completion, 'bot');
-    } else {
-      // Fallback to API with PS101 framework context
-      try {
-        const response = await askCoach(v, ps101Framework);
+      loadingDiv.textContent = 'bringing in fresh insights...';
+    }
+
+    try {
+      const response = await askCoach(v, ps101Framework);
+      if (response) {
         loadingDiv.remove();
         addMsg(response, 'bot');
-      } catch (error) {
+      } else {
         loadingDiv.remove();
+        if (!hasStrongMatch) {
+          addMsg('no response from coach yet — please try asking in a different way.', 'bot');
+        }
+      }
+    } catch (error) {
+      loadingDiv.remove();
+      if (!hasStrongMatch) {
         addMsg('I understand you\'re looking for guidance. Could you try rephrasing your question? I work best with specific situations like "I feel stuck in my career" or "I don\'t know what I want to do."', 'bot');
+      } else {
+        addMsg('having trouble reaching the live coach — I\'ll keep listening for now.', 'bot');
       }
     }
     
