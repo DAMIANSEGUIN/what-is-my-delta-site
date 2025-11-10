@@ -1240,12 +1240,27 @@
   // API check and chat listeners moved to initApp Phase 2.5
   // (prevents DOM access before elements exist)
 
-  // Chat element references - will be set in initApp
-  let chatLog = null;
-  let sendMsg = null;
-  let chatInput = null;
+// Chat element references - will be set in initApp
+let chat = null;
+let chatLog = null;
+let sendMsg = null;
+let chatInput = null;
+
+const chatGuard = (context) => {
+  if (chat && chatLog) {
+    return true;
+  }
+  console.warn(`[CHAT] ${context} called before chat widgets ready`, {
+    chatReady: !!chat,
+    chatLogReady: !!chatLog
+  });
+  return false;
+};
 
   function addMsg(txt, who = 'you') {
+    if (!chatGuard('addMsg')) {
+      return;
+    }
     const div = document.createElement('div');
     div.className = `msg ${who}`;
     div.textContent = (who === 'you' ? '> ' : '') + txt;
@@ -1288,8 +1303,15 @@
   }
 
   async function send() {
+    if (!chatInput) {
+      console.warn('[CHAT] send called before chatInput ready');
+      return;
+    }
     const v = chatInput.value.trim();
     if (!v) return;
+    if (!chatGuard('send')) {
+      return;
+    }
     
     addMsg(v, 'you');
     chatInput.value = '';
@@ -1322,7 +1344,9 @@
   async function sendStrip() {
     const v = (coachAsk.value || '').trim();
     if (!v) return;
-    const chat = document.getElementById('chat');
+    if (!chatGuard('sendStrip')) {
+      return;
+    }
     chat.style.display = 'block';
     addMsg(v, 'you');
     coachAsk.value = '';
@@ -1331,7 +1355,6 @@
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'msg loading';
     loadingDiv.textContent = 'thinking...';
-    const chatLog = document.getElementById('chatLog');
     chatLog.appendChild(loadingDiv);
     chatLog.scrollTop = chatLog.scrollHeight;
     
@@ -1369,16 +1392,6 @@
         sendStrip();
       }
     });
-  }
-
-  // First-visit gentle nudge with improved UX
-  const SEEN = 'delta_seen_intro_v2';
-  if (!localStorage.getItem(SEEN)) {
-    setTimeout(() => {
-      chat.style.display = 'block';
-      addMsg('hi — want to start with some key questions or explore on your own?', 'bot');
-      localStorage.setItem(SEEN, '1');
-    }, 1000);
   }
 
   // Enhanced Upload with Real API Integration
@@ -2074,11 +2087,16 @@
         }
       }, 30000);
 
-      // Chat System Setup
-      const chat = $('#chat');
-      chatInput = $('#chatInput'); // Set module-level variable
-      chatLog = $('#chatLog'); // Set module-level variable
-      sendMsg = $('#sendMsg'); // Set module-level variable
+  // Chat System Setup
+  chat = $('#chat'); // Set module-level variable
+  chatInput = $('#chatInput'); // Set module-level variable
+  chatLog = $('#chatLog'); // Set module-level variable
+  sendMsg = $('#sendMsg'); // Set module-level variable
+  console.log('[INIT] Phase 2.5 chat readiness', {
+    chatReady: !!chat,
+    chatLogReady: !!chatLog,
+    chatInputReady: !!chatInput
+  });
       const openChatBtn = $('#openChat');
       const closeChatBtn = $('#closeChat');
 
@@ -2097,11 +2115,24 @@
       }
 
       // Close chat on Escape key
-      document.addEventListener('keydown', e => {
-        if (chat && e.key === 'Escape' && chat.style.display === 'block') {
-          chat.style.display = 'none';
-        }
-      });
+  document.addEventListener('keydown', e => {
+    if (chat && e.key === 'Escape' && chat.style.display === 'block') {
+      chat.style.display = 'none';
+    }
+  });
+
+  // First-visit gentle nudge with improved UX (runs after chat wiring)
+  const SEEN = 'delta_seen_intro_v2';
+  if (chat && chatLog && !localStorage.getItem(SEEN)) {
+    setTimeout(() => {
+      if (!chatGuard('first-visit nudge')) {
+        return;
+      }
+      chat.style.display = 'block';
+      addMsg('hi — want to start with some key questions or explore on your own?', 'bot');
+      localStorage.setItem(SEEN, '1');
+    }, 1000);
+  }
 
       // Setup send message handlers
       if (sendMsg) {
