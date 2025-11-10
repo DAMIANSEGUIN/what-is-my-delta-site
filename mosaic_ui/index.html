@@ -2145,20 +2145,31 @@
       }
 
       // Setup coach strip (ask field) event listeners
+      console.log('[INIT] Phase 2.5 coach strip setup', {
+        coachSend: !!coachSend,
+        coachAsk: !!coachAsk
+      });
+
       if (coachSend) {
         coachSend.addEventListener('click', (e) => {
           e.preventDefault();
+          console.log('[COACH] coachSend clicked');
           sendStrip();
         });
+      } else {
+        console.warn('[INIT] coachSend element not found');
       }
 
       if (coachAsk) {
         coachAsk.addEventListener('keydown', e => {
           if (e.key === 'Enter') {
             e.preventDefault();
+            console.log('[COACH] coachAsk Enter pressed');
             sendStrip();
           }
         });
+      } else {
+        console.warn('[INIT] coachAsk element not found');
       }
 
       console.log('[INIT] Phase 2.5 complete');
