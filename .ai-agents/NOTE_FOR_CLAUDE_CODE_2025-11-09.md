@@ -8,7 +8,7 @@
   - `Mosaic/PS101_Continuity_Kit/inject_build_id.js` accepts `BUILD_ID_TARGET_ROOT`/`BUILD_ID_TARGETS` overrides so we can point it at the staging copy.
   - `scripts/deploy.sh` still exports `BUILD_ID`/`SPEC_SHA`, but only checks readiness; it no longer mutates tracked HTML.
 - Updated `DEPLOYMENT_CHECKLIST.md` to reflect the new stamping workflow and to call out the post-deploy `git status` check.
-- Follow-up (current session): hardened chat/auth wiring so the “first visit” nudge and chat helpers only run after Phase 2.5 initializes DOM references. `chat`, `chatLog`, `chatInput`, and `sendMsg` now live at module scope with a `chatGuard` helper, and the nudge block moved inside `initApp`. Mirrors applied to both HTML entry points.
+- Follow-up (current session): hardened chat/auth wiring so the “first visit” nudge and chat helpers only run after Phase 2.5 initializes DOM references. `chat`, `chatLog`, `chatInput`, and `sendMsg` now live at module scope with a `chatGuard` helper (which lazily rebinds DOM nodes if init hasn’t wired them yet), and the nudge block moved inside `initApp`. Mirrors applied to both HTML entry points.
 
 ## Verification already run
 - `./scripts/verify_critical_features.sh` ✅ (warnings about API_BASE / prod auth unchanged)
