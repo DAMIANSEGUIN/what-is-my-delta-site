@@ -2941,6 +2941,44 @@
     });
   }
 
+  // Ensure initApp runs once DOM is ready (kept inside primary IIFE for scope access)
+  const initAppType = typeof initApp;
+  console.log('[INIT BOOTSTRAP] initApp typeof check:', initAppType);
+
+  if (initAppType !== 'function') {
+    console.error('[FATAL] initApp function was not defined! Check for errors above.');
+    console.error('[DEBUG] Document ready state:', document.readyState);
+    return;
+  }
+
+  console.log('[INIT SETUP] initApp is defined, setting up initialization...');
+
+  const safeInitApp = () => {
+    try {
+      console.log('[INIT TRIGGER] Starting initialization');
+      initApp();
+    } catch (error) {
+      console.error('[INIT ERROR] Failed to initialize app:', error);
+      document.body.insertAdjacentHTML('beforeend', `
+        <div style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+                    background: #ff4444; color: white; padding: 20px; border-radius: 8px;
+                    z-index: 999999; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+          <strong>Initialization Error</strong><br>
+          The application failed to start. Please refresh the page.<br>
+          <small>Error: ${error.message}</small>
+        </div>
+      `);
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    console.log('[INIT SETUP] DOM still loading, adding listener');
+    document.addEventListener('DOMContentLoaded', safeInitApp, { once: true });
+  } else {
+    console.log('[INIT SETUP] DOM already ready, initializing immediately');
+    setTimeout(safeInitApp, 0);
+  }
+
 })();
 
   // Navigation scroll function
@@ -4071,47 +4109,6 @@
       }
     }
 
-  console.log('[IIFE] initApp defined successfully, typeof:', typeof initApp);
-
-  // ========== INITIALIZATION FIX ==========
-  // DEPLOY_MARKER: Safe initApp bootstrap | Line ~4016 | Inside IIFE
-  
-  // Safeguard: Verify initApp was defined
-  if (typeof initApp !== 'function') {
-    console.error('[FATAL] initApp function was not defined! Check for errors above.');
-    console.error('[DEBUG] Document ready state:', document.readyState);
-    return; // Exit IIFE early so we don't throw more errors
-  }
-  
-  console.log('[INIT SETUP] initApp is defined, setting up initialization...');
-  
-  // Wrapper function that defers initApp reference resolution
-  const safeInitApp = () => {
-    try {
-      console.log('[INIT TRIGGER] Starting initialization');
-      initApp();
-    } catch (error) {
-      console.error('[INIT ERROR] Failed to initialize app:', error);
-      document.body.insertAdjacentHTML('beforeend', `
-        <div style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-                    background: #ff4444; color: white; padding: 20px; border-radius: 8px;
-                    z-index: 999999; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-          <strong>Initialization Error</strong><br>
-          The application failed to start. Please refresh the page.<br>
-          <small>Error: ${error.message}</small>
-        </div>
-      `);
-    }
-  };
-  
-  // Handle both early and late script execution
-  if (document.readyState === 'loading') {
-    console.log('[INIT SETUP] DOM still loading, adding listener');
-    document.addEventListener('DOMContentLoaded', safeInitApp, { once: true });
-  } else {
-    console.log('[INIT SETUP] DOM already ready, initializing immediately');
-    setTimeout(safeInitApp, 0);
-  }
 })();
 // DEPLOY_MARKER: IIFE closes | Line ~4018
 

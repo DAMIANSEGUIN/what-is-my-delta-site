@@ -2,5 +2,8 @@
   "dependencies": {
     "re-resizable": "^6.11.2",
     "react-draggable": "^4.5.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
   }
 }
