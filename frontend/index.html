@@ -1289,14 +1289,11 @@ const chatGuard = (context, requireInput = false) => {
     }
   }
 
-async function askCoach(prompt, context = []) {
+async function askCoach(prompt) {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
     const payload = { prompt: prompt.trim() };
-    if (Array.isArray(context) && context.length > 0) {
-      payload.context = context;
-    }
 
     const response = await fetch(`${API_BASE}/wimd`, {
       method: 'POST',
@@ -1341,7 +1338,7 @@ async function askCoach(prompt, context = []) {
     chatLog.scrollTop = chatLog.scrollHeight;
     
   try {
-    const response = await askCoach(v, ps101Framework);
+    const response = await askCoach(v);
     loadingDiv.remove();
     const answer = (response || '').trim();
     if (answer) {
@@ -1408,7 +1405,7 @@ async function askCoach(prompt, context = []) {
   }
 
   try {
-    const response = await askCoach(v, ps101Framework);
+    const response = await askCoach(v);
     loadingDiv.remove();
     const answer = (response || '').trim();
     if (answer) {
