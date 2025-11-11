@@ -60,15 +60,27 @@ fi
 echo "Executing: git push $REMOTE $BRANCH"
 echo ""
 
-git push "$REMOTE" "$BRANCH"
+EXITCODE=1
+FALLBACK_EXITCODE=1
+FORCE_HTTPS=false
 
-EXITCODE=$?
-FALLBACK_EXITCODE=$EXITCODE
+if [[ "$REMOTE" == "railway-origin" && "${RAILWAY_FORCE_HTTPS:-false}" == "true" ]]; then
+  FORCE_HTTPS=true
+  echo "Forcing HTTPS push for $REMOTE (RAILWAY_FORCE_HTTPS=true)"
+else
+  git push "$REMOTE" "$BRANCH"
+  EXITCODE=$?
+  FALLBACK_EXITCODE=$EXITCODE
+fi
 
 # Automatic HTTPS fallback for Railway deploys when PAT is available
-if [[ $EXITCODE -ne 0 && "$REMOTE" == "railway-origin" && -n "${RAILWAY_PAT:-}" ]]; then
+if [[ ( $EXITCODE -ne 0 || "$FORCE_HTTPS" == "true" ) && "$REMOTE" == "railway-origin" && -n "${RAILWAY_PAT:-}" ]]; then
   echo ""
-  echo "⚠️  Primary push failed (exit code $EXITCODE). Attempting HTTPS fallback using RAILWAY_PAT..."
+  if [[ "$FORCE_HTTPS" == "true" ]]; then
+    echo "Using HTTPS fallback with RAILWAY_PAT (primary push skipped)."
+  else
+    echo "⚠️  Primary push failed (exit code $EXITCODE). Attempting HTTPS fallback using RAILWAY_PAT..."
+  fi
 
   FALLBACK_URL=""
   if [[ "$REMOTE_URL" == git@github.com:* ]]; then
