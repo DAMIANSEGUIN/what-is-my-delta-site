@@ -45,6 +45,10 @@ def _json_load(raw: Optional[str]) -> Any:
         return None
 
 
+def _normalize_email(email: str) -> str:
+    return (email or "").strip().lower()
+
+
 @contextmanager
 def get_conn():
     if connection_pool:
@@ -530,6 +534,7 @@ def create_user(email: str, password: str, subscription_tier: str = 'free',
     user_id = str(uuid.uuid4())
     password_hash = hash_password(password)
     now = datetime.utcnow().isoformat()
+    normalized_email = _normalize_email(email)
 
     with get_conn() as conn:
         cursor = conn.cursor()
@@ -537,16 +542,17 @@ def create_user(email: str, password: str, subscription_tier: str = 'free',
             INSERT INTO users (id, email, password_hash, created_at, last_login,
                              subscription_tier, subscription_status, discount_code)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """, (user_id, email, password_hash, now, now, subscription_tier, subscription_status, discount_code))
+        """, (user_id, normalized_email, password_hash, now, now, subscription_tier, subscription_status, discount_code))
     return user_id
 
 def authenticate_user(email: str, password: str) -> Optional[str]:
     """Authenticate user and return user ID if successful"""
+    normalized_email = _normalize_email(email)
     with get_conn() as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id, password_hash FROM users WHERE email = %s",
-            (email,)
+            "SELECT id, password_hash FROM users WHERE LOWER(email) = LOWER(%s)",
+            (normalized_email,)
         )
         row = cursor.fetchone()
 
@@ -564,11 +570,12 @@ def authenticate_user(email: str, password: str) -> Optional[str]:
 
 def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
     """Get user by email"""
+    normalized_email = _normalize_email(email)
     with get_conn() as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id, email, created_at, last_login FROM users WHERE email = %s",
-            (email,)
+            "SELECT id, email, created_at, last_login FROM users WHERE LOWER(email) = LOWER(%s)",
+            (normalized_email,)
         )
         row = cursor.fetchone()
 

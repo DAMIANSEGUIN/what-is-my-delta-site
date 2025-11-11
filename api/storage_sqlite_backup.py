@@ -37,6 +37,10 @@ def _json_load(raw: Optional[str]) -> Any:
         return None
 
 
+def _normalize_email(email: str) -> str:
+    return (email or "").strip().lower()
+
+
 @contextmanager
 def get_conn():
     if connection_pool:
@@ -493,20 +497,22 @@ def create_user(email: str, password: str) -> str:
     user_id = str(uuid.uuid4())
     password_hash = hash_password(password)
     now = datetime.utcnow().isoformat()
+    normalized_email = _normalize_email(email)
     
     with get_conn() as conn:
         conn.execute(
             "INSERT INTO users (id, email, password_hash, created_at, last_login) VALUES (?, ?, ?, ?, ?)",
-            (user_id, email, password_hash, now, now)
+            (user_id, normalized_email, password_hash, now, now)
         )
     return user_id
 
 def authenticate_user(email: str, password: str) -> Optional[str]:
     """Authenticate user and return user ID if successful"""
+    normalized_email = _normalize_email(email)
     with get_conn() as conn:
         row = conn.execute(
-            "SELECT id, password_hash FROM users WHERE email = ?",
-            (email,)
+            "SELECT id, password_hash FROM users WHERE LOWER(email) = LOWER(?)",
+            (normalized_email,)
         ).fetchone()
         
         if not row:
@@ -524,10 +530,11 @@ def authenticate_user(email: str, password: str) -> Optional[str]:
 
 def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
     """Get user by email"""
+    normalized_email = _normalize_email(email)
     with get_conn() as conn:
         row = conn.execute(
-            "SELECT id, email, created_at, last_login FROM users WHERE email = ?",
-            (email,)
+            "SELECT id, email, created_at, last_login FROM users WHERE LOWER(email) = LOWER(?)",
+            (normalized_email,)
         ).fetchone()
         
         if not row:

@@ -1068,6 +1068,7 @@ async def validate_discount_code(payload: DiscountCodeValidate):
 @app.post("/auth/register", response_model=UserResponse)
 async def register_user(payload: UserRegister):
     """Register a new user with optional discount code"""
+    payload.email = payload.email.strip()
     # Check if user already exists
     existing_user = get_user_by_email(payload.email)
     if existing_user:
@@ -1136,6 +1137,7 @@ async def register_user(payload: UserRegister):
 @app.post("/auth/login", response_model=UserResponse)
 async def login_user(payload: UserLogin):
     """Login user and return user data"""
+    payload.email = payload.email.strip()
     user_id = authenticate_user(payload.email, payload.password)
     if not user_id:
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -1167,23 +1169,17 @@ async def get_current_user(user_id: str = Header(..., alias="X-User-ID")):
 @app.post("/auth/reset-password")
 async def reset_password(email: str = Body(..., embed=True)):
     """Send password reset email (placeholder - needs email service)"""
-    # Check if user exists
-    with get_conn() as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
-        user = cursor.fetchone()
+    normalized_email = (email or "").strip().lower()
+    try:
+        with get_conn() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id FROM users WHERE LOWER(email) = LOWER(%s)", (normalized_email,))
+            user = cursor.fetchone()
+    except Exception as exc:
+        print(f"[AUTH] reset_password lookup failed: {exc}")
+        user = None
 
-    if not user:
-        # Don't reveal if user exists - security best practice
-        return {"message": "If that email exists, a reset link has been sent"}
-
-    # TODO: Implement actual email sending with reset token
-    # For now, just return success message
-    # In production, you would:
-    # 1. Generate a secure reset token
-    # 2. Store it in database with expiration
-    # 3. Send email with reset link
-
+    # Do not reveal whether the account exists; success either way
     return {"message": "If that email exists, a reset link has been sent"}
 
 
