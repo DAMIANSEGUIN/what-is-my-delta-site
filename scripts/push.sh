@@ -24,6 +24,12 @@ echo "Remote: $REMOTE"
 echo "Branch: $BRANCH"
 echo ""
 
+REMOTE_URL="$(git config --get remote."$REMOTE".url || true)"
+if [[ -n "$REMOTE_URL" ]]; then
+  echo "Remote URL: $REMOTE_URL"
+  echo ""
+fi
+
 # For production pushes, run verification first (unless bypass requested)
 if [[ "$REMOTE" == "railway-origin" ]]; then
   if [[ "${SKIP_VERIFICATION:-false}" == "true" ]]; then
@@ -57,8 +63,43 @@ echo ""
 git push "$REMOTE" "$BRANCH"
 
 EXITCODE=$?
+FALLBACK_EXITCODE=$EXITCODE
 
-if [ $EXITCODE -eq 0 ]; then
+# Automatic HTTPS fallback for Railway deploys when PAT is available
+if [[ $EXITCODE -ne 0 && "$REMOTE" == "railway-origin" && -n "${RAILWAY_PAT:-}" ]]; then
+  echo ""
+  echo "⚠️  Primary push failed (exit code $EXITCODE). Attempting HTTPS fallback using RAILWAY_PAT..."
+
+  FALLBACK_URL=""
+  if [[ "$REMOTE_URL" == git@github.com:* ]]; then
+    PATH_PART="${REMOTE_URL#git@github.com:}"
+    PATH_PART="${PATH_PART%.git}"
+    OWNER="${PATH_PART%%/*}"
+    REPO="${PATH_PART#*/}"
+    FALLBACK_URL="https://${OWNER}:${RAILWAY_PAT}@github.com/${OWNER}/${REPO}.git"
+    FALLBACK_DISPLAY="https://github.com/${OWNER}/${REPO}.git"
+  elif [[ "$REMOTE_URL" == https://* ]]; then
+    REST="${REMOTE_URL#https://}"
+    if [[ "$REST" == *@* ]]; then
+      REST="${REST#*@}"
+    fi
+    HOST_PORTION="${REST%%/*}"
+    OWNER_REPO="${REST#*/}"
+    OWNER="${OWNER_REPO%%/*}"
+    FALLBACK_URL="https://${OWNER}:${RAILWAY_PAT}@${HOST_PORTION}/${OWNER_REPO}"
+    FALLBACK_DISPLAY="https://${HOST_PORTION}/${OWNER_REPO}"
+  fi
+
+  if [[ -n "$FALLBACK_URL" ]]; then
+    echo "↪️  Fallback target: $FALLBACK_DISPLAY"
+    git push "$FALLBACK_URL" "$BRANCH"
+    FALLBACK_EXITCODE=$?
+  else
+    echo "⚠️  Unable to derive fallback URL from remote $REMOTE_URL"
+  fi
+fi
+
+if [ $FALLBACK_EXITCODE -eq 0 ]; then
   echo ""
   echo "✅ Push completed successfully"
 
@@ -71,7 +112,8 @@ if [ $EXITCODE -eq 0 ]; then
   fi
 else
   echo ""
-  echo "❌ Push failed with exit code $EXITCODE"
+  echo "❌ Push failed with exit code $FALLBACK_EXITCODE"
+  exit $FALLBACK_EXITCODE
 fi
 
-exit $EXITCODE
+exit 0
