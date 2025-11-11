@@ -57,11 +57,16 @@
   .msg.you{color:var(--hair)}
   .msg.bot{color:var(--muted)}
   .msg.loading{color:var(--muted);opacity:0.6;animation:pulse 1.5s ease-in-out infinite}
-  .chat footer{padding:8px 10px;border-top:1px solid var(--line);display:flex;gap:6px}
-  .chat input{flex:1;border:1px solid var(--line);padding:6px 8px;font:inherit;border-radius:2px}
-  .chat input:focus{border-color:#0ea5e9;outline:none}
-  .chat button{border:1px solid var(--line);padding:6px 8px;background:#fff;cursor:pointer;border-radius:2px;transition:background 0.2s ease}
-  .chat button:hover{background:#f8f8f8}
+.chat footer{padding:8px 10px;border-top:1px solid var(--line);display:flex;gap:6px}
+.chat input{flex:1;border:1px solid var(--line);padding:6px 8px;font:inherit;border-radius:2px}
+.chat input:focus{border-color:#0ea5e9;outline:none}
+.chat button{border:1px solid var(--line);padding:6px 8px;background:#fff;cursor:pointer;border-radius:2px;transition:background 0.2s ease}
+.chat button:hover{background:#f8f8f8}
+.auth-floating{position:fixed;bottom:28px;right:28px;padding:12px 16px;background:var(--hair);color:#fff;border:none;border-radius:24px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 12px 28px rgba(6,33,88,0.25);cursor:pointer;display:none;z-index:1500;transition:transform 0.2s ease, box-shadow 0.2s ease}
+.auth-floating:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(6,33,88,0.3)}
+@media(max-width:680px){
+  .auth-floating{bottom:18px;right:18px;font-size:11px;padding:10px 14px}
+}
 
   .modal{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(4px)}
   .modal .panel{background:#fff;border:1px solid var(--line);padding:20px;min-width:280px;max-width:92vw;border-radius:8px;box-shadow:0 10px 40px rgba(0,0,0,0.1)}
@@ -1036,6 +1041,10 @@
   </footer>
 </aside>
 
+<button id="floatingAuthBtn" class="auth-floating" type="button" aria-label="Sign up or log in">
+  sign up / log in
+</button>
+
 <!-- UPLOAD MODAL -->
 <div class="modal" id="uploadModal" role="dialog" aria-labelledby="uploadTitle">
   <div class="panel">
@@ -1957,6 +1966,9 @@ async function askCoach(prompt) {
       if(logoutBtn) logoutBtn.hidden = false;
       updateUserProgress();
       startAutoSave();
+      if (typeof window.__updateAuthCTAVisibility === 'function') {
+        window.__updateAuthCTAVisibility();
+      }
       
     }catch(err){
       setStatus($('#authStatus'), err.message, 'error');
@@ -2383,21 +2395,35 @@ async function askCoach(prompt) {
       // Phase 4: Auth Modal Button Setup
       console.log('[INIT] Phase 4: Setting up auth modal button...');
       const showAuthModalBtn = $('#showAuthModal');
-      if (showAuthModalBtn) {
-        // Surface the CTA whenever we are not confirmed authenticated
-        if (!isAuthenticated) {
-          showAuthModalBtn.style.display = 'inline-block';
-          showAuthModalBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const authModal = $('#authModal');
-            if (authModal) {
-              authModal.style.display = 'block';
-            }
-          });
-        } else {
-          showAuthModalBtn.style.display = 'none';
+      const floatingAuthBtn = $('#floatingAuthBtn');
+      const openAuthModal = (e) => {
+        e?.preventDefault();
+        const authModal = $('#authModal');
+        if (authModal) {
+          authModal.style.display = 'block';
         }
+      };
+
+      const updateAuthCTAVisibility = () => {
+        if (showAuthModalBtn) {
+          showAuthModalBtn.style.display = isAuthenticated ? 'none' : 'inline-block';
+        }
+        if (floatingAuthBtn) {
+          floatingAuthBtn.style.display = isAuthenticated ? 'none' : 'inline-flex';
+        }
+      };
+
+      if (showAuthModalBtn) {
+        showAuthModalBtn.removeEventListener('click', openAuthModal);
+        showAuthModalBtn.addEventListener('click', openAuthModal);
       }
+      if (floatingAuthBtn) {
+        floatingAuthBtn.removeEventListener('click', openAuthModal);
+        floatingAuthBtn.addEventListener('click', openAuthModal);
+      }
+
+      updateAuthCTAVisibility();
+      window.__updateAuthCTAVisibility = updateAuthCTAVisibility;
       console.log('[INIT] Phase 4 complete');
 
       // Phase 5: PS101 Event Listeners (deferred to end of function)
