@@ -3591,7 +3591,6 @@ async function askCoach(prompt) {
       if (nextBtn) {
         const isLastStep = currentStep === 10;
         const isLastPrompt = promptIndex === totalPrompts - 1;
-        const isStepComplete = PS101State.isStepComplete(currentStep);
 
         // Button text based on position
         if (isLastStep && isLastPrompt) {
@@ -3602,33 +3601,31 @@ async function askCoach(prompt) {
           nextBtn.textContent = 'Next Step →';
         }
 
-        // Enable/disable based on validation
-        const currentAnswer = PS101State.getAnswer(currentStep, promptIndex);
-        const step = PS101_STEPS.find(s => s.step === currentStep);
-        let isValid = currentAnswer.length >= (step ? step.minChars : 30);
-        
-        // Additional validation for experiment steps (when on last prompt)
-        if (isLastPrompt && [6, 7, 8, 9].includes(currentStep)) {
-          const activeExp = PS101State.getActiveExperiment();
-          if (currentStep === 6 && activeExp) {
-            // Step 6: need hypothesis, success metric, and duration
-            isValid = isValid && activeExp.hypothesis && activeExp.successMetric && 
-                     (activeExp.duration?.start || activeExp.duration?.review);
-          } else if (currentStep === 7 && activeExp) {
-            // Step 7: need at least one obstacle with strategy
-            isValid = isValid && activeExp.obstacles && activeExp.obstacles.length > 0 &&
-                     activeExp.obstacles.some(o => o.label && o.strategy);
-          } else if (currentStep === 8 && activeExp) {
-            // Step 8: need at least 3 actions
-            isValid = isValid && activeExp.actions && activeExp.actions.length >= 3;
-          } else if (currentStep === 9 && activeExp) {
-            // Step 9: need reflection outcome and learning
-            isValid = isValid && activeExp.reflection && 
-                     activeExp.reflection.outcome && activeExp.reflection.learning &&
-                     activeExp.reflection.confidence?.after;
+        let isValid = true;
+        if (isLastPrompt) {
+          const currentAnswer = PS101State.getAnswer(currentStep, promptIndex);
+          const step = PS101_STEPS.find(s => s.step === currentStep);
+          isValid = currentAnswer.length >= (step ? step.minChars : 30);
+
+          // Additional validation for experiment steps (when on last prompt)
+          if (isValid && [6, 7, 8, 9].includes(currentStep)) {
+            const activeExp = PS101State.getActiveExperiment();
+            if (currentStep === 6 && activeExp) {
+              isValid = activeExp.hypothesis && activeExp.successMetric && 
+                       (activeExp.duration?.start || activeExp.duration?.review);
+            } else if (currentStep === 7 && activeExp) {
+              isValid = activeExp.obstacles && activeExp.obstacles.length > 0 &&
+                       activeExp.obstacles.some(o => o.label && o.strategy);
+            } else if (currentStep === 8 && activeExp) {
+              isValid = activeExp.actions && activeExp.actions.length >= 3;
+            } else if (currentStep === 9 && activeExp) {
+              isValid = activeExp.reflection && 
+                       activeExp.reflection.outcome && activeExp.reflection.learning &&
+                       activeExp.reflection.confidence?.after;
+            }
           }
         }
-        
+
         nextBtn.disabled = !isValid;
       }
     }
@@ -4047,9 +4044,19 @@ async function askCoach(prompt) {
       
       const answer = textarea.value.trim();
       const promptIndex = state.currentPromptIndex || 0;
+      const totalPrompts = (step.prompts && step.prompts.length) ? step.prompts.length : 1;
+      const isLastPrompt = promptIndex === totalPrompts - 1;
 
       // Check minimum length
       if (answer.length < step.minChars) {
+        if (!isLastPrompt) {
+          const proceed = confirm('This prompt is still under the recommended detail. Continue to the next prompt anyway?');
+          if (proceed) {
+            return true;
+          }
+          textarea.focus();
+          return false;
+        }
         alert(`Please provide at least ${step.minChars} characters for this prompt.`);
         textarea.focus();
         return false;
