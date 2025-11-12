@@ -11,6 +11,10 @@
   - Routed `askCoach` through `callJson` so every `/wimd` request carries `X-Session-ID` (fixes repeating Step 1 responses and keeps login state).
   - Added optional `signal` support to `callJson` to preserve abort/timeout behaviour.
   - Deployed via Netlify (Deploy ID `6914a51661dc38f3e806ff02`).
+- PS101 UX tweak (commit `a2fffa3`)
+  - Non-final prompts no longer block “Next Prompt” when answers are short; users can review all questions before drafting full responses.
+  - `validateCurrentStep` now offers a confirmation dialogue when skipping early prompts; final prompts retain full validation.
+  - Deployed via Netlify (Deploy ID `6914a9eeb1531804b7605f91`).
 - Console verification
   - `scripts/capture_console.mjs` (2025-11-12 15:21Z) shows prompts loading + coach response with session continuity.
   - PS101 prompts now load: “Loaded 607 career coaching prompts + 8 PS101 framework questions”.
@@ -155,4 +159,3 @@ Verification: `./scripts/verify_critical_features.sh` (standard API_BASE/auth wa
 ---
 
 **Status:** All code changes complete and deployed. Awaiting Netlify build completion for live verification. Team questions document ready for input. Ready for automation template work once verification passes and team provides answers.
-

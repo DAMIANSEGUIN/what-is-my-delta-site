@@ -11,6 +11,7 @@
 - Login CTA renders for logged-out users; password reset flow verified after Railway rebuild (`f19ba55`, `623cbd5`)
 - Netlify deploy (ID `691219f373c0da2b0ac61b6f`) and Railway push were executed with the new HTTPS/PAT fallback
 - 12 Nov deploy (`f13cba4`, Netlify `6914a51661dc38f3e806ff02`) re-routed chat requests through `callJson` so `/wimd` gets session headers.
+- 12 Nov follow-up (`a2fffa3`, Netlify `6914a9eeb1531804b7605f91`) lets users browse PS101 prompts before writing full answers; final prompts still require minimum detail.
 
 See `.ai-agents/DEPLOYMENT_SNAPSHOT_2025-11-11.md` for the full verification checklist and backup instructions already completed.
 

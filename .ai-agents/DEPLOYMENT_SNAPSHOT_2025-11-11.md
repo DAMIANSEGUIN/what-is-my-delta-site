@@ -12,6 +12,10 @@
   - `askCoach()` now uses `callJson()`, so `/wimd` requests carry the `X-Session-ID` header; chat no longer loops on Step 1.  
   - Console capture (`scripts/capture_console.mjs`, 2025-11-12 15:21Z) confirms `[COACH] Using knowledge base match …` followed by API response, and PS101 assets load (`Loaded 607 career coaching prompts + 8 PS101 framework questions`).  
   - Verification: `./scripts/verify_critical_features.sh`, Netlify wrapper checks, and live console capture all pass post-deploy.
+- **2025-11-12 Update — PS101 navigation smoother**  
+  - Commit `a2fffa3028d779b19ed6814dad02aeb20842ff58` (“ux: allow browsing PS101 prompts before answering”) deployed via Netlify `6914a9eeb1531804b7605f91`.  
+  - Non-final PS101 prompts now allow “Next prompt” even when answers are short (user can preview all questions). Last prompts still enforce minimum detail before advancing to the next step.  
+  - `validateCurrentStep()` now offers a confirmation dialog when skipping early prompts. Console capture (2025-11-12 15:39Z) confirms prompts load successfully after deploy.
 
 - **Frontend (Netlify)**  
   - Deploy ID `691219f373c0da2b0ac61b6f` (built from commit `c9900f3` and subsequent UI hardening) is live.  
