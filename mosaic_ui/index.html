@@ -1300,25 +1300,15 @@
   }
 
   async function askCoach(prompt) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
       const payload = { prompt: prompt.trim() };
-
-      const response = await fetch(`${API_BASE}/wimd`, {
+      const data = await callJson('/wimd', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: payload,
         signal: controller.signal
       });
-      
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
       const message = data?.result?.message ?? data?.result ?? data?.message ?? '';
       return typeof message === 'string' ? message.trim() : '';
     } catch (error) {
@@ -1327,6 +1317,8 @@
       }
       console.error('Coach API error:', error);
       return `connection issue (${error.message || 'unknown error'})`;
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
@@ -1878,9 +1870,12 @@
     return configPromise;
   }
 
-  async function callJson(path, {method='GET', body, headers={}} = {}){
+  async function callJson(path, {method='GET', body, headers={}, signal} = {}){
     await ensureConfig();
     const init = {method, headers:{...headers}};
+    if (signal) {
+      init.signal = signal;
+    }
     if(body !== undefined){
       if(body instanceof FormData){
         init.body = body;
