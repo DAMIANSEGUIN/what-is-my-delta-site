@@ -5,6 +5,32 @@
 
 ---
 
+## 🔄 Latest Update — 2025-11-12
+
+- `mosaic_ui/index.html` & `frontend/index.html`
+  - Routed `askCoach` through `callJson` so every `/wimd` request carries `X-Session-ID` (fixes repeating Step 1 responses and keeps login state).
+  - Added optional `signal` support to `callJson` to preserve abort/timeout behaviour.
+  - Deployed via Netlify (Deploy ID `6914a51661dc38f3e806ff02`).
+- Console verification
+  - `scripts/capture_console.mjs` (2025-11-12 15:21Z) shows prompts loading + coach response with session continuity.
+  - PS101 prompts now load: “Loaded 607 career coaching prompts + 8 PS101 framework questions”.
+
+Verification: `./scripts/verify_critical_features.sh` + Netlify wrapper checks post-deploy.
+
+---
+
+## Previous Update — 2025-11-11
+
+- `mosaic_ui/index.html` & `frontend/index.html`
+  - Routed `askCoach` through `callJson` so every request carries `X-Session-ID` and retains conversational context (fixes repeating Step 1 responses).
+  - Added optional `signal` support to `callJson` to preserve the existing timeout/abort behaviour.
+- `.ai-agents/CODEX_READ_THIS_FIRST.txt`
+  - Replaced the “chat broken” banner with the 11 Nov snapshot (points to `DEPLOYMENT_SNAPSHOT_2025-11-11.md` and outlines next actions).
+
+Verification: `./scripts/verify_critical_features.sh` (standard API_BASE/auth warnings remain).
+
+---
+
 ## ✅ Completed Tasks
 
 ### 1. Live Site Verification (Pending Netlify Build)
@@ -129,5 +155,4 @@
 ---
 
 **Status:** All code changes complete and deployed. Awaiting Netlify build completion for live verification. Team questions document ready for input. Ready for automation template work once verification passes and team provides answers.
-
 

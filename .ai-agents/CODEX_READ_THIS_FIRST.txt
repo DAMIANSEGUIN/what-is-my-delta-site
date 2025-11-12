@@ -1,37 +1,50 @@
 ═══════════════════════════════════════════════════════════════
-  CODEX: CHAT BROKEN - NEED BROWSER CONSOLE OUTPUT
+  CODEX QUICK STATUS — 2025-11-11 (Chat/Auth Stable)
 ═══════════════════════════════════════════════════════════════
 
-Claude_Code got stuck fixing chat. Made 2 deployments, still broken.
+👋🏽 Welcome back. Read this snapshot *before* touching anything.
 
-IMMEDIATE ACTIONS:
+---
 
-1. Deploy debug logging:
-   ./scripts/deploy.sh netlify
+## ✅ What’s working (as of 12 Nov ET)
+- Chat strip opens and responds (commit chain through `8aeae46`, `96dd696`, `1065a91`)
+- Login CTA renders for logged-out users; password reset flow verified after Railway rebuild (`f19ba55`, `623cbd5`)
+- Netlify deploy (ID `691219f373c0da2b0ac61b6f`) and Railway push were executed with the new HTTPS/PAT fallback
+- 12 Nov deploy (`f13cba4`, Netlify `6914a51661dc38f3e806ff02`) re-routed chat requests through `callJson` so `/wimd` gets session headers.
 
-2. Ask user to open browser console and test:
-   - Go to https://whatismydelta.com
-   - Press F12 (open console)
-   - Type in "ask" field, press Enter
-   - Copy ALL console output
+See `.ai-agents/DEPLOYMENT_SNAPSHOT_2025-11-11.md` for the full verification checklist and backup instructions already completed.
 
-3. Read full details:
-   .ai-agents/FOR_CODEX_CHAT_STILL_BROKEN_2025-11-10.md
-   .ai-agents/TEAM_NOTE_CHAT_DEBUG_SESSION_2025-11-10.md
+---
 
-STATUS: User reports "chat window now does not even open"
+## 🎯 Current Priorities
+1. **Protect the baseline**
+   - Keep `main` matching the working state (tag: `snapshot-2025-11-11-chat-auth`)
+   - No edits without running `SESSION_START_PROTOCOL.md`
+2. **Review pending follow-ups from Codex-in-Cursor**
+   - Opportunity Bridge tasks resume after confirming no regressions
+   - Carry over any open TODOs from `.ai-agents/TEAM_NOTE_CHAT_DEBUG_SESSION_2025-11-10.md` (mark items resolved where today’s fixes addressed them)
+3. **Update documentation**
+   - Append the new results to `CURSOR_COMPLETION_SUMMARY_2025-11-05.md`
+   - Note the successful Railway fallback in `DEPLOYMENT_LOOP_DIAGNOSIS_2025-11-09.md` (if not already captured)
 
-COMMITS THIS SESSION:
-  fe4121d - Fixed sendMsg (deployed - made it worse)
-  6d01cf2 - Moved event listeners (deployed - still broken)
-  148805e - Added debug logs (NOT DEPLOYED - you do this)
+---
 
-DIAGNOSIS NEEDED: We don't know if:
-  - Event listeners attached?
-  - Elements found?
-  - sendStrip() being called?
-  - chatGuard() blocking?
+## 📚 Files to Read *Now*
+1. `.ai-agents/DEPLOYMENT_SNAPSHOT_2025-11-11.md`
+2. `.ai-agents/NOTE_FOR_CLAUDE_CODE_2025-11-09.md`
+3. `.ai-agents/TEAM_NOTE_CHAT_DEBUG_SESSION_2025-11-10.md` (update status section)
 
-Console output will tell us everything.
+Optional for deeper context:
+- `.ai-agents/FOR_CODEX_CHAT_STILL_BROKEN_2025-11-10.md` (historical reference)
+- `.ai-agents/MASTER_INDEX_SESSION_RECOVERY.md`
+
+---
+
+## 🔒 Guardrails
+- Always run `./scripts/verify_critical_features.sh` before any deploy attempt
+- Use `./scripts/deploy.sh netlify` and `./scripts/deploy.sh railway` — the wrappers now keep the tree clean
+- Keep the HTTPS fallback logic in `scripts/push.sh`; do **not** revert to SSH-only pushes
+
+Need to roll back? Use the `snapshot-2025-11-11-chat-auth` tag or the backup at `~/Backups/WIMD-Railway-Deploy-Project_2025-11-11/`.
 
 ═══════════════════════════════════════════════════════════════

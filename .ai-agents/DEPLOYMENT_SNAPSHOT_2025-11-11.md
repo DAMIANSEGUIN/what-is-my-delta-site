@@ -7,6 +7,12 @@
 
 ## Current Production State
 
+- **2025-11-12 Update — Chat session fix deployed**  
+  - Commit `f13cba45a39262fc902b7783fa3a4a3ce8548867` (“fix: route coach chat via callJson”) is live on Netlify deploy `6914a51661dc38f3e806ff02`.  
+  - `askCoach()` now uses `callJson()`, so `/wimd` requests carry the `X-Session-ID` header; chat no longer loops on Step 1.  
+  - Console capture (`scripts/capture_console.mjs`, 2025-11-12 15:21Z) confirms `[COACH] Using knowledge base match …` followed by API response, and PS101 assets load (`Loaded 607 career coaching prompts + 8 PS101 framework questions`).  
+  - Verification: `./scripts/verify_critical_features.sh`, Netlify wrapper checks, and live console capture all pass post-deploy.
+
 - **Frontend (Netlify)**  
   - Deploy ID `691219f373c0da2b0ac61b6f` (built from commit `c9900f3` and subsequent UI hardening) is live.  
   - Chat strip responds, login CTA renders and opens the auth modal. Verified manually morning of 11 Nov.  
