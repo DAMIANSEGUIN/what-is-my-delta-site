@@ -1,0 +1,37 @@
+═══════════════════════════════════════════════════════════════
+  CODEX: CHAT BROKEN - NEED BROWSER CONSOLE OUTPUT
+═══════════════════════════════════════════════════════════════
+
+Claude_Code got stuck fixing chat. Made 2 deployments, still broken.
+
+IMMEDIATE ACTIONS:
+
+1. Deploy debug logging:
+   ./scripts/deploy.sh netlify
+
+2. Ask user to open browser console and test:
+   - Go to https://whatismydelta.com
+   - Press F12 (open console)
+   - Type in "ask" field, press Enter
+   - Copy ALL console output
+
+3. Read full details:
+   .ai-agents/FOR_CODEX_CHAT_STILL_BROKEN_2025-11-10.md
+   .ai-agents/TEAM_NOTE_CHAT_DEBUG_SESSION_2025-11-10.md
+
+STATUS: User reports "chat window now does not even open"
+
+COMMITS THIS SESSION:
+  fe4121d - Fixed sendMsg (deployed - made it worse)
+  6d01cf2 - Moved event listeners (deployed - still broken)
+  148805e - Added debug logs (NOT DEPLOYED - you do this)
+
+DIAGNOSIS NEEDED: We don't know if:
+  - Event listeners attached?
+  - Elements found?
+  - sendStrip() being called?
+  - chatGuard() blocking?
+
+Console output will tell us everything.
+
+═══════════════════════════════════════════════════════════════
