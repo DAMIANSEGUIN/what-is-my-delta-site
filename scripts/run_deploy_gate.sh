@@ -40,20 +40,21 @@ CHECKS=(
   "Human reviewer notified (or queued) for user-facing changes"
 )
 
-typeset -A RESPONSES
+typeset -a RESPONSES
 echo "Step 2: Confirm manual gate checklist (answer yes / no / n/a)."
 echo ""
 
-for check in "${CHECKS[@]}"; do
+for idx in "${!CHECKS[@]}"; do
+  check="${CHECKS[$idx]}"
   while true; do
     printf "%s? [yes/no/n/a]: " "$check"
     read -r reply
     reply="${reply:l}"
     if [[ "$reply" == "yes" || "$reply" == "y" ]]; then
-      RESPONSES["$check"]="yes"
+      RESPONSES[$idx]="yes"
       break
     elif [[ "$reply" == "no" || "$reply" == "n" ]]; then
-      RESPONSES["$check"]="no"
+      RESPONSES[$idx]="no"
       {
         echo "[$TIMESTAMP] deploy_gate FAIL (manual:$check) actor=$ACTOR"
       } >> "$LOG_FILE"
@@ -61,7 +62,7 @@ for check in "${CHECKS[@]}"; do
       echo "❌ Deployment gate aborted - '$check' not confirmed."
       exit 1
     elif [[ "$reply" == "n/a" || "$reply" == "na" ]]; then
-      RESPONSES["$check"]="n/a"
+      RESPONSES[$idx]="n/a"
       break
     else
       echo "Please respond with yes, no, or n/a."
@@ -76,8 +77,9 @@ echo ""
 {
   echo "[$TIMESTAMP] deploy_gate PASS actor=$ACTOR"
   echo "  automated=pass"
-  for check in "${CHECKS[@]}"; do
-    response="${RESPONSES[$check]-unset}"
+  for idx in "${!CHECKS[@]}"; do
+    check="${CHECKS[$idx]}"
+    response="${RESPONSES[$idx]-unset}"
     echo "  ${check} => ${response}"
   done
 } >> "$LOG_FILE"
