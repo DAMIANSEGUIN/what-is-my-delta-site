@@ -4071,11 +4071,17 @@ async function askCoach(prompt) {
 
       // Step-specific validation (only for first prompt of step 1)
       if (step.step === 1 && promptIndex === 0) {
-        // Step 1, prompt 1 - need at least 2 sentences
-        const sentences = answer.split(/[.!?]+/).filter(s => s.trim().length > 0);
+        // Encourage richer detail but allow newline-separated thoughts
+        const sentences = answer
+          .split(/[.!?\n]+/)
+          .map(s => s.trim())
+          .filter(Boolean);
         if (sentences.length < 2) {
-          alert('Please provide at least 2 sentences describing your situation.');
-          return false;
+          const proceed = confirm('We recommend at least two thoughts here. Continue anyway?');
+          if (!proceed) {
+            textarea.focus();
+            return false;
+          }
         }
       }
 
