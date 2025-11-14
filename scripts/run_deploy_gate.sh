@@ -44,7 +44,7 @@ typeset -a RESPONSES
 echo "Step 2: Confirm manual gate checklist (answer yes / no / n/a)."
 echo ""
 
-for idx in "${!CHECKS[@]}"; do
+for idx in {1..${#CHECKS[@]}}; do
   check="${CHECKS[$idx]}"
   while true; do
     printf "%s? [yes/no/n/a]: " "$check"
@@ -77,7 +77,7 @@ echo ""
 {
   echo "[$TIMESTAMP] deploy_gate PASS actor=$ACTOR"
   echo "  automated=pass"
-  for idx in "${!CHECKS[@]}"; do
+  for idx in {1..${#CHECKS[@]}}; do
     check="${CHECKS[$idx]}"
     response="${RESPONSES[$idx]-unset}"
     echo "  ${check} => ${response}"
