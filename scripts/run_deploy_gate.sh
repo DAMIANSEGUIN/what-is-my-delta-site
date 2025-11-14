@@ -77,7 +77,8 @@ echo ""
   echo "[$TIMESTAMP] deploy_gate PASS actor=$ACTOR"
   echo "  automated=pass"
   for check in "${CHECKS[@]}"; do
-    echo "  ${check} => ${RESPONSES[$check]}"
+    response="${RESPONSES[$check]-unset}"
+    echo "  ${check} => ${response}"
   done
 } >> "$LOG_FILE"
 
