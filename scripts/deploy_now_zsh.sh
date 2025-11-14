@@ -20,15 +20,28 @@ git add docs/PS101_Mosaic_Deployment_Guardrails_2025-11-04.md \
 echo "📝 Committing..."
 git commit -m "PS101 Mosaic: trial-mode init, guardrails doc, verify script, base/publish=mosaic_ui" || echo "ℹ️  No changes to commit"
 
+# Deployment gate
+echo ""
+echo "🛡️  Enforcing deployment gate..."
+./scripts/run_deploy_gate.sh
+
 # Push
 echo "📤 Pushing to origin main..."
 git push origin main
 
 # Deploy to Netlify
 echo "🌐 Deploying to Netlify production..."
-netlify deploy --prod --site bb594f69-4d23-4817-b7de-dadb8b4db874 --dir mosaic_ui
+NETLIFY_SITE_ID="bb594f69-4d23-4817-b7de-dadb8b4db874" NETLIFY_DEPLOY_DIR="mosaic_ui" ./scripts/deploy_frontend_netlify.sh
+
+# Post-deploy verification
+echo ""
+echo "🔎 Running live deployment verification..."
+if ! ./scripts/verify_live_deployment.sh; then
+  echo ""
+  echo "❌ Live verification failed. Investigate immediately."
+  exit 1
+fi
 
 echo ""
 echo "✅ Deploy complete!"
-
 

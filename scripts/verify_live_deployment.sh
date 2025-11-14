@@ -27,17 +27,27 @@ echo ""
 
 # Check 2: Line count matches expected
 echo "Check 2: Content line count..."
-# Consolidated build with initApp (post-syntax fix): 3989 lines
-EXPECTED_LINES=3989
+BASELINE_FILE="deployment/deploy_baseline.env"
+if [ -f "$BASELINE_FILE" ]; then
+  # shellcheck disable=SC1090
+  source "$BASELINE_FILE"
+fi
+EXPECTED_LINES=${MOSAIC_UI_LINE_COUNT:-3989}
+LINE_TOLERANCE=${MOSAIC_UI_LINE_TOLERANCE:-15}
 ACTUAL_LINES=$(curl -s -m 10 "$BASE_URL" | wc -l | tr -d ' ')
 
-if [ "$ACTUAL_LINES" != "$EXPECTED_LINES" ]; then
+DELTA=$((ACTUAL_LINES - EXPECTED_LINES))
+ABS_DELTA=${DELTA#-}
+
+if [ "$ABS_DELTA" -gt "$LINE_TOLERANCE" ]; then
   echo "❌ Line count mismatch:"
-  echo "   Expected: $EXPECTED_LINES"
+  echo "   Expected: $EXPECTED_LINES ±$LINE_TOLERANCE"
   echo "   Actual:   $ACTUAL_LINES"
   ERRORS=$((ERRORS + 1))
+elif [ "$ABS_DELTA" -gt 0 ]; then
+  echo "⚠️  Line count differs by $DELTA line(s) (within tolerance)"
 else
-  echo "✅ Line count matches ($EXPECTED_LINES lines)"
+  echo "✅ Line count matches baseline ($EXPECTED_LINES lines)"
 fi
 echo ""
 

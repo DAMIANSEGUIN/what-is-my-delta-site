@@ -54,17 +54,26 @@ echo ""
 echo "Step 4: Content verification..."
 if [ -f "mosaic_ui/index.html" ]; then
   ACTUAL_LINES=$(wc -l mosaic_ui/index.html | awk '{print $1}')
-  # Consolidated build with initApp + auth button: 3989 lines (commit 3acab1d + auth button fix)
-  EXPECTED_LINES=3989
+  BASELINE_FILE="deployment/deploy_baseline.env"
+  if [ -f "$BASELINE_FILE" ]; then
+    # shellcheck disable=SC1090
+    source "$BASELINE_FILE"
+  fi
+  EXPECTED_LINES=${MOSAIC_UI_LINE_COUNT:-3989}
+  LINE_TOLERANCE=${MOSAIC_UI_LINE_TOLERANCE:-15}
+  DELTA=$((ACTUAL_LINES - EXPECTED_LINES))
+  ABS_DELTA=${DELTA#-}
 
-  if [ "$ACTUAL_LINES" != "$EXPECTED_LINES" ]; then
-    echo "⚠️  Warning: Line count mismatch"
-    echo "   Expected: $EXPECTED_LINES"
+  if [ "$ABS_DELTA" -gt "$LINE_TOLERANCE" ]; then
+    echo "❌ Content line count outside expected bounds"
+    echo "   Expected: $EXPECTED_LINES ±$LINE_TOLERANCE"
     echo "   Actual:   $ACTUAL_LINES"
-    echo "   This may indicate missing content"
-    # Don't fail on this - just warn
+    echo "   Update deployment/deploy_baseline.env if the change is intentional."
+    ERRORS=$((ERRORS + 1))
+  elif [ "$ABS_DELTA" -gt 0 ]; then
+    echo "⚠️  Line count differs by $DELTA line(s) (within tolerance)"
   else
-    echo "✅ Content line count matches expected ($EXPECTED_LINES lines)"
+    echo "✅ Content line count within expected bounds ($EXPECTED_LINES lines)"
   fi
 
   # Check for critical features in content
