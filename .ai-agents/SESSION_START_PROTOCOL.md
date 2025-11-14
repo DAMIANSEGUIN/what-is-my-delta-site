@@ -66,6 +66,10 @@ ls -t .ai-agents/handoff_*.json | head -1
   ```bash
   echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Session start: [AGENT_NAME]" >> .ai-agents/session_log.txt
   ```
+- Review `deploy_logs/RELEASE_LOG.md` (latest entry) and note the active `prod-YYYY-MM-DD` tag.
+- Verify a current backup exists before you touch files:
+  - If no `/backups/site-backup_<today>.zip` exists, run `scripts/archive_current_site.sh`.
+  - Log the backup filename/path in your first session message.
 
 ## Step 4: Review Recent Activity
 
