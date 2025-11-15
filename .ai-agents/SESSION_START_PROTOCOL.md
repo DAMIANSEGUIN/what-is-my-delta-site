@@ -5,6 +5,11 @@
 > Codex Reset Protocol → When invoked, re-run Steps 1–5 below.  
 > Restate Present State → Desired Outcome, and re-log the session.
 
+> **Current production references (2025-11-14T22:50Z):**  
+> • Active prod tag: `prod-2025-11-12` @ commit `0da8694baf6f0662a9a0a4cddc7207d8ab8aebaa`  
+> • Latest site snapshot: `backups/site-backup_20251114_224001Z.zip` (full Mosaic bundle)  
+> • Release log to review: `deploy_logs/2025-11-14_prod-2025-11-12.md`
+
 ## Step 1: Identify Yourself (FIRST MESSAGE)
 
 ```
