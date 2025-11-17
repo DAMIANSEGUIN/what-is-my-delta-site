@@ -10,6 +10,44 @@ echo ""
 
 ERRORS=0
 
+# Step 0: CRITICAL - Verify recent backup exists (within 1 hour)
+echo "Step 0: Backup verification (rollback protection)..."
+ONE_HOUR_AGO=$(date -u -v-1H +%Y%m%d_%H%M%SZ 2>/dev/null || date -u -d '1 hour ago' +%Y%m%d_%H%M%SZ 2>/dev/null)
+BACKUP_FOUND=0
+
+if [ -d "backups" ]; then
+  # Find backups from the last hour
+  while IFS= read -r backup; do
+    BACKUP_TIME=$(basename "$backup" | sed 's/site-backup_//' | sed 's/.zip//')
+    if [[ "$BACKUP_TIME" > "$ONE_HOUR_AGO" ]]; then
+      LATEST_BACKUP="$backup"
+      BACKUP_FOUND=1
+      break
+    fi
+  done < <(ls -t backups/site-backup_*.zip 2>/dev/null || true)
+fi
+
+if [ $BACKUP_FOUND -eq 0 ]; then
+  echo "❌ NO RECENT BACKUP FOUND (required within last hour)"
+  echo ""
+  echo "CRITICAL: Create backup before deployment for rollback capability"
+  echo ""
+  echo "Run: ./scripts/create_site_backup.sh"
+  echo ""
+  echo "Why this matters:"
+  echo "  - Provides rollback point if deployment fails"
+  echo "  - Preserves working state before changes"
+  echo "  - Required by deployment safety protocol"
+  echo ""
+  ERRORS=$((ERRORS + 1))
+else
+  BACKUP_SIZE=$(ls -lh "$LATEST_BACKUP" | awk '{print $5}')
+  BACKUP_AGE=$(basename "$LATEST_BACKUP" | sed 's/site-backup_//' | sed 's/.zip//')
+  echo "✅ Recent backup found: $(basename $LATEST_BACKUP) ($BACKUP_SIZE)"
+  echo "   Created: $BACKUP_AGE"
+fi
+echo ""
+
 # Step 1: Run existing predeploy sanity checks
 echo "Step 1: Pre-deployment sanity checks..."
 if [ -f "./scripts/predeploy_sanity.sh" ]; then

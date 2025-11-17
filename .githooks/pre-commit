@@ -5,6 +5,15 @@
 
 set -e
 
+# Session Start Protocol Reminder (2.C - automated reminder, non-blocking)
+HANDOFF_COUNT=$(ls -1 .ai-agents/handoff_*.json 2>/dev/null | wc -l | tr -d ' ')
+if [ "$HANDOFF_COUNT" -eq 0 ]; then
+  echo "ℹ️  REMINDER: No handoff manifests found"
+  echo "   This may be a fresh session - have you run session start protocol?"
+  echo "   See: .ai-agents/SESSION_START_PROTOCOL.md"
+  echo ""
+fi
+
 echo "🔍 Running pre-commit quality checks..."
 
 # Track if any checks fail

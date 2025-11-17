@@ -57,3 +57,49 @@ fi
 ) &
 
 log_info "Started background sync to Google Drive (monitor /tmp/gdrive-sync.log)"
+
+# Auto-create handoff manifest for session continuity (3.A requirement)
+TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)
+HANDOFF_FILE=".ai-agents/handoff_$TIMESTAMP.json"
+COMMIT_HASH=$(git rev-parse HEAD)
+COMMIT_MSG=$(git log -1 --pretty=%B | head -1)
+BRANCH=$(git branch --show-current)
+LATEST_BACKUP=$(ls -t backups/site-backup_*.zip 2>/dev/null | head -1 || echo "none")
+
+# Check critical features
+AUTH_PRESENT=$(grep -c "authModal" mosaic_ui/index.html 2>/dev/null || echo "0")
+PS101_PRESENT=$(grep -c "PS101State" mosaic_ui/index.html 2>/dev/null || echo "0")
+
+# Create handoff manifest
+cat > "$HANDOFF_FILE" <<EOF
+{
+  "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "commit": "$COMMIT_HASH",
+  "commit_message": "$(echo "$COMMIT_MSG" | sed 's/"/\\"/g')",
+  "branch": "$BRANCH",
+  "latest_backup": "$(basename "$LATEST_BACKUP")",
+  "critical_features": {
+    "auth_present": $([ "$AUTH_PRESENT" -gt 0 ] && echo "true" || echo "false"),
+    "ps101_present": $([ "$PS101_PRESENT" -gt 0 ] && echo "true" || echo "false")
+  },
+  "session_continuity": {
+    "last_5_commits": [
+$(git log -5 --pretty=format:'      "%h: %s"' | sed '$ ! s/$/,/')
+    ],
+    "modified_files": [
+$(git diff-tree --no-commit-id --name-only -r HEAD | sed 's/^/      "/' | sed 's/$/"/' | sed '$ ! s/$/,/')
+    ]
+  },
+  "next_agent_checklist": [
+    "Review this handoff manifest",
+    "Verify backup exists: $LATEST_BACKUP",
+    "Run: ./scripts/verify_critical_features.sh",
+    "Check git log for recent changes",
+    "Read .ai-agents/SESSION_START_PROTOCOL.md"
+  ]
+}
+EOF
+
+echo "[HANDOFF] Created: $HANDOFF_FILE"
+echo "[HANDOFF] Commit: $COMMIT_HASH"
+echo "[HANDOFF] Backup: $(basename "$LATEST_BACKUP")"
