@@ -33,7 +33,14 @@ fi
 # For production pushes, run verification first (unless bypass requested)
 if [[ "$REMOTE" == "railway-origin" ]]; then
   if [[ "${SKIP_VERIFICATION:-false}" == "true" ]]; then
+    if [[ -z "${BYPASS_REASON:-}" ]]; then
+      echo "❌ BYPASS_REASON is required when SKIP_VERIFICATION=true"
+      echo "   Example: BYPASS_REASON=\"Hotfix - production outage\" SKIP_VERIFICATION=true ./scripts/push.sh $REMOTE $BRANCH"
+      exit 1
+    fi
+
     echo "⚠️  Emergency bypass requested - skipping local verification"
+    echo "    Reason: $BYPASS_REASON"
     echo "    (pre-push hook will log the bypass)"
     echo ""
   else
@@ -46,7 +53,7 @@ if [[ "$REMOTE" == "railway-origin" ]]; then
       echo ""
       echo "Options:"
       echo "1. Fix issues and re-run: ./scripts/push.sh $REMOTE $BRANCH"
-      echo "2. Emergency bypass: SKIP_VERIFICATION=true ./scripts/push.sh $REMOTE $BRANCH"
+      echo "2. Emergency bypass: BYPASS_REASON=\"<reason>\" SKIP_VERIFICATION=true ./scripts/push.sh $REMOTE $BRANCH"
       exit 1
     fi
 

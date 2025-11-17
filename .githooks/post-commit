@@ -1,0 +1,59 @@
+#!/bin/bash
+# Auto-sync to GDrive after every commit
+# Tracked hook so agents keep automation active when core.hooksPath=.githooks
+
+set -euo pipefail
+
+PROJECT_DIR_DEFAULT="/Users/damianseguin/Downloads/WIMD-Railway-Deploy-Project"
+GDRIVE_PATH_DEFAULT="gdrive:WIMD-Railway-Deploy-Project"
+RCLONE_DEFAULT="/Users/damianseguin/coachvox_tools/bin/rclone"
+
+# Allow overrides so other operators can customize paths without editing hook
+PROJECT_DIR="${GDRIVE_PROJECT_DIR:-$PROJECT_DIR_DEFAULT}"
+GDRIVE_PATH="${GDRIVE_SYNC_REMOTE:-$GDRIVE_PATH_DEFAULT}"
+RCLONE_BIN="${GDRIVE_RCLONE_BIN:-$RCLONE_DEFAULT}"
+
+log_info() {
+  echo "[GDRIVE-SYNC] $1"
+}
+
+if [[ ! -x "$RCLONE_BIN" ]]; then
+  log_info "Skipping sync (rclone not found at $RCLONE_BIN). Set GDRIVE_RCLONE_BIN to override."
+  exit 0
+fi
+
+if [[ ! -d "$PROJECT_DIR" ]]; then
+  log_info "Skipping sync (project dir $PROJECT_DIR missing). Set GDRIVE_PROJECT_DIR to override."
+  exit 0
+fi
+
+if [[ -z "$GDRIVE_PATH" ]]; then
+  log_info "Skipping sync (no remote configured). Set GDRIVE_SYNC_REMOTE to continue."
+  exit 0
+fi
+
+# Run sync in background to avoid blocking git workflow
+(
+  "$RCLONE_BIN" sync "$PROJECT_DIR" "$GDRIVE_PATH" \
+    --exclude ".git/**" \
+    --exclude "node_modules/**" \
+    --exclude "venv/**" \
+    --exclude ".venv/**" \
+    --exclude ".test-venv/**" \
+    --exclude ".claude-run/**" \
+    --exclude "__pycache__/**" \
+    --exclude "*.pyc" \
+    --exclude ".DS_Store" \
+    --exclude "*.log" \
+    --fast-list \
+    --transfers 4 \
+    > /tmp/gdrive-sync.log 2>&1
+
+  if [[ $? -eq 0 ]]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ GDrive sync complete" >> /tmp/gdrive-sync.log
+  else
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ GDrive sync failed" >> /tmp/gdrive-sync.log
+  fi
+) &
+
+log_info "Started background sync to Google Drive (monitor /tmp/gdrive-sync.log)"

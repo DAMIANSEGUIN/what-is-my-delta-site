@@ -1,0 +1,124 @@
+#!/bin/bash
+# Mosaic Platform Pre-Commit Hook
+# Enforces code quality patterns from TROUBLESHOOTING_CHECKLIST.md
+# Auto-blocks commits that violate critical patterns
+
+set -e
+
+echo "🔍 Running pre-commit quality checks..."
+
+# Track if any checks fail
+FAILED=0
+
+# Check 1: Context Manager Pattern Violation
+echo "  □ Checking context manager pattern..."
+if grep -rn "conn = get_conn()" api/*.py 2>/dev/null | grep -v "# OK:" | grep -v ".pyc"; then
+    echo "❌ BLOCKED: Context manager violation detected"
+    echo "   Found: conn = get_conn()"
+    echo "   Required: with get_conn() as conn:"
+    echo "   See: TROUBLESHOOTING_CHECKLIST.md line 62"
+    FAILED=1
+fi
+
+# Check 2: SQLite Syntax in PostgreSQL Code
+echo "  □ Checking PostgreSQL syntax..."
+if grep -rn '\.execute.*".*\?.*"' api/storage.py 2>/dev/null | grep -v "# OK:" | grep -v ".pyc"; then
+    echo "❌ BLOCKED: SQLite syntax detected in PostgreSQL code"
+    echo "   Found: execute(...\"...?...\"...)"
+    echo "   Required: Use %s placeholders for PostgreSQL"
+    echo "   See: TROUBLESHOOTING_CHECKLIST.md line 63"
+    FAILED=1
+fi
+
+# Check 3: Silent Exception Swallowing
+# Only check new/modified files, skip legacy code
+echo "  □ Checking error handling..."
+if grep -rn "except:$" api/conversational_coach.py api/ps101_flow.py 2>/dev/null | grep -v "# OK:" | grep -v ".pyc"; then
+    echo "❌ BLOCKED: Silent exception swallowing detected in new code"
+    echo "   Found: except: (bare except clause)"
+    echo "   Required: except SpecificException as e: + logging"
+    echo "   See: TROUBLESHOOTING_CHECKLIST.md line 68"
+    FAILED=1
+fi
+
+# Check 4: Direct cursor.execute() without getting cursor first
+# Only check storage.py (primary DB layer), skip SQLite backup and analytics
+echo "  □ Checking cursor pattern..."
+if grep -rn "conn\.execute(" api/storage.py api/index.py api/conversational_coach.py api/ps101_flow.py 2>/dev/null | grep -v "# OK:" | grep -v ".pyc" | grep -v "PRAGMA"; then
+    echo "❌ BLOCKED: Direct conn.execute() detected in primary files"
+    echo "   Found: conn.execute(...)"
+    echo "   Required: cursor = conn.cursor(); cursor.execute(...)"
+    echo "   See: TROUBLESHOOTING_CHECKLIST.md line 64"
+    FAILED=1
+fi
+
+# Check 5: AUTOINCREMENT in PostgreSQL schema
+echo "  □ Checking schema patterns..."
+if grep -rn "AUTOINCREMENT" api/storage.py 2>/dev/null | grep -v "# OK:" | grep -v ".pyc"; then
+    echo "❌ BLOCKED: SQLite AUTOINCREMENT in PostgreSQL schema"
+    echo "   Found: AUTOINCREMENT"
+    echo "   Required: SERIAL PRIMARY KEY"
+    echo "   See: TROUBLESHOOTING_CHECKLIST.md line 63"
+    FAILED=1
+fi
+
+# If any check failed, block the commit
+if [ $FAILED -eq 1 ]; then
+    echo ""
+    echo "🚫 COMMIT BLOCKED - Fix the issues above before committing"
+    echo "   Review: TROUBLESHOOTING_CHECKLIST.md"
+    echo "   Review: SELF_DIAGNOSTIC_FRAMEWORK.md"
+    exit 1
+fi
+
+# Check 6: Critical Frontend Feature Removal
+echo "  □ Checking critical frontend features..."
+CRITICAL_FILES="frontend/index.html mosaic_ui/index.html"
+FEATURE_REMOVED=0
+
+for file in $CRITICAL_FILES; do
+  if git diff --cached --name-only | grep -q "^$file$"; then
+    # Check if auth being removed
+    AUTH_BEFORE=$(git show HEAD:"$file" 2>/dev/null | grep -c "authModal\|loginForm" || echo 0)
+    AUTH_STAGED=$(cat "$file" 2>/dev/null | grep -c "authModal\|loginForm" || echo 0)
+
+    if [[ $AUTH_BEFORE -gt 0 ]] && [[ $AUTH_STAGED -eq 0 ]]; then
+      echo "❌ BLOCKED: Authentication removed from $file"
+      echo "   References before: $AUTH_BEFORE"
+      echo "   References after:  $AUTH_STAGED"
+      FEATURE_REMOVED=1
+      FAILED=1
+    fi
+
+    # Check if PS101 being removed
+    PS101_BEFORE=$(git show HEAD:"$file" 2>/dev/null | grep -c "PS101State" || echo 0)
+    PS101_STAGED=$(cat "$file" 2>/dev/null | grep -c "PS101State" || echo 0)
+
+    if [[ $PS101_BEFORE -gt 0 ]] && [[ $PS101_STAGED -eq 0 ]]; then
+      echo "❌ BLOCKED: PS101 flow removed from $file"
+      echo "   References before: $PS101_BEFORE"
+      echo "   References after:  $PS101_STAGED"
+      FEATURE_REMOVED=1
+      FAILED=1
+    fi
+  fi
+done
+
+if [ $FEATURE_REMOVED -eq 1 ]; then
+  echo ""
+  echo "🚨 CRITICAL FEATURE REMOVAL DETECTED"
+  echo "   To restore: ./scripts/verify_critical_features.sh"
+  echo "   Override (if approved): Add [BREAK-FEATURE-APPROVED] to commit message"
+fi
+
+# If any check failed, block the commit
+if [ $FAILED -eq 1 ]; then
+    echo ""
+    echo "🚫 COMMIT BLOCKED - Fix the issues above before committing"
+    echo "   Review: TROUBLESHOOTING_CHECKLIST.md"
+    echo "   Review: SELF_DIAGNOSTIC_FRAMEWORK.md"
+    exit 1
+fi
+
+echo "✅ All pre-commit checks passed"
+exit 0

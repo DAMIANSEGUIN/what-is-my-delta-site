@@ -35,3 +35,4 @@ build/
 mosaic_ui/assets/
 mosaic_ui/data/
 mosaic_ui/src/
+.netlify_fake_home/
