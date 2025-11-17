@@ -36,3 +36,7 @@ mosaic_ui/assets/
 mosaic_ui/data/
 mosaic_ui/src/
 .netlify_fake_home/
+
+# Generated artifacts (created automatically by hooks)
+.ai-agents/handoff_*.json
+backups/site-backup_*.zip
