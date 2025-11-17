@@ -134,6 +134,14 @@ Current critical features confirmed:
    - Use `./scripts/deploy.sh netlify` instead of `netlify deploy --prod`
    - Use `./scripts/deploy.sh railway` to deploy backend
    - Use `./scripts/deploy.sh all` to deploy both frontend and backend
+10. ✅ **NEVER declare issues "fixed" or "resolved" without USER CONFIRMATION:**
+   - Git commits saying "fix" ≠ issue is resolved
+   - Code changes ≠ feature working
+   - No errors in logs ≠ user-facing feature working
+   - **ONLY the human operator can confirm features work in production**
+   - Before archiving investigation files, get explicit user approval
+   - Before closing issues, wait for user testing confirmation
+   - **Rule:** "Fixed" means user verified, not AI assumed
 
 **If I fail to follow these rules:**
 - Pre-commit hook will BLOCK the commit
