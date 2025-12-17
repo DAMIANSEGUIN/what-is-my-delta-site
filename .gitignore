@@ -1,37 +1,32 @@
+# Local Netlify folder
+# Logs
+# Netlify CLI state
+# app data
 # env & secrets
+# node (if present)
+# runtime
+*.key
+*.log
+*.p8
+*.pem
+*.pyc
+.DS_Store
+.claude-run/
 .env
 .env.*
-*.key
-*.pem
-*.p8
-
-# runtime
-__pycache__/
-*.pyc
-.venv/
-.test-venv/
 .envrc
-.DS_Store
-
-# app data
-data/prompts_registry.json
-
-# node (if present)
-node_modules/
-.next/
-dist/
-build/
-
-# Local Netlify folder
 .netlify
-
-# Netlify CLI state
 .netlify_site_id
-
-# Logs
-*.log
-.claude-run/
+.next/
+.test-venv/
+.venv/
 .verification_audit.log
+__pycache__/
+build/
+data/prompts_registry.json
+dist/
 mosaic_ui/assets/
 mosaic_ui/data/
 mosaic_ui/src/
+node_modules/
+out/
