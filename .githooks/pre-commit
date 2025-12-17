@@ -1,0 +1,5 @@
+#!/bin/zsh
+set -euo pipefail
+ENFORCER="$HOME/mosaic_enforcer/mosaic_enforcer.sh"
+if [[ ! -x "$ENFORCER" ]]; then echo "Mosaic enforcer missing or not executable: $ENFORCER" >&2; exit 1; fi
+"$ENFORCER"
