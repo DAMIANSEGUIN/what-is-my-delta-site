@@ -30,3 +30,9 @@ mosaic_ui/data/
 mosaic_ui/src/
 node_modules/
 out/
+
+# === CANONICAL RUNTIME EXCLUSIONS ===
+.claude-run/
+**/site-packages/
+**/__pycache__/
+*.log
