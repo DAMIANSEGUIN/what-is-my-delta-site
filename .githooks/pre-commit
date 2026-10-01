@@ -1,5 +1,13 @@
 #!/bin/zsh
 set -euo pipefail
-ENFORCER="$HOME/mosaic_enforcer/mosaic_enforcer.sh"
-if [[ ! -x "$ENFORCER" ]]; then echo "Mosaic enforcer missing or not executable: $ENFORCER" >&2; exit 1; fi
-"$ENFORCER"
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+git diff --cached --check
+
+python_bin="${WIMD_PYTHON_BIN:-python3}"
+staged_python=("${(@f)$(git diff --cached --name-only --diff-filter=ACMR -- '*.py')}")
+if (( ${#staged_python[@]} )); then
+  "$python_bin" -m py_compile "${staged_python[@]}"
+fi

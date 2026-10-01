@@ -14,6 +14,7 @@ from psycopg2.extras import RealDictCursor
 DATABASE_URL = os.getenv("DATABASE_URL")
 DATA_ROOT = Path(os.getenv("DATA_ROOT", "data"))
 UPLOAD_ROOT = Path(os.getenv("UPLOAD_ROOT", DATA_ROOT / "uploads"))
+DB_PATH = Path(os.getenv("DATABASE_PATH", DATA_ROOT / "mosaic.db"))
 SESSION_TTL_DAYS = int(os.getenv("SESSION_TTL_DAYS", "30"))
 
 UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
@@ -30,6 +31,34 @@ if DATABASE_URL:
         print(f"[STORAGE] Falling back to SQLite")
 else:
     print(f"[STORAGE] DATABASE_URL not set, using SQLite")
+
+
+class _SQLiteCursorProxy:
+    def __init__(self, cursor):
+        self._cursor = cursor
+
+    def execute(self, statement, parameters=()):
+        return self._cursor.execute(statement.replace("%s", "?"), parameters)
+
+    def executemany(self, statement, parameters):
+        return self._cursor.executemany(statement.replace("%s", "?"), parameters)
+
+    def __getattr__(self, name):
+        return getattr(self._cursor, name)
+
+
+class _SQLiteConnectionProxy:
+    def __init__(self, connection):
+        self._connection = connection
+
+    def cursor(self, *args, **kwargs):
+        return _SQLiteCursorProxy(self._connection.cursor())
+
+    def execute(self, statement, parameters=()):
+        return self._connection.execute(statement.replace("%s", "?"), parameters)
+
+    def __getattr__(self, name):
+        return getattr(self._connection, name)
 
 
 def _json_dump(data: Any) -> str:
@@ -63,13 +92,12 @@ def get_conn():
             connection_pool.putconn(conn)
     else:
         import sqlite3
-        DB_PATH = Path(os.getenv("DATABASE_PATH", DATA_ROOT / "mosaic.db"))
         DB_PATH.parent.mkdir(parents=True, exist_ok=True)
         conn = sqlite3.connect(DB_PATH)
         try:
             conn.row_factory = sqlite3.Row
             conn.execute("PRAGMA foreign_keys = ON")
-            yield conn
+            yield _SQLiteConnectionProxy(conn)
             conn.commit()
         finally:
             conn.close()
@@ -113,6 +141,22 @@ def init_db() -> None:
                 response TEXT,
                 analysis_data TEXT,
                 metrics TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+            )
+            """
+        )
+
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS diagnostic_results (
+                id TEXT PRIMARY KEY,
+                session_id TEXT,
+                schema_version TEXT NOT NULL,
+                responses TEXT NOT NULL,
+                areas TEXT NOT NULL,
+                path TEXT NOT NULL,
+                written_review TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
             )
@@ -265,6 +309,30 @@ def latest_metrics(session_id: str) -> Optional[Dict[str, Any]]:
         parsed = _json_load(row["metrics"])
         return parsed if isinstance(parsed, dict) else None
     return None
+
+
+def record_diagnostic_result(
+    session_id: Optional[str],
+    schema_version: str,
+    responses: Dict[str, Any],
+    areas: Dict[str, Any],
+    path: List[Dict[str, Any]],
+    written_review: Optional[Dict[str, Any]] = None,
+) -> str:
+    """Persist an immutable diagnostic attempt for later calibration."""
+    result_id = uuid.uuid4().hex
+    with get_conn() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO diagnostic_results
+                (id, session_id, schema_version, responses, areas, path, written_review)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (result_id, session_id, schema_version, _json_dump(responses),
+             _json_dump(areas), _json_dump(path), _json_dump(written_review) if written_review else None),
+        )
+    return result_id
 
 
 def wimd_history(session_id: str, limit: int = 25) -> List[Dict[str, Any]]:
@@ -477,16 +545,23 @@ def cleanup_expired_sessions() -> None:
         cursor.execute("SELECT id FROM sessions WHERE expires_at <= %s", (cutoff,))
         expired_ids = [row['id'] for row in cursor.fetchall()]
         if expired_ids:
+            if connection_pool:
+                membership_clause = "= ANY(%s)"
+                membership_params = (expired_ids,)
+            else:
+                placeholders = ",".join(["%s"] * len(expired_ids))
+                membership_clause = f"IN ({placeholders})"
+                membership_params = tuple(expired_ids)
             cursor.execute(
-                "SELECT file_path FROM file_uploads WHERE session_id = ANY(%s)",
-                (expired_ids,)
+                f"SELECT file_path FROM file_uploads WHERE session_id {membership_clause}",
+                membership_params,
             )
             file_rows = cursor.fetchall()
-            cursor.execute("DELETE FROM file_uploads WHERE session_id = ANY(%s)", (expired_ids,))
-            cursor.execute("DELETE FROM resume_versions WHERE session_id = ANY(%s)", (expired_ids,))
-            cursor.execute("DELETE FROM job_matches WHERE session_id = ANY(%s)", (expired_ids,))
-            cursor.execute("DELETE FROM wimd_outputs WHERE session_id = ANY(%s)", (expired_ids,))
-            cursor.execute("DELETE FROM sessions WHERE id = ANY(%s)", (expired_ids,))
+            cursor.execute(f"DELETE FROM file_uploads WHERE session_id {membership_clause}", membership_params)
+            cursor.execute(f"DELETE FROM resume_versions WHERE session_id {membership_clause}", membership_params)
+            cursor.execute(f"DELETE FROM job_matches WHERE session_id {membership_clause}", membership_params)
+            cursor.execute(f"DELETE FROM wimd_outputs WHERE session_id {membership_clause}", membership_params)
+            cursor.execute(f"DELETE FROM sessions WHERE id {membership_clause}", membership_params)
             for row in file_rows:
                 try:
                     path = Path(row['file_path'])

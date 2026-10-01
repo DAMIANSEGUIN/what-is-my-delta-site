@@ -519,6 +519,19 @@
         </button>
       </div>
 
+      <section class="diagnostic-card" id="ai-knowledge-diagnostic" aria-labelledby="diagnostic-title">
+        <h2 id="diagnostic-title">AI knowledge diagnostic</h2>
+        <p>Describe how you currently work with AI. Mosaic will save your answers and, when available, request a bounded Claude review.</p>
+      <textarea id="diagnostic-description" rows="4" placeholder="What do you use AI for, and where do you get stuck?"></textarea>
+      <label for="diagnostic-repo" style="display:block;margin-top:1rem;font-weight:600">Optionally assess a project folder</label>
+      <input id="diagnostic-repo" type="file" webkitdirectory directory multiple>
+        <div class="diagnostic-actions">
+          <button class="quiet" id="run-diagnostic" type="button">Run diagnostic</button>
+          <span id="diagnostic-status" role="status" aria-live="polite"></span>
+        </div>
+        <div id="diagnostic-result" class="hidden" aria-live="polite"></div>
+      </section>
+
       <div class="welcome-resume hidden" id="welcome-resume">
         <p class="resume-text">Already started? Your progress is saved.</p>
         <button class="quiet" id="continue-ps101">
@@ -1114,6 +1127,40 @@
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
   const API_BASE = 'https://what-is-my-delta-site-production.up.railway.app';
+
+  function renderDiagnosticReview(payload) {
+    const target = $('#diagnostic-result');
+    if (!target) return;
+    target.classList.remove('hidden');
+    if (!payload.review) { target.textContent = 'Diagnostic saved. Claude review is not available in this environment yet.'; return; }
+    const review = payload.review;
+    target.textContent = [review.summary || 'Review complete', review.evidence_summary?.length ? `Evidence: ${review.evidence_summary.join(' ')}` : '', review.gaps?.length ? `Gaps to explore: ${review.gaps.join(' ')}` : '', review.next_questions?.length ? `Next questions: ${review.next_questions.join(' ')}` : ''].filter(Boolean).join('\n\n');
+  }
+
+  async function runKnowledgeDiagnostic() {
+    const description = $('#diagnostic-description')?.value.trim();
+    const status = $('#diagnostic-status');
+    if (!description) { if (status) status.textContent = 'Describe your current AI use first.'; return; }
+    if (status) status.textContent = 'Saving diagnostic…';
+    try {
+      const files = [...($('#diagnostic-repo')?.files || [])];
+      const names = files.map(file => file.webkitRelativePath || file.name).filter(name => !/(^|\/)(node_modules|\.git|dist|build)(\/|$)/.test(name));
+      const evidenceFiles = files.filter(file => /(^|\/)(readme|architecture|adr|contributing|package\.json|pyproject\.toml|requirements\.txt|docker-compose|\.github\/)/i.test(file.webkitRelativePath || file.name)).slice(0, 8);
+      const sampleContents = await Promise.all(evidenceFiles.map(async file => ({path: file.webkitRelativePath || file.name, content: (await file.text()).slice(0, 2000)})));
+      const repoEvidence = files.length ? {file_count: files.length, included_file_count: names.length, sample_paths: names.slice(0, 160), sample_contents: sampleContents, signals: {tests: names.filter(n => /test|spec|pytest|jest/i.test(n)).length, docs: names.filter(n => /readme|docs|architecture|adr/i.test(n)).length, workflows: names.filter(n => /\.github\/|workflow|docker|compose/i.test(n)).length, source: names.filter(n => /\.(py|js|ts|tsx|go|rs|java|rb|php)$/i.test(n)).length}} : null;
+      const response = await fetch(`${API_BASE}/diagnostic/review`, {
+        method: 'POST', headers: {'Content-Type': 'application/json', ...(sessionId ? {'X-Session-Id': sessionId} : {})},
+        body: JSON.stringify({description, placement: {prompt: 0}, responses: {description}, repo_evidence: repoEvidence})
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const payload = await response.json();
+    if (status) status.textContent = payload.status === 'reviewed' ? 'Claude review complete.' : 'Diagnostic saved; review queued/fallback.';
+      renderDiagnosticReview(payload);
+    } catch (error) {
+      if (status) status.textContent = 'Unable to save diagnostic. Try again when the API is reachable.';
+      console.error('Diagnostic submission failed', error);
+    }
+  }
   
   // Authentication variables
   const SESSION_KEY = 'delta_session_id';
@@ -1227,6 +1274,7 @@ function findBestMatch(userInput) {
   
   // Initialize prompts on page load
   loadPrompts();
+  $('#run-diagnostic')?.addEventListener('click', runKnowledgeDiagnostic);
 
   // API Status Check with improved error handling
   async function checkAPI() {

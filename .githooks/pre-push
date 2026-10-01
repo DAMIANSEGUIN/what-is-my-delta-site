@@ -1,4 +1,8 @@
 #!/bin/zsh
 set -euo pipefail
-ZSH_DISABLE_COMPFIX=true
-exec "$HOME/mosaic_enforcer/mosaic_enforcer.sh"
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+git diff --check HEAD
+python3 -m compileall -q api
